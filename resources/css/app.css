@@ -1,0 +1,79 @@
+@import 'tailwindcss';
+
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Dancing+Script:wght@400;700&display=swap');
+@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
+@source '../../storage/framework/views/*.php';
+@source '../**/*.blade.php';
+@source '../**/*.js';
+
+@theme {
+
+    --font-sans: 'Poppins', ui-sans-serif, system-ui, sans-serif;
+    --font-dancing: "Dancing Script", cursive;
+
+    --color-brand-green: rgb(7, 46, 44);
+    --color-brand-gold: rgb(204, 180, 99);
+}
+@layer components {
+    .form-input-pill {
+        @apply w-full bg-white text-black rounded-xl px-4 py-2 outline-none focus:ring-2 focus:ring-brand-gold transition-all;
+    }
+    
+.form-label-bold {
+    @apply block text-white font-sans font-bold text-sm mb-1 tracking-wide m-1;
+}
+    .form-select-pill {
+    @apply w-full bg-white text-black rounded-xl px-4 py-2 outline-none focus:ring-2 focus:ring-brand-gold transition-all appearance-none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%236b7280'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 1rem center;
+    background-size: 1em;
+}
+.btn-gold {
+        @apply bg-brand-gold text-black font-bold py-2 px-4 rounded-xl 
+               hover:scale-105 transition-transform uppercase 
+              shadow-lg text-sm cursor-pointer;
+    }
+
+.btn-container-center {
+        @apply flex justify-center w-full mt-6;
+    }
+
+.btn-sidebar {
+
+        @apply flex items-center justify-start w-full py-4 px-6;
+        @apply text-white font-bold tracking-widest text-sm uppercase transition-all;
+        @apply hover:text-brand-gold;
+    }
+    .btn-sidebar.is-active .btn-sidebar-text {
+        @apply text-brand-gold;
+    }
+
+    .btn-sidebar-icon {
+        @apply w-8 flex justify-center mr-4;
+    }
+
+    .btn-sidebar-text {
+        @apply flex-1 text-left;
+    }
+    .btn-sidebar-sub {
+    @apply flex items-center gap-2 py-2 px-4 rounded-lg text-white font-medium transition-all duration-200 hover:text-brand-gold;
+}
+
+.btn-sidebar-sub.is-active {
+    @apply  text-brand-gold;
+}
+
+.select-filter{
+    @apply text-black bg-white py-1 rounded-xl;
+}
+}
+
+.btn-adduser{
+    @apply bg-brand-gold text-black rounded-lg font-sans p-2  hover:scale-105 transition-transform
+}
+
+.card {
+    @apply bg-brand-green text-white rounded-xl shadow-xl;
+}

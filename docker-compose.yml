@@ -1,0 +1,87 @@
+version: "3.3"
+
+services:
+  # --- SISTEMA CRM (Laravel) ---
+  app:
+    build: .
+    container_name: crm-app
+    restart: unless-stopped
+    volumes:
+      - ./:/var/www:delegated
+      - vendor:/var/www/vendor
+      - ./uploads.ini:/usr/local/etc/php/conf.d/uploads.ini
+    networks:
+      - crm-net
+    depends_on:
+      - crm-db
+
+  nginx:
+    image: nginx:alpine
+    container_name: crm-nginx
+    restart: unless-stopped
+    ports:
+      - "8000:80"
+    volumes:
+      - ./:/var/www
+      - ./docker-config/nginx:/etc/nginx/conf.d
+    networks:
+      - crm-net
+
+  crm-db:
+    image: postgres:15-alpine
+    container_name: crm-db
+    restart: always
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: pozicionate
+      POSTGRES_PASSWORD: pozicionate199620
+      POSTGRES_DB: posicionate_db
+    volumes:
+      - crm_pg_data:/var/lib/postgresql/data
+    networks:
+      - crm-net
+
+  crm-redis:
+    image: redis:alpine
+    container_name: crm-redis
+    restart: always
+    networks:
+      - crm-net
+
+  # --- MOTOR DE WHATSAPP (Evolution API) ---
+  evolution_api:
+    container_name: evolution_api
+    image: atendai/evolution-api:latest
+    restart: always
+    ports:
+      - "8081:8080"
+    volumes:
+      - evolution_instances:/evolution/instances
+    networks:
+      - crm-net
+    env_file:
+      - .env.evolution # <--- CREAREMOS ESTE ARCHIVO APARTE
+
+  evolution_db:
+    image: postgres:13
+    container_name: evolution_db
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: typebot
+      POSTGRES_DB: evolution_db
+    volumes:
+      - evolution_pg_data:/var/lib/postgresql/data
+    networks:
+      - crm-net
+
+networks:
+  crm-net:
+    driver: bridge
+
+volumes:
+  evolution_instances:
+  crm_pg_data:
+  evolution_pg_data:
+  vendor:

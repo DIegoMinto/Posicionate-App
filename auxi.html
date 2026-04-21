@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Estudio - Teoría de Sistemas (Capítulos 1 y 2)</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f4f7f6; color: #333; line-height: 1.6; padding: 20px; }
+        .container { max-width: 800px; margin: auto; background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+        h1 { text-align: center; color: #2c3e50; margin-bottom: 10px; }
+        
+        .chapter-selector { text-align: center; margin-bottom: 20px; padding: 15px; background: #ecf0f1; border-radius: 8px; }
+        select { padding: 10px; font-size: 1em; border-radius: 5px; border: 1px solid #bdc3c7; cursor: pointer; }
+
+        .tabs { display: flex; justify-content: center; margin-bottom: 25px; gap: 10px; }
+        .tab-btn { padding: 12px 25px; cursor: pointer; border: none; background: #bdc3c7; color: white; border-radius: 5px; font-weight: bold; transition: 0.3s; }
+        .tab-btn.active { background: #3498db; }
+        
+        .content { display: none; }
+        .content.active { display: block; }
+        
+        .question-card { margin-bottom: 25px; padding: 20px; border: 1px solid #e0e0e0; border-radius: 8px; background: #fafafa; }
+        .options-list { list-style: none; padding: 0; margin-top: 15px; }
+        .options-list li { margin-bottom: 10px; }
+        .option-btn { width: 100%; text-align: left; padding: 10px 15px; border: 2px solid #ddd; border-radius: 6px; background: white; cursor: pointer; transition: 0.2s; }
+        .option-btn:hover:not(:disabled) { border-color: #3498db; background: #ebf5fb; }
+        
+        .correct { background-color: #d4edda !important; border-color: #28a745 !important; color: #155724; }
+        .incorrect { background-color: #f8d7da !important; border-color: #dc3545 !important; color: #721c24; }
+        .feedback-text { margin-top: 10px; font-weight: bold; display: none; }
+        
+        .submit-btn { display: block; width: 100%; padding: 15px; background: #2ecc71; color: white; border: none; border-radius: 8px; font-size: 1.1em; font-weight: bold; cursor: pointer; margin-top: 20px; }
+        .results-box { display: none; margin-top: 30px; padding: 25px; border-radius: 10px; text-align: center; }
+        .score { font-size: 2em; font-weight: bold; color: #2c3e50; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>SIS308 - Teoría de Sistemas</h1>
+    
+    <div class="chapter-selector">
+        <label for="cap-select"><strong>Elegir Capítulo:</strong></label>
+        <select id="cap-select" onchange="changeChapter()">
+    <option value="1">Capítulo 1: Fundamentos de la Ciencia de Sistemas</option>
+    <option value="2">Capítulo 2: La Moral de Sistemas</option>
+    <option value="3">Capítulo 3: Características y Taxonomía</option>
+<option value="5">Capítulo 5: Modelos y Patrones de Pensamiento</option>
+ </select>
+    
+    </div>
+    
+    <div class="tabs">
+        <button id="btn-estudio" class="tab-btn active" onclick="showTab('estudio')">Modo Estudio</button>
+        <button id="btn-examen" class="tab-btn" onclick="showTab('examen')">Modo Examen</button>
+    </div>
+
+    <div id="estudio" class="content active">
+        <div id="estudio-questions"></div>
+    </div>
+
+    <div id="examen" class="content">
+        <div id="examen-questions"></div>
+        <button class="submit-btn" onclick="gradeExamen()">Finalizar Examen</button>
+        <div id="examen-results" class="results-box"></div>
+    </div>
+</div>
+
+<script>
+const baseDePreguntas = {
+    "1": [
+        { q: "¿Cuál es el dilema epistemológico fundamental?", options: ["Matemáticas vs Lógica", "Las partes o el todo", "Ciencia vs Religión", "Pasado vs Futuro"], correct: 1 },
+        { q: "¿Quiénes discutieron esto en la antigüedad?", options: ["Sócrates y Aristóteles", "Hesíodo y Platón", "Pitágoras", "Alexander Bogdanov"], correct: 1 },
+        { q: "¿A qué autor se le atribuye la 'Tectología'?", options: ["Bertalanffy", "Kant", "Alexander Bogdanov", "Comte"], correct: 2 },
+        { q: "¿Cuándo surge el interés interdisciplinario?", options: ["Rev. Industrial", "Renacimiento", "Poco antes de la II Guerra Mundial", "Siglo XXI"], correct: 2 },
+        { q: "¿Qué término describe las analogías de funcionamiento?", options: ["Entropía", "Isomorfismos", "Sinergia", "Recursividad"], correct: 1 },
+        { q: "¿De qué raíces griegas proviene 'Sistema'?", options: ["Synistanai y Synistêmi", "Logos y Techne", "Metron y Bios", "Physis y Nomos"], correct: 0 },
+        { q: "¿Qué significa 'Synistanai'?", options: ["Mantenerse juntos", "Reunir", "Dividir", "Analizar"], correct: 1 },
+        { q: "Según Hegel, ¿cuál es la relación?", options: ["Todo < Suma Partes", "Todo = Suma Partes", "Todo > Suma Partes", "No hay relación"], correct: 2 },
+        { q: "¿Atributo que indica que las propiedades se entienden por la interacción?", options: ["Entropía", "Recursividad", "Holismo o Totalidad", "Equifinalidad"], correct: 2 },
+        { q: "Principio: 'Ningún sistema es completo en sí mismo'", options: ["Subsidiaridad", "Interacción", "Determinismo", "Equifinalidad"], correct: 0 },
+        { q: "Principio: 'La actuación de un componente se difunde por todo el sistema'", options: ["Incertidumbre", "Pervasividad", "Determinismo", "Subsidiaridad"], correct: 1 },
+        { q: "¿Cómo se llama el proceso de salida que vuelve a entrar?", options: ["Sinergia", "Insumo", "Retroacción (Feedback)", "Adaptabilidad"], correct: 2 },
+        { q: "¿Qué define el 'Propósito' según el texto?", options: ["El sistema", "El contexto o ambiente", "El ingeniero", "Los componentes"], correct: 1 },
+        { q: "¿Qué asume el enfoque sobre la incertidumbre?", options: ["Que no existe", "Que es evitable", "Que es un factor ineludible", "Que es un error"], correct: 2 },
+        { q: "¿Qué son los parámetros?", options: ["Variables", "Constantes arbitrarias", "Salidas", "Límites físicos"], correct: 1 },
+        { q: "¿Quién propuso unificar todas las ciencias?", options: ["Platón", "Bogdanov", "Hegel", "Espinoza"], correct: 1 },
+        { q: "¿Qué es la sinergia?", options: ["Desorden", "El todo mayor a la suma de partes", "Equilibrio", "Entrada de datos"], correct: 1 },
+        { q: "¿Qué busca la Tectología?", options: ["Dividir ciencias", "Unificar ciencias", "Crear máquinas", "Estudiar planetas"], correct: 1 },
+        { q: "¿Qué significa isomorfismo?", options: ["Formas diferentes", "Analogías de funcionamiento", "Misma masa", "Sin forma"], correct: 1 },
+        { q: "¿Qué es el enfoque reduccionista?", options: ["Ver el todo", "Dividir para estudiar", "No estudiar", "Usar computadoras"], correct: 1 }
+    ],
+    "2": [
+        { q: "¿Qué implica ver el Universo como un sistema integrado?", options: ["Sin importancia", "Implicancias morales profundas", "Solo datos técnicos", "Caos total"], correct: 1 },
+        { q: "¿Cuál es la responsabilidad moral del Pensador de Sistemas?", options: ["Ignorar la realidad", "Dominar el Enfoque y principios", "Solo programar", "Hacer dinero"], correct: 1 },
+        { q: "¿Por qué el Pensador de Sistemas debe ser responsable?", options: ["Porque su observación es parcial", "Porque lo sabe todo", "Porque no importa", "Porque es ley"], correct: 0 },
+        { q: "¿Qué se debe evitar al construir metodologías?", options: ["Que sean integrales", "Que degraden la integridad humana", "Que sean eficaces", "Que usen lógica"], correct: 1 },
+        { q: "La frase del clavo y el reino perdido de George Herbert ilustra:", options: ["Historia antigua", "Interconectividad y responsabilidad", "Falta de dinero", "Mala suerte"], correct: 1 },
+        { q: "En sistemas, 'por falta de un clavo...' significa que:", options: ["Un error pequeño no importa", "Un pequeño componente afecta la totalidad", "Hay que comprar clavos", "El caballo era malo"], correct: 1 },
+        { q: "¿Qué es el 'Silencio' según el Capítulo 2?", options: ["Ausencia de lenguaje", "Ausencia de ruido y presión", "No hablar", "Aburrimiento"], correct: 1 },
+        { q: "¿Qué permite desarrollar el silencio?", options: ["Sordera", "Capacidad reflexiva", "Miedo", "Olvidar"], correct: 1 },
+        { q: "¿El silencio es siempre involuntario?", options: ["Sí", "No, se produce voluntaria e involuntariamente", "Solo cuando duermes", "No existe"], correct: 1 },
+        { q: "¿Para qué sirve el silencio como 'pausa'?", options: ["Para dejar de trabajar", "Para afinar nuestro sentir y pensar", "Para dormir", "Para perder tiempo"], correct: 1 },
+        { q: "¿Qué dice la frase sobre la lógica en sistemas complejos?", options: ["Es perfecta", "No es adecuada para manejar sistemas complejos", "Es lo único que sirve", "Es para niños"], correct: 1 },
+        { q: "El mundo no es lógico, según la reflexión, es:", options: ["Ordenado", "Desordenado y no lineal", "Un círculo", "Fácil"], correct: 1 },
+        { q: "¿Qué requiere el Pensador de Sistemas según la moral?", options: ["Mucha memoria", "Sensibilidad y visión integral", "Mucha fuerza", "Ser solitario"], correct: 1 },
+        { q: "¿Qué significa que la observación sea 'interpretativa'?", options: ["Que es la verdad absoluta", "Que depende del observador", "Que es mentira", "Que es matemática"], correct: 1 },
+        { q: "¿A qué invita el espacio tranquilo del silencio?", options: ["A la desolación", "A la conexión trascendental y reflexión", "Al ruido", "A la ira"], correct: 1 },
+        { q: "La integridad del sistema se mantiene bajo:", options: ["Ningún cambio", "Cierto rango de variabilidad", "Presión extrema", "El vacío"], correct: 1 },
+        { q: "¿Qué asume el pensador sobre las soluciones propuestas?", options: ["Deben ser parciales", "Deben ser integrales", "Deben ser baratas", "No importan"], correct: 1 },
+        { q: "¿Qué tipo de conexión menciona el silencio?", options: ["Eléctrica", "Trascendental (oración, meditación)", "Internet", "Física"], correct: 1 },
+        { q: "¿La moral de sistemas ve al hombre como?", options: ["Una pieza de máquina", "Un ser integral e interconectado", "Un número", "Un error"], correct: 1 },
+        { q: "¿Qué es lo más 'álgido' de abordar hoy en día?", options: ["La sencillez", "La complejidad", "La velocidad", "El clima"], correct: 1 }
+    ],
+    "3": [
+        { q: "¿Qué es la 'Emergencia' en un sistema?", options: ["Un accidente", "Algo que surge o evoluciona", "Una falla técnica", "El fin del sistema"], correct: 1 },
+        { q: "¿Qué dice Boulding sobre el compromiso de la TGS?", options: ["Debe ser solo matemática", "Entre lo específico sin significado y lo general sin contenido", "Debe ser solo para biólogos", "No debe haber compromiso"], correct: 1 },
+        { q: "¿Cuál es el nivel 1 de la Jerarquía de Boulding?", options: ["Sistemas dinámicos", "Estructuras estáticas (Marco de referencia)", "Células", "Sistemas sociales"], correct: 1 },
+        { q: "¿A qué nivel de Boulding pertenecen los relojes y el sistema solar?", options: ["Nivel 1", "Nivel 2 (Sistemas dinámicos simples)", "Nivel 3", "Nivel 4"], correct: 1 },
+        { q: "¿Qué caracteriza al Nivel 3 (Mecanismos de control) de Boulding?", options: ["La reproducción", "La transmisión de información y homeostasis", "El pensamiento", "La estática"], correct: 1 },
+        { q: "¿En qué nivel de Boulding aparece la vida (Célula)?", options: ["Nivel 4 (Sistemas abiertos)", "Nivel 2", "Nivel 9", "Nivel 1"], correct: 0 },
+        { q: "¿Cuál es el nivel más alto (Nivel 9) de la jerarquía de Boulding?", options: ["El ser humano", "Empresas", "Sistemas Trascendentales (Dios/Metafísica)", "Animales"], correct: 2 },
+        { q: "Nehemiah Jordan presenta una taxonomía de tipo:", options: ["Jerárquica", "No jerárquica", "Solo para máquinas", "Basada en el caos"], correct: 1 },
+        { q: "Según Jordan, si algo no cambia en un tiempo es:", options: ["Funcional", "Estructural o Estático", "Organísmico", "Inútil"], correct: 1 },
+        { q: "¿Qué principio de Jordan describe si el sistema es Mecanicista u Organísmico?", options: ["Razón de cambio", "Propósito", "Conectividad", "Entropía"], correct: 2 },
+        { q: "Un sistema 'Mecanicista' según Jordan se caracteriza porque:", options: ["Si quitas una parte no produce cambio global", "Si quitas una parte el sistema muere", "Es muy complejo", "Es biológico"], correct: 0 },
+        { q: "Un sistema 'Organísmico' según Jordan se caracteriza porque:", options: ["Sus partes son independientes", "Un cambio en una conexión afecta a todo el sistema", "No tiene propósito", "Es estático"], correct: 1 },
+        { q: "El propósito 'hacia adentro' de un sistema busca:", options: ["Vender productos", "Mantener la homeostasis", "Destruir el entorno", "Cambiar de nombre"], correct: 1 },
+        { q: "¿Qué dice Jordan sobre la estructura a largo plazo?", options: ["Es eterna", "Cambia por la entropía", "Se vuelve más fuerte", "No existe"], correct: 1 },
+        { q: "En la taxonomía de Stafford Beer, un sistema capaz de sobrevivir se llama:", options: ["Sistema Muerto", "Sistema Viable", "Sistema Cerrado", "Sistema Lógico"], correct: 1 },
+        { q: "¿Qué es un sistema 'Propositivo' según Jordan?", options: ["El que no hace nada", "El que procesa entradas para lograr salidas deseadas", "Un sistema sin metas", "Un reloj"], correct: 1 },
+        { q: "¿A qué nivel de Boulding pertenecen las organizaciones sociales (empresas)?", options: ["Nivel 1", "Nivel 8", "Nivel 4", "Nivel 2"], correct: 1 },
+        { q: "¿Qué permite la taxonomía de Boulding entre expertos de distintas áreas?", options: ["Pelearse", "Un lenguaje común para comunicarse", "No hablarse", "Dividir las ciencias"], correct: 1 },
+        { q: "¿Cuál es la característica principal de los Sistemas de Actividad Humana?", options: ["La mecánica", "La intencionalidad y relaciones interpersonales", "La falta de propósito", "La estática"], correct: 1 },
+        { q: "Los sistemas culturales (ciudades, partidos políticos) son parte de:", options: ["Sistemas físicos", "Sistemas formados por agrupación de personas", "Sistemas estáticos", "Sistemas de nivel 1"], correct: 1 }
+    ],
+    "5": [
+        { q: "Si un modelo representa fielmente la realidad pero no ayuda a resolver el problema del analista, ¿qué principio de modelación está fallando?", options: ["La formalidad", "La selección de aspectos de interés (Abstracción)", "La sintaxis", "La capacidad física"], correct: 1 },
+        { q: "¿Por qué se afirma que la modelación de sistemas es un proceso de 'reducción'?", options: ["Porque hace que el sistema funcione más lento", "Porque simplifica la complejidad eliminando detalles irrelevantes para el objetivo", "Porque reduce los costos de hardware", "Porque usa menos papel"], correct: 1 },
+        { q: "En el contexto de modelado, ¿cuál es la función primordial de un 'Metamodelo'?", options: ["Ser un modelo más grande", "Establecer las reglas, símbolos y relaciones permitidas para construir otros modelos", "Reemplazar al código fuente", "Servir de manual para el usuario final"], correct: 1 },
+        { q: "Un diagrama UML que muestra la comunicación entre componentes es una 'vista' del sistema. ¿Qué justifica el uso de múltiples vistas?", options: ["Que el cliente quiere ver muchos dibujos", "Que ninguna vista por sí sola puede representar la totalidad de un sistema complejo", "Que UML obliga a usar al menos diez vistas", "Que así se gasta más tiempo de consultoría"], correct: 1 },
+        { q: "Si dos analistas crean modelos diferentes sobre el mismo sistema y ambos son correctos, esto demuestra que el modelo es:", options: ["Erróneo", "Subjetivo (depende de la perspectiva del modelador)", "Inconsistente", "Un modelo físico"], correct: 1 },
+        { q: "¿Qué diferencia fundamental separa a un modelo 'Formal' de uno 'Informal'?", options: ["El uso de herramientas digitales", "La existencia de una semántica y sintaxis rigurosa que permite verificación", "Que el formal es más caro", "Que el informal solo se hace a mano"], correct: 1 },
+        { q: "Al utilizar UML para 'capturar conocimiento', el modelo actúa como:", options: ["Un repositorio de código", "Un mecanismo de preservación de la lógica del negocio ante la evolución del diseño", "Un firewall", "Una base de datos de usuarios"], correct: 1 },
+        { q: "¿En qué se diferencia un modelo 'Abstracto' de un modelo 'Físico' en Ingeniería de Sistemas?", options: ["El abstracto no existe", "El abstracto usa símbolos y conceptos; el físico es una representación tangible", "El físico es siempre mejor", "El abstracto es solo para matemáticos"], correct: 1 },
+        { q: "La modelación ayuda a la 'validación' del sistema porque permite:", options: ["Escribir código más rápido", "Comparar el comportamiento esperado del modelo contra los requerimientos del cliente", "Borrar el sistema anterior", "Vender el producto"], correct: 1 },
+        { q: "Cuando un modelo matemático predice el fallo de un puente, estamos ante un modelo de tipo:", options: ["Físico e Informal", "Abstracto y Formal", "Físico y Formal", "Abstracto e Informal"], correct: 1 },
+        { q: "¿Cuál es el riesgo de no definir correctamente el 'Dominio de Interés' al modelar?", options: ["Que el modelo sea muy colorido", "Incluir información irrelevante que oscurezca la solución", "Que el software no compile", "Que el cliente no pague"], correct: 1 },
+        { q: "Un prototipo de software (mockup) que el cliente puede tocar y probar se clasifica como:", options: ["Modelo mental", "Modelo Físico (representación tangible del concepto)", "Modelo Matemático", "Modelo Trascendental"], correct: 1 },
+        { q: "La 'Sintaxis' en un lenguaje de modelado se refiere a:", options: ["El significado de los símbolos", "Las reglas de combinación de los elementos gráficos", "El color de las flechas", "La velocidad del dibujo"], correct: 1 },
+        { q: "La 'Semántica' en un lenguaje de modelado se refiere a:", options: ["La forma de los cuadros", "El significado preciso de cada elemento y relación", "El nombre del autor", "El software usado"], correct: 1 },
+        { q: "¿Por qué el modelo es una herramienta de 'comunicación'?", options: ["Porque reemplaza al correo electrónico", "Porque proporciona un lenguaje visual común entre stakeholders y técnicos", "Porque tiene texto", "Porque se puede imprimir"], correct: 1 },
+        { q: "En la frase 'el modelo es una abstracción', ¿qué significa abstraer?", options: ["Copiar todo", "Aislar mentalmente una propiedad o función dejando fuera el resto", "Hacer un dibujo borroso", "Ignorar al cliente"], correct: 1 },
+        { q: "Si un modelo UML se usa para 'verificar' el sistema, ¿qué se está buscando?", options: ["Que los colores combinen", "Que el diseño cumpla con las especificaciones técnicas", "Que el sistema sea barato", "Que sea fácil de instalar"], correct: 1 },
+        { q: "¿Qué relación hay entre el término latino 'modulus' y la ingeniería de sistemas?", options: ["Significa 'computadora'", "Se refiere a la medida o módulo que sirve de comparación para la realidad", "Significa 'dibujo'", "No tiene relación"], correct: 1 },
+        { q: "Un modelo que representa la jerarquía de mando de una empresa es un modelo:", options: ["Físico", "Estructural y Abstracto", "Dinámico y Mecanicista", "Informal"], correct: 1 },
+        { q: "¿Cuál es la principal ventaja de que UML sea un 'Estándar'?", options: ["Que es gratis", "Que permite que cualquier profesional de sistemas entienda el modelo sin importar su país", "Que lo creó Microsoft", "Que es obligatorio por ley"], correct: 1 }
+    ]
+};
+
+let currentChapter = "1";
+let userAnswers = [];
+
+function changeChapter() {
+    currentChapter = document.getElementById('cap-select').value;
+    resetState();
+    loadQuestions();
+}
+
+function resetState() {
+    userAnswers = Array(baseDePreguntas[currentChapter].length).fill(null);
+    document.getElementById('examen-results').style.display = "none";
+    showTab('estudio'); // Por defecto volver a estudio al cambiar
+}
+
+function showTab(tabId) {
+    document.querySelectorAll('.content').forEach(c => c.classList.remove('active'));
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById(tabId).classList.add('active');
+    
+    if(tabId === 'estudio') document.getElementById('btn-estudio').classList.add('active');
+    else document.getElementById('btn-examen').classList.add('active');
+}
+
+function loadQuestions() {
+    const preguntas = baseDePreguntas[currentChapter];
+    const estudioDiv = document.getElementById('estudio-questions');
+    const examenDiv = document.getElementById('examen-questions');
+    
+    estudioDiv.innerHTML = "";
+    examenDiv.innerHTML = "";
+    
+    preguntas.forEach((p, index) => {
+        // Render Modo Estudio
+        estudioDiv.innerHTML += `
+            <div class="question-card">
+                <p><strong>${index + 1}. ${p.q}</strong></p>
+                <div class="options-list">
+                    ${p.options.map((opt, i) => `
+                        <li><button class="option-btn" onclick="checkEstudio(this, ${index}, ${i})">${opt}</button></li>
+                    `).join('')}
+                </div>
+                <p id="feedback-${index}" class="feedback-text"></p>
+            </div>
+        `;
+
+        // Render Modo Examen
+        examenDiv.innerHTML += `
+            <div class="question-card" id="q-examen-${index}">
+                <p><strong>${index + 1}. ${p.q}</strong></p>
+                <div class="options-list">
+                    ${p.options.map((opt, i) => `
+                        <li><button class="option-btn q-examen-btn-${index}" onclick="selectExamen(this, ${index}, ${i})">${opt}</button></li>
+                    `).join('')}
+                </div>
+            </div>
+        `;
+    });
+}
+
+function checkEstudio(btn, qIdx, optIdx) {
+    const preguntas = baseDePreguntas[currentChapter];
+    const card = btn.closest('.question-card');
+    const feedback = document.getElementById(`feedback-${qIdx}`);
+    const buttons = card.querySelectorAll('.option-btn');
+    
+    buttons.forEach(b => b.disabled = true);
+    
+    if(optIdx === preguntas[qIdx].correct) {
+        btn.classList.add('correct');
+        feedback.innerText = "¡Correcto!";
+        feedback.style.color = "#28a745";
+    } else {
+        btn.classList.add('incorrect');
+        buttons[preguntas[qIdx].correct].classList.add('correct');
+        feedback.innerText = "Incorrecto. Repasa la teoría.";
+        feedback.style.color = "#dc3545";
+    }
+    feedback.style.display = "block";
+}
+
+function selectExamen(btn, qIdx, optIdx) {
+    const buttons = document.querySelectorAll(`.q-examen-btn-${qIdx}`);
+    buttons.forEach(b => {
+        b.style.borderColor = "#ddd";
+        b.style.backgroundColor = "white";
+    });
+    btn.style.borderColor = "#3498db";
+    btn.style.backgroundColor = "#ebf5fb";
+    userAnswers[qIdx] = optIdx;
+}
+
+function gradeExamen() {
+    const preguntas = baseDePreguntas[currentChapter];
+    let score = 0;
+    
+    preguntas.forEach((p, i) => {
+        const buttons = document.querySelectorAll(`.q-examen-btn-${i}`);
+        buttons.forEach(b => b.disabled = true);
+        
+        if(userAnswers[i] === p.correct) {
+            score++;
+            buttons[p.correct].classList.add('correct');
+        } else {
+            if(userAnswers[i] !== null) buttons[userAnswers[i]].classList.add('incorrect');
+            buttons[p.correct].classList.add('correct');
+        }
+    });
+    
+    const resultsBox = document.getElementById('examen-results');
+    resultsBox.style.display = "block";
+    resultsBox.style.backgroundColor = (score/preguntas.length) >= 0.51 ? "#d4edda" : "#f8d7da";
+    resultsBox.innerHTML = `
+        <p class="score">Nota: ${(score/preguntas.length * 100).toFixed(0)}/100</p>
+        <p>Acertaste ${score} de ${preguntas.length} preguntas.</p>
+        <button class="submit-btn" style="background:#3498db" onclick="changeChapter()">Reiniciar Capítulo</button>
+    `;
+    window.scrollTo(0, document.body.scrollHeight);
+}
+
+// Inicio inicial
+changeChapter();
+</script>
+
+</body>
+</html>
