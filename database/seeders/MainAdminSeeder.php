@@ -13,8 +13,13 @@ class MainAdminSeeder extends Seeder
     public function run(): void
     {
         Schema::disableForeignKeyConstraints();
-        Personal::truncate();
-        Persona::truncate();
+        if (app()->environment('local')) {
+            Schema::disableForeignKeyConstraints();
+            Personal::truncate();
+            Persona::truncate();
+            Schema::enableForeignKeyConstraints();
+        }
+
         Schema::enableForeignKeyConstraints();
 
         // 1. Crear la Persona con CADA campo del fillable
@@ -53,8 +58,8 @@ class MainAdminSeeder extends Seeder
             'codigo_personal' => 'ADM-001',
             'user' => 'DM29Diego',
             'password' => Hash::make('10384292'),
-            'rol' => 'admin',
-            'cargo' => 'Ingeniero de TI',
+            'rol' => 'super_admin',
+            'cargo' => 'gerente_marketing',
         ]);
 
         $this->command->info('¡Usuario creado con todos los campos obligatorios!');

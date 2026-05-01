@@ -1,7 +1,6 @@
 version: "3.3"
 
 services:
-  # --- SISTEMA CRM (Laravel) ---
   app:
     build: .
     container_name: crm-app
@@ -49,7 +48,6 @@ services:
     networks:
       - crm-net
 
-  # --- MOTOR DE WHATSAPP (Evolution API) ---
   evolution_api:
     container_name: evolution_api
     image: atendai/evolution-api:latest
@@ -61,7 +59,7 @@ services:
     networks:
       - crm-net
     env_file:
-      - .env.evolution # <--- CREAREMOS ESTE ARCHIVO APARTE
+      - .env.evolution
 
   evolution_db:
     image: postgres:13
