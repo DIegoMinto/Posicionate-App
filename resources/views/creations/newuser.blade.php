@@ -114,26 +114,27 @@
                                     <td class="py-3 px-4 text-right sticky right-0 bg-white" x-data="{ openDelete: false }">
                                         <div class="flex justify-end gap-2 items-center">
 
-                                            <!-- ✅ DAR ALTA -->
-                                            <a href="{{ route('users.create_user', $p->id_persona) }}"
-                                                class="btn-adduser text-xs">
-                                                Alta
-                                            </a>
+                                            @if($usuario->rol === 'super_admin')
+                                                <a href="{{ route('users.create_user', $p->id_persona) }}"
+                                                    class="btn-adduser text-xs">
+                                                    Alta
+                                                </a>
+                                            @endif
 
-                                            <!-- 🗑 ELIMINAR -->
-                                            <button @click="openDelete = true"
-                                                class="text-red-600 hover:text-red-800 transition cursor-pointer">
-                                                <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none"
-                                                    viewBox="0 0 24 24" stroke="currentColor">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-1 12a2 2 0 01-2 2H8a2 2 0 01-2-2L5 
-                                                                7m5-4h4m-4 0a1 1 0 00-1 1v1h6V4a1 
-                                                                1 0 00-1-1m-4 0h4" />
-                                                </svg>
-                                            </button>
+                                            @if($usuario->rol === 'super_admin')
+                                                <button @click="openDelete = true"
+                                                    class="text-red-600 hover:text-red-800 transition cursor-pointer">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none"
+                                                        viewBox="0 0 24 24" stroke="currentColor">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-1 12a2 2 0 01-2 2H8a2 2 0 01-2-2L5 
+                                                                                        7m5-4h4m-4 0a1 1 0 00-1 1v1h6V4a1 
+                                                                                        1 0 00-1-1m-4 0h4" />
+                                                    </svg>
+                                                </button>
+                                            @endif
 
                                         </div>
 
-                                        <!-- 🔥 MODAL -->
                                         <div x-show="openDelete"
                                             class="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 backdrop-blur-sm"
                                             x-cloak>

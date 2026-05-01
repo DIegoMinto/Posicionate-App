@@ -12,7 +12,7 @@
     <x-layout-dashboard :usuario="$usuario">
         <x-page-header titulo="Configuración de Credenciales" />
 
-        <div class="p-6" font-sans>
+        <div class="p-6 font-sans">
             <div class="max-w-3xl mx-auto bg-white rounded-sm border-2 border-brand-gold shadow-md">
                 <div class="mb-6 border-b border-gray-100 pb-4 bg-brand-green text-white p-8 rounded-sm">
                     <h2 class="text-lg font-black uppercase">Asignar Acceso a Sistema</h2>
@@ -48,12 +48,18 @@
                                 Laboral</label>
                             <select name="cargo" required
                                 class="form-select-pill text-xs border-1 border-brand-green outline-none">
-                                <option value="Broker">BROKER</option>
-                                <option value="Administrador">ADMINISTRADOR</option>
-                                <option value="Asesor">ASESOR</option>
-                                <option value="Coordinador">COORDINADOR</option>
-                                <option value="Académico">ACADÉMICO
-                                <option value="Ingeniero TI">INGENIERO TI</option>
+                                <option value="">Seleccionar</option>
+
+                                <option value="gerente_marketing">Gerente de marketing</option>
+                                <option value="supervisor_marketing">Supervisor de marketing</option>
+                                <option value="asesora_marketing">Asesora de marketing</option>
+
+                                <option value="supervisor_academico">Supervisor académico</option>
+                                <option value="coordinador_academico">Coordinador académico</option>
+                                <option value="asistente_academico">Asistente académico</option>
+
+                                <option value="contador">Contador</option>
+                                <option value="asistente_contable">Asistente contable</option>
                             </select>
                         </div>
 
@@ -62,8 +68,10 @@
                                 Sistema</label>
                             <select name="rol" required
                                 class="form-select-pill text-xs border-1 border-brand-green outline-none">
-                                <option value="super_admin">ADMINISTRADOR</option>
-                                <option value=" normal_user">USUARIO ESTÁNDAR</option>
+                                <option value="">Seleccionar</option>
+                                <option value="super_admin">Super Administrador</option>
+                                <option value="admin">Administrador</option>
+                                <option value="user">Usuario</option>
                             </select>
                         </div>
 

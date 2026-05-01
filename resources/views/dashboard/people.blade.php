@@ -10,9 +10,6 @@
 
 <body>
     <x-layout-dashboard :usuario="$usuario">
-        <div class="bg-white p-6 rounded-sm border-2 border-brand-gold shadow-md">
-            <h1 class="text-2xl font-bold text-brand-green mb-4">Gestión de Estudiantes</h1>
-        </div>
     </x-layout-dashboard>
 </body>
 

@@ -96,46 +96,97 @@ class WhatsappController extends Controller
 
     public function send(Request $request)
     {
-        set_time_limit(60);
+        set_time_limit(120);
 
         $instance = auth()->user()->codigo_personal;
+
         if (!$instance) {
-            return response()->json(['ok' => false, 'error' => 'Instancia no encontrada'], 400);
+            return response()->json([
+                'ok' => false,
+                'error' => 'Instancia no encontrada'
+            ], 400);
         }
 
         $numero = preg_replace('/[^0-9]/', '', $request->numeros);
+        $modo = $request->modo ?? 'junto';
 
-        if ($request->hasFile('file')) {
-            $file = $request->file('file');
-            $mime = $file->getMimeType();
-            $base64 = base64_encode(file_get_contents($file));
-            $mediatype = str_contains($mime, 'image') ? 'image' : 'document';
+        try {
 
-            $safeName = str_replace(' ', '_', $file->getClientOriginalName());
+            $responseMedia = null;
+            $responseText = null;
 
-            $response = Http::withHeaders($this->headers())
-                ->timeout(30) // Timeout de la petición HTTP
-                ->post("{$this->baseUrl}/message/sendMedia/{$instance}", [
-                    "number" => $numero,
-                    "mediatype" => $mediatype,
-                    "mimetype" => $mime,
-                    "caption" => $request->mensaje,
-                    "media" => $base64,
-                    "fileName" => $safeName
-                ]);
-        } else {
-            $response = Http::withHeaders($this->headers())
-                ->post("{$this->baseUrl}/message/sendText/{$instance}", [
-                    "number" => $numero,
-                    "text" => $request->mensaje
-                ]);
+            if ($request->hasFile('file')) {
+
+                $file = $request->file('file');
+                $mime = $file->getMimeType();
+                $base64 = base64_encode(file_get_contents($file));
+                $safeName = str_replace(' ', '_', $file->getClientOriginalName());
+
+                if (str_contains($mime, 'video')) {
+                    $mediatype = 'video';
+                } elseif (str_contains($mime, 'image')) {
+                    $mediatype = 'image';
+                } else {
+                    $mediatype = 'document';
+                }
+                if ($modo === 'junto') {
+
+                    $responseMedia = Http::withHeaders($this->headers())
+                        ->timeout(60)
+                        ->post("{$this->baseUrl}/message/sendMedia/{$instance}", [
+                            "number" => $numero,
+                            "mediatype" => $mediatype,
+                            "mimetype" => $mime,
+                            "caption" => $request->mensaje,
+                            "media" => $base64,
+                            "fileName" => $safeName
+                        ]);
+                } else {
+
+                    $responseMedia = Http::withHeaders($this->headers())
+                        ->timeout(60)
+                        ->post("{$this->baseUrl}/message/sendMedia/{$instance}", [
+                            "number" => $numero,
+                            "mediatype" => $mediatype,
+                            "mimetype" => $mime,
+                            "media" => $base64,
+                            "fileName" => $safeName
+                        ]);
+                    sleep(2);
+
+                    $responseText = Http::withHeaders($this->headers())
+                        ->post("{$this->baseUrl}/message/sendText/{$instance}", [
+                            "number" => $numero,
+                            "text" => $request->mensaje
+                        ]);
+                }
+
+            } else {
+
+                $responseText = Http::withHeaders($this->headers())
+                    ->post("{$this->baseUrl}/message/sendText/{$instance}", [
+                        "number" => $numero,
+                        "text" => $request->mensaje
+                    ]);
+            }
+
+            return response()->json([
+                'ok' => true,
+                'media' => $responseMedia ? $responseMedia->json() : null,
+                'text' => $responseText ? $responseText->json() : null
+            ]);
+
+        } catch (\Exception $e) {
+
+            return response()->json([
+                'ok' => false,
+                'error' => $e->getMessage()
+            ], 500);
         }
 
-        return response()->json([
-            'ok' => $response->successful(),
-            'data' => $response->json(),
-            'status' => $response->status()
-        ]);
+
     }
+
+
 
 }

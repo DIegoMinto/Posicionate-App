@@ -12,6 +12,8 @@ use App\Http\Controllers\SedeController;
 use App\Http\Controllers\ClassController;
 use App\Http\Controllers\InscripcionController;
 use App\Http\Controllers\StatiticController;
+use App\Http\Controllers\PlanController;
+use App\Models\PlanesPago;
 
 Route::get('/', function () {
     return view('welcome');
@@ -42,10 +44,7 @@ Route::post('/registrodocente', [DocenteController::class, 'store'])->name('doce
 
 //RUTAS REGISTRO ESTUDIANTE
 Route::get('/inscripcion/{id_curso}/{id_personal}', [InscripcionController::class, 'showForm'])->name('inscripcion.public');
-Route::post('/inscripcion/store', [InscripcionController::class, 'store'])
-    ->name('inscripcion.store');
-
-//CONTENIDO PROTEGIDO
+Route::post('/inscripcion/store', [InscripcionController::class, 'store'])->name('inscripcion.store');
 
 Route::middleware(['auth', 'vigente'])->group(function () {
 
@@ -53,48 +52,66 @@ Route::middleware(['auth', 'vigente'])->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
     Route::prefix('people')->name('people.')->group(function () {
         Route::get('/students', [DashboardController::class, 'students'])->name('index');
-        Route::get('/staff', [DashboardController::class, 'staff'])->name('staff');
+        Route::middleware('role:super_admin,admin')->group(function () {
+            Route::get('/staff', [DashboardController::class, 'staff'])->name('staff');
+        });
+
     });
     Route::get('/wpsender', [DashboardController::class, 'wpsender'])->name('wpsender.index');
 
     //RUTAS CREACIÓN DE USUARIOS
-    Route::get('/userscreate', [UserController::class, 'create'])->name('users.create');
-    Route::get('/userscreate/adduser/{id}', [UserController::class, 'create_user'])->name('users.create_user');
-    Route::post('/userscreate/store', [UserController::class, 'store_user'])->name('users.store_user');
-    Route::get('/users/{id}/edit', [UserController::class, 'edit'])->name('users.edit');
-    Route::put('/personal/{id}', [UserController::class, 'update'])->name('personal.update');
-
-    //RUTAS ELIMINACIÓN DE USUARIOS
-    Route::delete('/users/{id}', [UserController::class, 'destroy'])->name('users.destroy');
-    Route::delete('/personas/{id}', [PersonaController::class, 'destroy'])->name('personas.destroy');
-
-    //RUTAS DE VER INFO DE USUARIO
-    Route::get('/users/{id}/info', [UserController::class, 'show'])->name('users.show');
+    Route::middleware('role:admin,super_admin')->group(function () {
+        Route::get('/userscreate', [UserController::class, 'create'])->name('users.create');
+        Route::get('/userscreate/adduser/{id}', [UserController::class, 'create_user'])->name('users.create_user');
+        Route::post('/userscreate/store', [UserController::class, 'store_user'])->name('users.store_user');
+        Route::get('/users/{id}/edit', [UserController::class, 'edit'])->name('users.edit');
+        Route::put('/personal/{id}', [UserController::class, 'update'])->name('personal.update');
+        //RUTAS ELIMINACIÓN DE USUARIOS
+        Route::delete('/users/{id}', [UserController::class, 'destroy'])->name('users.destroy');
+        Route::delete('/personas/{id}', [PersonaController::class, 'destroy'])->name('personas.destroy');
+        Route::get('/users/{id}/info', [UserController::class, 'show'])->name('users.show');
+    });
 
     //RUTAS MIDDLEWARE
     Route::post('/users/{id}/toggle', [UserController::class, 'toggle'])->name('users.toggle');
 
     //RUTAS CURSO
     Route::get('/programs', [DashboardController::class, 'programs'])->name('programs.index');
-    Route::get('/programs/create', [DashboardController::class, 'programsCreate'])->name('programs.create');
+    Route::middleware('role:super_admin,admin')->group(function () {
+        Route::get('/programs/create', [DashboardController::class, 'programsCreate'])->name('programs.create');
+        Route::get('/programs/{id}/edit', [DashboardController::class, 'programsEdit'])->name('programs.edit');
+        Route::post('/programs/store', [DashboardController::class, 'programsStore'])->name('programs.store');
+        Route::get('/programs/{id}/payments-setup', [DashboardController::class, 'programsPaymentsSetup'])->name('programs.payments.setup');
+        Route::patch('/programs/{id}/status', [DashboardController::class, 'updateStatus'])->name('programs.updateStatus');
+        Route::put('/programs/{id}/update', [DashboardController::class, 'programsUpdate'])->name('programs.update');
+        Route::delete('/programs/{id}', [DashboardController::class, 'programsDestroy'])->name('programs.destroy');
+    });
+
     Route::get('/programs/{id}/show', [DashboardController::class, 'programsShow'])->name('programs.show');
-    Route::get('/programs/{id}/edit', [DashboardController::class, 'programsEdit'])->name('programs.edit');
-    Route::post('/programs/store', [DashboardController::class, 'programsStore'])->name('programs.store');
-    Route::patch('/programs/{id}/status', [DashboardController::class, 'updateStatus'])->name('programs.updateStatus');
-    Route::put('/programs/{id}/update', [DashboardController::class, 'programsUpdate'])->name('programs.update');
-    Route::delete('/programs/{id}', [DashboardController::class, 'programsDestroy'])->name('programs.destroy');
     Route::get('/curso/{id}/estudiantes', [InscripcionController::class, 'list'])->name('curso.estudiantes');
+
+    //RUTAS PLANES
+    Route::middleware('role:super_admin,admin')->group(function () {
+        Route::delete('/planes-pago/{id}', [PlanController::class, 'destroy'])->name('plans.destroy');
+    });
+    Route::get('/programs/{id}/payments-setup', [DashboardController::class, 'programsPaymentsSetup'])->name('programs.payments.setup');
+    Route::post('/planes-pago/guardar', [PlanController::class, 'store'])->name('plans.store');
+    Route::get('/planes-pago/{id}/detalles', [PlanController::class, 'showInstallments'])->name('plans.installments');
 
 
     //RUTAS CLASE
-    Route::get('/class/create', [ClassController::class, 'classCreate'])->name('class.create');
-    Route::post('/class/store', [ClassController::class, 'classStore'])->name('class.store');
-
+    Route::middleware('role:super_admin,admin')->group(function () {
+        Route::get('/class/create', [ClassController::class, 'classCreate'])->name('class.create');
+        Route::post('/class/store', [ClassController::class, 'classStore'])->name('class.store');
+    });
     //CREACIONES
-    Route::get('/creations', [DashboardController::class, 'creations'])->name('creations.index');
-    // Rutas para la gestión de Instituciones
-    Route::resource('institutions', InstitucionController::class)->names('institutions');
-    Route::resource('sedes', SedeController::class)->names('sedes');
+    Route::middleware('role:super_admin,admin')->group(function () {
+        Route::get('/creations', [DashboardController::class, 'creations'])->name('creations.index');
+        // Rutas para la gestión de Instituciones
+        Route::resource('institutions', InstitucionController::class)->names('institutions');
+        Route::resource('sedes', SedeController::class)->names('sedes');
+    });
+
 
     //RUTAS WHATSAPP
     Route::get('/wpsender', [WhatsappController::class, 'index'])->name('wpsender.index');
@@ -105,15 +122,30 @@ Route::middleware(['auth', 'vigente'])->group(function () {
 
 
     // RUTAS DOCENTE
-    Route::prefix('teachers')->group(function () {
-        // Listado principal
-        Route::get('/', [DocenteController::class, 'teachers'])->name('teachers.index');
-        Route::get('/{docente}', [DocenteController::class, 'show'])->name('docentes.show');
-        Route::get('/{docente}/edit', [DocenteController::class, 'edit'])->name('docentes.edit');
-        Route::put('/{docente}', [DocenteController::class, 'update'])->name('docentes.update');
-        Route::delete('/teachers/{docente}', [DocenteController::class, 'destroy'])->name('docentes.destroy');
+    Route::middleware('role:super_admin,admin')->group(function () {
+        Route::prefix('teachers')->group(function () {
+            Route::get('/', [DocenteController::class, 'teachers'])->name('teachers.index');
+            Route::get('/{docente}', [DocenteController::class, 'show'])->name('docentes.show');
+            Route::get('/{docente}/edit', [DocenteController::class, 'edit'])->name('docentes.edit');
+            Route::put('/{docente}', [DocenteController::class, 'update'])->name('docentes.update');
+            Route::delete('/teachers/{docente}', [DocenteController::class, 'destroy'])->name('docentes.destroy');
+        });
+
     });
 
     //RUTAS ESTADÍSTICAS
     Route::resource('statitics', StatiticController::class)->names('statitics');
+
+    //RUTAS ESTUDIANTES
+    Route::get('/estudiantes/change/{id}', [InscripcionController::class, 'change'])->name('students.change');
+    Route::post('/estudiantes/change/{id}', [InscripcionController::class, 'store_change'])->name('inscripcion.store_change');
+    Route::get('/api/plan-detalles/{id}', function ($id) {
+        return \App\Models\PlanCuotaDetalle::where('id_planes_pago', $id)->get();
+    });
+    Route::get('/estudiantes/facturacion/{id}', [InscripcionController::class, 'facturacion'])->name('students.facturacion');
+    Route::middleware('role:super_admin,admin')->group(function () {
+        Route::delete('/students/{id}', [InscripcionController::class, 'destroy'])->name('students.destroy');
+        Route::get('/pagos/{id}/edit', [InscripcionController::class, 'editPago'])->name('pagos.edit');
+        Route::put('/pagos/{id}', [InscripcionController::class, 'updatePago'])->name('pagos.update');
+    });
 });

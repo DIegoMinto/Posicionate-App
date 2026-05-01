@@ -10,6 +10,8 @@ use App\Models\Sede;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Validation\Rule;
+
 
 class UserController extends Controller
 {
@@ -33,13 +35,29 @@ class UserController extends Controller
 
     public function store_user(Request $request)
     {
+        if (auth()->user()->rol !== 'super_admin') {
+            abort(403, 'No autorizado');
+        }
         $request->validate([
             'id_persona' => 'required|exists:persona,id_persona',
             'user' => 'required|unique:personal,user',
             'password' => 'required|confirmed|min:6',
             'id_sede' => 'required|exists:sede,id_sede',
-            'cargo' => 'required',
-            'rol' => 'required'
+            'cargo' => [
+                'required',
+                Rule::in([
+                    'gerente_marketing',
+                    'supervisor_marketing',
+                    'asesora_marketing',
+                    'supervisor_academico',
+                    'coordinador_academico',
+                    'asistente_academico',
+                    'contador',
+                    'asistente_contable'
+                ])
+            ],
+
+            'rol' => 'required|in:super_admin,admin,user,viewer'
         ]);
 
         $persona = Persona::findOrFail($request->id_persona);
@@ -69,7 +87,9 @@ class UserController extends Controller
 
     public function destroy(Request $request, $id)
     {
-        // Validar contraseña
+        if (auth()->user()->rol !== 'super_admin') {
+            abort(403, 'No autorizado');
+        }
         if (!Hash::check($request->password_confirm, auth()->user()->password)) {
             return back()->withErrors(['password_confirm' => 'Contraseña incorrecta']);
         }
@@ -108,6 +128,9 @@ class UserController extends Controller
 
     public function edit($id)
     {
+        if (auth()->user()->rol !== 'super_admin') {
+            abort(403, 'No autorizado');
+        }
         $personal = Personal::with('persona')->findOrFail($id);
         $persona = $personal->persona;
         $usuario = auth()->user()->load('persona');
@@ -143,11 +166,23 @@ class UserController extends Controller
             'apellido_p' => 'required|string|max:100',
             'ci' => 'required|unique:persona,ci,' . $persona->id_persona . ',id_persona',
             'correo_electronico' => 'required|email|unique:persona,correo_electronico,' . $persona->id_persona . ',id_persona',
-            // Validación Personal
             'user' => 'required|unique:personal,user,' . $personal->id_personal . ',id_personal',
             'id_sede' => 'required|exists:sede,id_sede',
-            'cargo' => 'required',
-            'rol' => 'required',
+            'cargo' => [
+                'required',
+                Rule::in([
+                    'gerente_marketing',
+                    'supervisor_marketing',
+                    'asesora_marketing',
+                    'supervisor_academico',
+                    'coordinador_academico',
+                    'asistente_academico',
+                    'contador',
+                    'asistente_contable'
+                ])
+            ],
+
+            'rol' => 'required|in:super_admin,admin,user,viewer',
             'password' => 'nullable|confirmed|min:6',
         ]);
 
@@ -174,7 +209,6 @@ class UserController extends Controller
                     Storage::disk('public')->delete($persona->fotografia);
                 $personaData['fotografia'] = $request->file('fotografia')->store('uploads/fotos', 'public');
             }
-
             $persona->update($personaData);
 
             // 2. Actualizar Datos de Personal

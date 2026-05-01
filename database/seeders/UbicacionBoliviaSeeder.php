@@ -65,7 +65,7 @@ class UbicacionBoliviaSeeder extends Seeder
 
         InstitucionBancaria::create(['nombre' => 'Banco Nacional de Bolivia']);
         InstitucionBancaria::create(['nombre' => 'Banco Unión']);
-        InstitucionBancaria::create(['nombre' => 'Banco Visa']);
+        InstitucionBancaria::create(['nombre' => 'Banco Bisa']);
         InstitucionBancaria::create(['nombre' => 'Banco Sol']);
         InstitucionBancaria::create(['nombre' => 'Banco Mercantil de Santa Cruz']);
         InstitucionBancaria::create(['nombre' => 'Banco Económico']);

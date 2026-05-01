@@ -63,7 +63,7 @@ class DocenteController extends Controller
 
     public function store(Request $request)
     {
-        // Definimos $data al inicio para que el catch siempre la reconozca
+
         $data = [];
 
         try {
@@ -85,17 +85,13 @@ class DocenteController extends Controller
                 ? strtoupper(trim($request->extension_otro))
                 : $request->extension_select;
 
-            // Llenamos $data quitando lo que sobra
+
             $data = $request->except(['_token', 'extension_select', 'extension_otro', 'id_pais', 'id_departamento']);
 
-            // --- EL CORAZÓN DEL PROBLEMA ---
-            // Si el CHECK de Postgres falla con '0', es casi seguro que espera 'S' o 'N'
             $data['extension_ci'] = $extensionFinal;
             $data['emite_factura'] = ($request->emite_factura == '1') ? 'SI' : 'NO';
 
             $idArchivo = $request->ci . '_' . $extensionFinal;
-
-            // Procesamiento de archivos (asegurando que se guarde el string del path)
             if ($request->hasFile('curriculum')) {
                 $data['curriculum'] = $request->file('curriculum')->storeAs('uploads/cvs', "CV_$idArchivo." . $request->file('curriculum')->extension(), 'public');
             }
@@ -135,13 +131,15 @@ class DocenteController extends Controller
 
     public function edit(Docente $docente)
     {
-        // Carga de catálogos necesarios para los <select> de la vista
+        if (auth()->user()->rol !== 'super_admin') {
+            abort(403, 'No autorizado');
+        }
         $paises = Pais::all();
         $profesiones = Profesion::all();
         $instituciones = InstitucionEgreso::all();
-        $grados = GradoAcademico::all(); // <--- FALTABA ESTA
-        $bancos = InstitucionBancaria::all(); // <--- FALTABA ESTA
-        $ciudades = \App\Models\Ciudad::all(); // <--- FALTABA ESTA
+        $grados = GradoAcademico::all();
+        $bancos = InstitucionBancaria::all();
+        $ciudades = \App\Models\Ciudad::all();
 
         $usuario = auth()->user()->load('persona');
 
@@ -159,6 +157,9 @@ class DocenteController extends Controller
 
     public function update(Request $request, Docente $docente)
     {
+        if (auth()->user()->rol !== 'super_admin') {
+            abort(403, 'No autorizado');
+        }
         $data = [];
         try {
             $request->validate([
@@ -211,6 +212,9 @@ class DocenteController extends Controller
 
     public function destroy(Request $request, Docente $docente)
     {
+        if (auth()->user()->rol !== 'super_admin') {
+            abort(403, 'No autorizado');
+        }
         try {
             // 1. Validación de seguridad (Ya comprobaste que esto funciona)
             $request->validate([
@@ -248,18 +252,8 @@ class DocenteController extends Controller
             }
 
         } catch (\Exception $e) {
-            // Si algo falla a nivel SQL, esto te dirá EXACTAMENTE qué restricción lo impide
             return back()->withErrors(['error' => 'Error de base de datos: ' . $e->getMessage()]);
-
-
-
-
-
-
-
         }
-
-
     }
 
 }

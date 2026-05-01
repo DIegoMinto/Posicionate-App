@@ -58,18 +58,31 @@
                         </button>
 
                         <div x-show="open" x-collapse.duration.300ms class="mt-1 ml-8 flex flex-col gap-1">
-                            <a href="{{ route('people.staff') }}"
-                                class="btn-sidebar-sub group {{ request()->routeIs('people.staff') ? 'is-active' : '' }}">
-                                <span class="btn-sidebar-text uppercase text-sm">PERSONAL</span>
-                            </a>
+                            @if(in_array($usuario->rol, ['super_admin', 'admin']))
+                                <a href="{{ route('people.staff') }}"
+                                    class="btn-sidebar-sub group {{ request()->routeIs('people.staff') ? 'is-active' : '' }}">
+                                    <span class="btn-sidebar-text uppercase text-sm">PERSONAL</span>
+                                </a>
+                            @endif
                             <a href="{{ route('people.index') }}"
                                 class="btn-sidebar-sub group {{ request()->routeIs('people.index') ? 'is-active' : '' }}">
                                 <span class="btn-sidebar-text uppercase text-sm">ESTUDIANTES</span>
                             </a>
-                            <a href="{{ route('teachers.index') }}"
-                                class="btn-sidebar-sub group {{ request()->routeIs('teachers.index') ? 'is-active' : '' }}">
-                                <span class="btn-sidebar-text uppercase text-sm">DOCENTES</span>
-                            </a>
+                            @if(
+                                    in_array($usuario->cargo, [
+                                        'asistente_academico',
+                                        'supervisor_academico',
+                                        'coordinador_academico',
+                                    ])
+                                    ||
+                                    in_array($usuario->rol, ['admin', 'super_admin'])
+                                )
+                                <a href="{{ route('teachers.index') }}"
+                                    class="btn-sidebar-sub group {{ request()->routeIs('teachers.index') ? 'is-active' : '' }}">
+                                    <span class="btn-sidebar-text uppercase text-sm">DOCENTES</span>
+                                </a>
+                            @endif
+
                         </div>
                     </div>
 
@@ -89,21 +102,27 @@
                         <span class="btn-sidebar-text leading-tight uppercase">WP SENDER</span>
                     </a>
 
-                    <a href="{{ route('creations.index') }}"
-                        class="btn-sidebar group {{ request()->routeIs('creations.index') ? 'is-active' : '' }}">
-                        <div class="btn-sidebar-icon">
-                            <img src="/img/add_icon.png" class="w-20 object-contain" alt="">
-                        </div>
-                        <span class="btn-sidebar-text leading-tight uppercase">GESTIÓN DE DATOS</span>
-                    </a>
+                    @if(in_array($usuario->rol, ['super_admin']))
+                        <a href="{{ route('creations.index') }}"
+                            class="btn-sidebar group {{ request()->routeIs('creations.index') ? 'is-active' : '' }}">
+                            <div class="btn-sidebar-icon">
+                                <img src="/img/add_icon.png" class="w-20 object-contain" alt="">
+                            </div>
+                            <span class="btn-sidebar-text leading-tight uppercase">GESTIÓN DE DATOS</span>
+                        </a>
+                    @endif
 
-                    <a href="{{ route('statitics.index') }}"
-                        class="btn-sidebar group {{ request()->routeIs('statitics.index') ? 'is-active' : '' }}">
-                        <div class="btn-sidebar-icon">
-                            <img src="/img/statitics_icon.png" class="w-20 object-contain" alt="">
-                        </div>
-                        <span class="btn-sidebar-text leading-tight uppercase">ESTADÍSTICAS</span>
-                    </a>
+
+                    @if(in_array($usuario->rol, ['super_admin', 'admin']))
+                        <a href="{{ route('statitics.index') }}"
+                            class="btn-sidebar group {{ request()->routeIs('statitics.index') ? 'is-active' : '' }}">
+                            <div class="btn-sidebar-icon">
+                                <img src="/img/statitics_icon.png" class="w-20 object-contain" alt="">
+                            </div>
+                            <span class="btn-sidebar-text leading-tight uppercase">ESTADÍSTICAS</span>
+                        </a>
+                    @endif
+
                 </nav>
             </div>
         </div>
@@ -142,7 +161,8 @@
                             {{ $usuario->persona->apellido_m }}
                         </h2>
                         <p class="text-brand-gold font-black text-2xl leading-none mt-1 tracking-wider">
-                            {{ $usuario->cargo }}
+                            {{ $usuario->cargo_nombre }}
+
                         </p>
                     </div>
                 </div>

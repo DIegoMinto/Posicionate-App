@@ -147,7 +147,13 @@
                                                     </p>
                                                 </div>
                                             </div>
-
+@if(
+                                                            in_array($usuario->cargo, [
+                                                                'supervisor_academico',
+                                                                
+                                                            ]) 
+                                                            || $usuario->rol === 'super_admin'
+                                                        )
                                             <div class="w-full flex justify-center mt-2">
                                                 <form action="{{ route('programs.updateStatus', $curso->id_curso) }}" method="POST">
                                                     @csrf
@@ -169,6 +175,7 @@
                                                     </select>
                                                 </form>
                                             </div>
+                                            @endif
                                         </div>
                                         <div class="flex items-center gap-3 border-l border-gray-200 pl-4">
                                             <div class="text-center">
@@ -190,6 +197,14 @@
                                                                 Ver Información Completa
                                                             </span>
                                                         </a>
+                                                        @if(
+                                                            in_array($usuario->cargo, [
+                                                                'coordinador_academico',
+                                                                'supervisor_academico',
+                                                                'asistente_academico'
+                                                            ]) 
+                                                            || $usuario->rol === 'super_admin'
+                                                        )
                                                     <a href="{{ route('class.create', ['id_curso' => $curso->id_curso]) }}" 
                                                     class="group relative flex items-center justify-center"
                                                     title="Añadir Clase">
@@ -201,6 +216,7 @@
                                                             Añadir Clase
                                                         </span>
                                                     </a>
+                                                    
                                                     <a href="{{ route('programs.edit', ['id' => $curso->id_curso]) }}"
                                                     class="group relative flex items-center justify-center"
                                                     title="Editar Curso">
@@ -214,6 +230,7 @@
                                                             Editar Información
                                                         </span>
                                                     </a>
+                                                    @endif
                                                     <a href="{{ route('inscripcion.public', ['id_curso' => $curso->id_curso, 'id_personal' => $usuario->id_personal]) }} " 
                                                     class="group relative flex items-center justify-center"
                                                     title="Añadir Clase" target="_blank">
@@ -225,6 +242,7 @@
                                                             Añadir Estudiante
                                                         </span>
                                                     </a>
+                                                    
                                                     <a href="{{ route('curso.estudiantes', $curso->id_curso) }}" 
                                                     class="group relative flex items-center justify-center"
                                                     title="Añadir Clase">
@@ -236,6 +254,25 @@
                                                             Ver Lista
                                                         </span>
                                                     </a>
+                                                     @if(
+                                                            in_array($usuario->cargo, [
+                                                                'supervisor_academico',
+                                                                
+                                                            ]) 
+                                                            || $usuario->rol === 'super_admin'
+                                                        )
+                                                    <a href="{{ route('programs.payments.setup', $curso->id_curso) }}" 
+                                                    class="group relative flex items-center justify-center"
+                                                    title="Añadir Clase">
+                                                        <div class="">
+                                                            <img src="/img/plans_icon.png" class="w-10 h-10 object-contain" alt="Añadir Clase">
+                                                        </div>
+                                                        
+                                                        <span class="absolute -top-8 scale-0 transition-all rounded bg-gray-800 p-1 text-[10px] text-white group-hover:scale-100">
+                                                            Planes de Pago
+                                                        </span>
+                                                    </a>
+                                                    @endif
                                                     <div x-data="{ openEstudiantes: false }">
                                                         <button @click="openEstudiantes = true" 
                                                                 class="group relative flex items-center justify-center cursor-pointer focus:outline-none p-2">
@@ -319,6 +356,12 @@
                                                             </div>
                                                         </div>
                                                     </div>
+                                                     @if(
+                                                            in_array($usuario->cargo, [
+                                                                'supervisor_academico',
+                                                            ]) 
+                                                            || $usuario->rol === 'super_admin'
+                                                        )
                                                     <div x-data="{ openDelete: false }">
                                                         <button @click="openDelete = true" class="group relative flex items-center justify-center pb-1 cursor-pointer">
                                                             <svg xmlns="http://www.w3.org/2000/svg" class="w-8 h-8 group-hover:text-red-600 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -343,7 +386,7 @@
                                                                 <p class="text-[10px] mb-4 text-gray-600">
                                                                     Vas a eliminar a:<br>
                                                                     <span class="text-black font-bold uppercase">
-                                                                        {{ $curso->nombre }}
+                                                                        {{ $curso->nombre }} {{ $curso->apellido_p}} {{ $curso->apellido_m}}
                                                                     </span>
                                                                 </p>
 
@@ -370,6 +413,7 @@
                                                             </div>
                                                         </div>
                                                     </div>
+                                                    @endif
                                                 </div>
                                             </div>
                                         </div>

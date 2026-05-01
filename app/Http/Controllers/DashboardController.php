@@ -127,6 +127,9 @@ class DashboardController extends Controller
 
     public function programsCreate()
     {
+        if (auth()->user()->rol !== 'super_admin') {
+            abort(403, 'No autorizado');
+        }
         $usuario = auth()->user()->load('persona');
         $instituciones = \App\Models\Institucion::all();
         $docentes = \App\Models\Docente::all();
@@ -138,32 +141,69 @@ class DashboardController extends Controller
 
     public function programsStore(Request $request)
     {
+        if (auth()->user()->rol !== 'super_admin') {
+            abort(403, 'No autorizado');
+        }
         $request->validate([
             'nombre' => 'required|string|max:255',
             'id_institucion' => 'required|exists:institucion,id_institucion',
-            'id_sede' => 'required|exists:sede,id_sede', // Agregamos validación de sede
+            'id_sede' => 'required|exists:sede,id_sede',
             'id_docente' => 'nullable|exists:docente,id_docente',
-            'codigo_curso' => 'required|string|unique:curso,codigo_curso', // Importante validar el código único
+            'codigo_curso' => 'required|string|unique:curso,codigo_curso',
             'codigo_qr' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
             'fecha_inicio' => 'required|date',
             'fecha_fin' => 'nullable|date|after_or_equal:fecha_inicio',
+            'tipo' => 'required|in:CURSO,PROGRAMA,DIPLOMADO',
+            'costo_matricula' => 'required_if:tipo,DIPLOMADO,PROGRAMA|numeric|min:0',
+            'docentes_adicionales' => 'nullable|array',
+            'docentes_adicionales.*' => 'exists:docente,id_docente'
         ]);
 
         $data = $request->all();
 
-        // Lógica para guardar la imagen del QR
         if ($request->hasFile('codigo_qr')) {
             $data['codigo_qr'] = $request->file('codigo_qr')->store('qrs', 'public');
         }
 
-        // Valores por defecto para evitar errores de NOT NULL
         $data['estado'] = $data['estado'] ?? 'Activo';
         $data['inscritos'] = 0;
         $data['pre_inscritos'] = 0;
 
-        \App\Models\Curso::create($data);
+        // 1. Crear el Curso
+        $curso = \App\Models\Curso::create($data);
 
-        return redirect()->route('programs.index')->with('success', 'Programa creado con éxito');
+        // 2. Guardar Docentes Adicionales (Si vienen en el array dinámico)
+        if ($request->has('docentes_adicionales')) {
+            foreach ($request->docentes_adicionales as $doc_id) {
+                if ($doc_id) {
+                    // Esto inserta automáticamente en la tabla docentes_adicionales
+                    $curso->docentesAdicionales()->create([
+                        'id_docente' => $doc_id
+                    ]);
+                }
+            }
+        }
+
+        // 3. REDIRECCIÓN KING: A la configuración de pagos
+        return redirect()->route('programs.payments.setup', $curso->id_curso)
+            ->with('success', 'Programa creado. Ahora define los planes de pago.');
+    }
+
+    public function programsPaymentsSetup($id)
+    {
+        $usuario = auth()->user()->load('persona');
+
+        $curso = \App\Models\Curso::findOrFail($id);
+
+        $planes = \App\Models\PlanesPago::where('id_curso', $id)->with('detalles')->get();
+
+        return view('dashboard.programs_payments_setup', compact('usuario', 'curso', 'planes'));
+    }
+
+    public function setup($id)
+    {
+        // lógica aquí
+        return view('plans.setup', compact('id'));
     }
 
     public function programsShow($id)
@@ -185,6 +225,9 @@ class DashboardController extends Controller
 
     public function programsDestroy(Request $request, $id)
     {
+        if (auth()->user()->rol !== 'super_admin') {
+            abort(403, 'No autorizado');
+        }
         $request->validate([
             // Cambiado de confirmation a confirm
             'password_confirm' => 'required',
@@ -204,6 +247,9 @@ class DashboardController extends Controller
 
     public function updateStatus(Request $request, $id)
     {
+        if (auth()->user()->rol !== 'super_admin') {
+            abort(403, 'No autorizado');
+        }
         $curso = Curso::findOrFail($id);
         $curso->update(['estado' => $request->estado]);
         return back()->with('success', 'Estado actualizado');
@@ -211,6 +257,9 @@ class DashboardController extends Controller
 
     public function programsEdit($id)
     {
+        if (auth()->user()->rol !== 'super_admin') {
+            abort(403, 'No autorizado');
+        }
         $curso = Curso::with(['institucion', 'clases', 'docente', 'sede'])->findOrFail($id);
         $usuario = auth()->user();
 
@@ -225,6 +274,9 @@ class DashboardController extends Controller
     // 2. Procesar Actualización
     public function programsUpdate(Request $request, $id)
     {
+        if (auth()->user()->rol !== 'super_admin') {
+            abort(403, 'No autorizado');
+        }
         $curso = Curso::findOrFail($id);
 
         // Actualizar Curso
@@ -284,6 +336,5 @@ class DashboardController extends Controller
         return view('dashboard.wpsender', compact('usuario'));
     }
 
-    //Funciones para personal
 
 }

@@ -141,16 +141,66 @@
                             <div>
                                 <label class="form-label-bold !text-brand-green">Rol de Usuario</label>
                                 <select name="rol" class="form-select-pill border-2 border-brand-gold">
-                                    <option value="ADMIN" {{ $personal->rol == 'ADMIN' ? 'selected' : '' }}>Administrador</option>
-                                    <option value="STAFF" {{ $personal->rol == 'STAFF' ? 'selected' : '' }}>Staff</option>
+                                            <option value="">Seleccionar</option>
+                                            <option value="super_admin" {{ $personal->rol == 'super_admin' ? 'selected' : '' }}>
+                                                Super Administrador
+                                            </option>
+
+                                            <option value="admin" {{ $personal->rol == 'admin' ? 'selected' : '' }}>
+                                                Administrador
+                                            </option>
+
+                                            <option value="user" {{ $personal->rol == 'user' ? 'selected' : '' }}>
+                                                Usuario
+                                            </option>
+
+                                            <option value="viewer" {{ $personal->rol == 'viewer' ? 'selected' : '' }}>
+                                                Espectador
+                                            </option>
                                 </select>
                             </div>
 
                             <div>
                                 <label class="form-label-bold !text-brand-green">Cargo Institucional</label>
-                                <input type="text" name="cargo" value="{{ old('cargo', $personal->cargo) }}"
-                                    class="form-input-pill border-2 border-brand-gold">
+                                <select name="cargo" class="form-select-pill border-2 border-brand-gold">
+
+                                    <option value="">Seleccionar</option>
+
+                                    <option value="gerente_marketing" {{ $personal->cargo == 'gerente_marketing' ? 'selected' : '' }}>
+                                        Gerente de marketing
+                                    </option>
+
+                                    <option value="supervisor_marketing" {{ $personal->cargo == 'supervisor_marketing' ? 'selected' : '' }}>
+                                        Supervisor de marketing
+                                    </option>
+
+                                    <option value="asesora_marketing" {{ $personal->cargo == 'asesora_marketing' ? 'selected' : '' }}>
+                                        Asesora de marketing
+                                    </option>
+
+                                    <option value="supervisor_academico" {{ $personal->cargo == 'supervisor_academico' ? 'selected' : '' }}>
+                                        Supervisor académico
+                                    </option>
+
+                                    <option value="coordinador_academico" {{ $personal->cargo == 'coordinador_academico' ? 'selected' : '' }}>
+                                        Coordinador académico
+                                    </option>
+
+                                    <option value="asistente_academico" {{ $personal->cargo == 'asistente_academico' ? 'selected' : '' }}>
+                                        Asistente académico
+                                    </option>
+
+                                    <option value="contador" {{ $personal->cargo == 'contador' ? 'selected' : '' }}>
+                                        Contador
+                                    </option>
+
+                                    <option value="asistente_contable" {{ $personal->cargo == 'asistente_contable' ? 'selected' : '' }}>
+                                        Asistente contable
+                                    </option>
+
+                                </select>
                             </div>
+
 
                             <div>
                                 <label class="form-label-bold !text-brand-green">Ubicación Maps (Link)</label>

@@ -59,20 +59,43 @@
                                         class="form-input-pill border-2 border-brand-gold">
                                 </div>
                             </div>
+                            <div>
+                                <label class="form-label-bold text-black">Tipo de Oferta</label>
+                                <select name="tipo" id="tipo_oferta" required onchange="toggleMatricula()"
+                                    class="form-select-pill border-2 border-brand-gold">
+                                    <option value="CURSO">Curso</option>
+                                    <option value="PROGRAMA">Programa</option>
+                                    <option value="DIPLOMADO">Diplomado</option>
+                                </select>
+                            </div>
+
+                            <div id="campo_matricula" class="hidden">
+                                <label class="form-label-bold text-black">Costo de Matrícula (Bs)</label>
+                                <input type="number" name="costo_matricula" value="0"
+                                    class="form-input-pill border-2 border-brand-gold">
+                            </div>
                         </div>
 
                         <div class="space-y-4">
                             <div>
-                                <label class="form-label-bold text-black">Docente
-                                    Responsable</label>
-                                <select name="id_docente" class="form-select-pill border-2 border-brand-gold">
-                                    <option value="">Asignar docente...</option>
-                                    @foreach($docentes as $doc)
-                                        <option value="{{ $doc->id_docente }}">{{ $doc->nombre }}
-                                            {{ $doc->apellido_p }} {{ $doc->apellido_m }}
-                                        </option>
-                                    @endforeach
-                                </select>
+                                <div>
+                                    <label class="form-label-bold text-black">Docente Responsable</label>
+                                    <select name="id_docente" class="form-select-pill border-2 border-brand-gold">
+                                        <option value="">Asignar docente...</option>
+                                        @foreach($docentes as $doc)
+                                            <option value="{{ $doc->id_docente }}">{{ $doc->nombre }} {{ $doc->apellido_p }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                </div>
+
+                                <div id="docentes-adicionales-container" class="space-y-2">
+                                </div>
+
+                                <button type="button" onclick="agregarDocente()"
+                                    class="text-[10px] font-bold text-black uppercase hover:text-brand-gold transition-colors cursor-pointer">
+                                    + Agregar Docente Adicional
+                                </button>
                             </div>
                             <div>
                                 <label class="form-label-bold text-black">Código del Programa</label>
@@ -99,7 +122,7 @@
 
                                         <div class="flex text-xs text-gray-600 justify-center">
                                             <label
-                                                class="relative cursor-pointer bg-white rounded-md font-sans font-bold text-brand-gold hover:text-brand-green tracking-tighter uppercase">
+                                                class="relative cursor-pointer bg-white rounded-md font-sans font-bold text-black hover:text-brand-gold tracking-tighter uppercase">
                                                 <span id="btn-text">Seleccionar Código QR</span>
                                                 <input id="qr-input" name="codigo_qr" type="file" class="sr-only"
                                                     accept="image/*" onchange="previewQR(event)">
@@ -123,6 +146,38 @@
             </div>
         </div>
     </x-layout-dashboard>
+    <script>
+        function agregarDocente() {
+            const container = document.getElementById('docentes-adicionales-container');
+            const div = document.createElement('div');
+            div.className = 'flex gap-2 items-center animate-fade-in'; // Si usas Tailwind, esto le da estilo
+
+            // Usamos array en el name "docentes_adicionales[]" para que Laravel reciba una lista
+            div.innerHTML = `
+            <select name="docentes_adicionales[]" class="form-select-pill border-2 border-brand-gold flex-1">
+                <option value="">Seleccionar docente adicional...</option>
+                @foreach($docentes as $doc)
+                    <option value="{{ $doc->id_docente }}">{{ $doc->nombre }} {{ $doc->apellido_p }}</option>
+                @endforeach
+            </select>
+            <button type="button" onclick="this.parentElement.remove()" class="text-red-500 font-bold px-2">
+                ✕
+            </button>
+        `;
+            container.appendChild(div);
+        }
+
+        function toggleMatricula() {
+            const tipo = document.getElementById('tipo_oferta').value;
+            const campo = document.getElementById('campo_matricula');
+            // Solo mostramos matrícula si es Diplomado o Programa (según tu regla)
+            if (tipo === 'DIPLOMADO' || tipo === 'PROGRAMA') {
+                campo.classList.remove('hidden');
+            } else {
+                campo.classList.add('hidden');
+            }
+        }
+    </script>
 </body>
 
 </html>

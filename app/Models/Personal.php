@@ -50,6 +50,30 @@ class Personal extends Authenticatable
         return $this->id_personal;
     }
 
+    public function getCargoNombreAttribute()
+    {
+        return [
+            'gerente_marketing' => 'Gerente de Marketing',
+            'supervisor_marketing' => 'Supervisor de Marketing',
+            'asesora_marketing' => 'Asesora de Marketing',
+            'supervisor_academico' => 'Supervisor Académico',
+            'coordinador_academico' => 'Coordinador Académico',
+            'asistente_academico' => 'Asistente Académico',
+            'contador' => 'Contador',
+            'asistente_contable' => 'Asistente Contable',
+        ][$this->cargo] ?? $this->cargo;
+    }
+    public function getRolNombreAttribute()
+    {
+        return [
+            'super_admin' => 'Super Administrador',
+            'admin' => 'Administrador',
+            'user' => 'Usuario',
+            'viewer' => 'Solo Lectura',
+        ][$this->rol] ?? $this->rol;
+    }
+
+
     public $timestamps = true;
     protected $casts = [
         'es_vigente' => 'boolean',
