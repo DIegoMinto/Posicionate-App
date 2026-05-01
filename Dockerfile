@@ -1,10 +1,11 @@
 FROM php:8.4-cli
 
-# Dependencias
+# Dependencias del sistema
 RUN apt-get update && apt-get install -y \
     libpq-dev \
     libzip-dev \
     zip unzip git curl \
+    nodejs npm \
     && docker-php-ext-install pdo pdo_pgsql zip
 
 # Composer
@@ -14,19 +15,21 @@ WORKDIR /var/www
 
 COPY . .
 
-# Instalar dependencias
+# Instalar dependencias PHP
 RUN composer install --no-dev --optimize-autoloader
 
-# Permisos
+# Instalar dependencias Node + build
+RUN npm install && npm run build
+
+# Permisos Laravel
 RUN chmod -R 777 storage bootstrap/cache
 
-# Build frontend
-RUN apt-get install -y nodejs npm \
-    && npm install \
-    && npm run build
+# Entrypoint script
+COPY docker-entrypoint.sh /usr/local/bin/
+RUN chmod +x /usr/local/bin/docker-entrypoint.sh
 
-# Puerto de Render
+# Puerto Render
 EXPOSE 10000
 
-# Comando para producción
-CMD php artisan serve --host=0.0.0.0 --port=10000
+# ENTRYPOINT (CLAVE)
+ENTRYPOINT ["docker-entrypoint.sh"]
