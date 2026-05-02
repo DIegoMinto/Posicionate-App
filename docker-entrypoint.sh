@@ -15,7 +15,6 @@ echo "Caching config..."
 php artisan config:cache
 php artisan route:cache || true
 php artisan view:cache
-php artisan db:seed --force
 
 echo "Starting server..."
 exec php artisan serve --host=0.0.0.0 --port=10000
