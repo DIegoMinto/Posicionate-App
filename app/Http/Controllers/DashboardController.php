@@ -12,6 +12,8 @@ use App\Models\Docente;
 use App\Models\Clase;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\DB;
+
 
 class DashboardController extends Controller
 {
@@ -22,11 +24,52 @@ class DashboardController extends Controller
         return view('dashboard.index', compact('usuario'));
     }
 
-    public function students()
+    public function students(Request $request)
     {
-        $usuario = auth()->user()->load('persona');
-        return view('dashboard.people', compact('usuario'));
+        $usuario = auth()->user();
+
+        $query = DB::table('curso_estudiante')
+            ->join('estudiante', 'curso_estudiante.id_estudiante', '=', 'estudiante.id_estudiante')
+            ->join('curso', 'curso_estudiante.id_curso', '=', 'curso.id_curso')
+            ->join('personal', 'estudiante.id_personal', '=', 'personal.id_personal')
+            ->join('persona', 'personal.id_persona', '=', 'persona.id_persona')
+            ->select(
+                'estudiante.*',
+                'curso.nombre as curso_nombre',
+                'curso_estudiante.estado',
+                'curso_estudiante.id_curso',
+                'curso_estudiante.created_at as fecha_inscripcion',
+                'persona.nombre as asesor_nombre',
+                'persona.apellido_p as asesor_apellido'
+            );
+
+        // 🔒 filtro por rol
+        if ($usuario->rol === 'user') {
+            $query->where('estudiante.id_personal', $usuario->id_personal);
+        }
+
+        // 🔎 filtros
+        if ($request->filled('id_personal')) {
+            $query->where('estudiante.id_personal', $request->id_personal);
+        }
+
+        if ($request->filled('estado')) {
+            $query->where('curso_estudiante.estado', $request->estado);
+        }
+
+        $estudiantes = $query
+            ->orderBy('curso_estudiante.created_at', 'desc') // 🟢 FIX FINAL
+            ->get();
+
+        $personales = Personal::with('persona')->get();
+
+        return view('dashboard.people', compact(
+            'usuario',
+            'estudiantes',
+            'personales'
+        ));
     }
+
     public function creations()
     {
         $usuario = auth()->user()->load('persona');
