@@ -13,41 +13,64 @@
 
         <x-page-header titulo="Todos los Estudiantes">
 
-            @if(in_array($usuario->rol, ['admin', 'super_admin']))
-<form method="GET" class="flex items-center gap-3 mb-4">
+            <form method="GET" action="{{ route('people.index') }}"
+                class="flex flex-col lg:flex-row lg:items-end gap-3 flex-wrap">
+                @if(in_array($usuario->rol, ['admin', 'super_admin']))
+                    <select name="id_personal" onchange="this.form.submit()"
+                        class="bg-white text-black text-[10px] font-bold px-3 py-1.5 rounded-md">
 
-    <select name="id_personal" onchange="this.form.submit()"
-        class="bg-white text-black text-[10px] font-bold px-3 py-1.5 rounded-md">
-        
-        <option value="">ASESOR: TODOS</option>
+                        <option value="">ASESOR: TODOS</option>
 
-        @foreach($personales as $per)
-            <option value="{{ $per->id_personal }}"
-                {{ request('id_personal') == $per->id_personal ? 'selected' : '' }}>
-                
-                {{ strtoupper($per->persona->nombre . ' ' . $per->persona->apellido_p) }}
-            
-            </option>
-        @endforeach
-    </select>
+                        @foreach($personales as $per)
+                            <option value="{{ $per->id_personal }}" {{ request('id_personal') == $per->id_personal ? 'selected' : '' }}>
 
-    <select name="estado" onchange="this.form.submit()"
-        class="bg-white text-black text-[10px] font-bold px-3 py-1.5 rounded-md">
+                                {{ strtoupper($per->persona->nombre . ' ' . $per->persona->apellido_p) }}
 
-        <option value="">ESTADO: TODOS</option>
+                            </option>
+                        @endforeach
+                    </select>
+                @endif
+                <select name="estado" onchange="this.form.submit()"
+                    class="bg-white text-black text-[10px] font-bold px-3 py-1.5 rounded-md">
 
-        <option value="pre_inscrito" {{ request('estado') == 'pre_inscrito' ? 'selected' : '' }}>
-            PRE INSCRITO
-        </option>
+                    <option value="">ESTADO: TODOS</option>
 
-        <option value="inscrito" {{ request('estado') == 'inscrito' ? 'selected' : '' }}>
-            INSCRITO
-        </option>
-    </select>
+                    <option value="pre_inscrito" {{ request('estado') == 'pre_inscrito' ? 'selected' : '' }}>
+                        PRE INSCRITO
+                    </option>
 
-</form>
-@endif
+                    <option value="inscrito" {{ request('estado') == 'inscrito' ? 'selected' : '' }}>
+                        INSCRITO
+                    </option>
+                </select>
+                <div>
+                    <div class="font-sans text-[12px]">Fecha inicio</div>
+                    <input type="date" name="fecha_inicio" value="{{ request('fecha_inicio') }}"
+                        onchange="this.form.submit()" class="bg-white text-[10px] px-2 py-1.5 rounded-md">
+                </div>
 
+                <div>
+                    <div class="font-sans text-[12px]">Fecha fin</div>
+                    <input type="date" name="fecha_fin" value="{{ request('fecha_fin') }}" onchange="this.form.submit()"
+                        class="bg-white text-[10px] px-2 py-1.5 rounded-md">
+                </div>
+
+            </form>
+            <x-slot name="search">
+                <form method="GET" action="{{ route('people.index') }}" class="relative bg-white rounded-full">
+
+                    <input type="text" name="search" value="{{ request('search') }}"
+                        placeholder="Buscar por nombre o CI..." class="pl-10 pr-4 py-1.5 text-xs w-64 outline-none">
+
+                    <div class="absolute left-3 top-1/2 -translate-y-1/2 text-black">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                        </svg>
+                    </div>
+
+                </form>
+            </x-slot>
 
         </x-page-header>
 
@@ -71,8 +94,8 @@
                                 <th class="py-3 px-4 whitespace-nowrap">CI</th>
                                 <th class="py-3 px-4 whitespace-nowrap">Ext</th>
                                 <th class="py-3 px-4 whitespace-nowrap">Nombre</th>
-                                <th class="py-3 px-4 whitespace-nowrap">Apellido P</th>
-                                <th class="py-3 px-4 whitespace-nowrap">Apellido M</th>
+                                <th class="py-3 px-4 whitespace-nowrap">Apellido Paterno</th>
+                                <th class="py-3 px-4 whitespace-nowrap">Apellido Materno</th>
                                 <th class="py-3 px-4 whitespace-nowrap">Teléfono</th>
                                 <th class="py-3 px-4 whitespace-nowrap">Correo</th>
                                 <th class="py-3 px-4 whitespace-nowrap">Asesor</th>
@@ -129,15 +152,29 @@
                                     </td>
 
                                     <td class="py-3 px-4 text-center">
-                                        <span class="px-2 py-0.5 rounded-full text-[9px] font-black uppercase
-                                                    {{ $e->estado == 'pre_inscrito' ? 'bg-yellow-100 text-yellow-700' : '' }}
-                                                    {{ $e->estado == 'inscrito' ? 'bg-green-100 text-green-700' : '' }}">
+                                        <span
+                                            class="px-2 py-0.5 rounded-full text-[9px] font-black uppercase
+                                                                    {{ $e->estado == 'pre_inscrito' ? 'bg-yellow-100 text-yellow-700' : '' }}
+                                                                    {{ $e->estado == 'inscrito' ? 'bg-green-100 text-green-700' : '' }}">
                                             {{ $e->estado }}
                                         </span>
                                     </td>
 
                                     <td class="px-4 text-right sticky right-0 bg-white">
                                         <div class="flex justify-center items-center gap-2">
+
+                                            <a href="{{ route('people.show', $e->id_estudiante) }}"
+                                                class="text-brand-green hover:text-brand-gold transition"
+                                                title="Ver Información" alt="Ver información">
+                                                <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none"
+                                                    viewBox="0 0 24 24" stroke="currentColor">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                        d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                        d="M2.458 12C3.732 7.943 7.523 5 12 5c4.477 0 8.268 2.943 9.542 7-1.274 
+                                                                                                                                                                                                                                                                                                                                4.057-5.065 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                                </svg>
+                                            </a>
 
                                             @if($e->estado != 'inscrito')
                                                 <a href="{{ route('students.change', $e->id_estudiante) }}?id_curso={{ $e->id_curso }}"

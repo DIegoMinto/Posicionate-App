@@ -148,4 +148,7 @@ Route::middleware(['auth', 'vigente'])->group(function () {
         Route::get('/pagos/{id}/edit', [InscripcionController::class, 'editPago'])->name('pagos.edit');
         Route::put('/pagos/{id}', [InscripcionController::class, 'updatePago'])->name('pagos.update');
     });
+    Route::get('/students/{id}/info', [DashboardController::class, 'show_student'])->name('people.show');
+    Route::post('/curso/agregar-estudiante', [InscripcionController::class, 'agregarEstudiante'])
+        ->name('curso.agregar.estudiante');
 });

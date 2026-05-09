@@ -15,7 +15,7 @@ return new class extends Migration {
 
             // Datos de Identidad
             $table->string('ci', 20)->unique();
-            $table->string('extension_ci', 10); // Ejemplo: CH, LP, SC
+            $table->string('extension_ci', 10);
             $table->string('nombre', 100);
             $table->string('apellido_p', 100);
             $table->string('apellido_m', 100)->nullable();
@@ -24,16 +24,12 @@ return new class extends Migration {
             $table->string('telefono_movil', 20)->nullable();
             $table->string('correo_electronico', 150)->unique();
             $table->char('genero', 1); // M, F, O
-            $table->boolean('estado')->default(true); // Activo/Inactivo
-
-            // Llaves Foráneas (Relaciones)
+            $table->boolean('estado')->default(true);
             $table->unsignedBigInteger('id_ciudad');
-            $table->unsignedBigInteger('id_personal'); // Quién lo registró
+            $table->unsignedBigInteger('id_personal');
             $table->unsignedBigInteger('id_institucion_egreso');
             $table->unsignedBigInteger('id_grado_academico');
             $table->unsignedBigInteger('id_profesion');
-
-            // Definición de constraints (Asegúrate que las tablas existan)
             $table->foreign('id_ciudad')->references('id_ciudad')->on('ciudad');
             $table->foreign('id_personal')->references('id_personal')->on('personal');
             $table->foreign('id_institucion_egreso')->references('id_institucion_egreso')->on('institucion_egreso');

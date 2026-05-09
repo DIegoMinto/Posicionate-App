@@ -20,31 +20,26 @@ class InscripcionController extends Controller
 {
     public function showForm($id_curso, $id_personal)
     {
-        // 1. Verificamos que el curso y el asesor existan
         $curso = Curso::findOrFail($id_curso);
         $asesor = Personal::with('persona')->findOrFail($id_personal);
 
-        // 2. Cargamos las tablas maestras (AQUÍ AGREGAMOS PAÍSES)
-        $paises = Pais::all(); // <--- FALTA ESTO
+        $paises = Pais::all();
         $ciudades = Ciudad::all();
         $profesiones = Profesion::all();
         $grados = GradoAcademico::all();
         $instituciones = InstitucionEgreso::all();
 
-        // 3. Retornamos la vista con la variable 'paises' incluida
         return view('public.inscripcion', compact(
             'curso',
             'asesor',
-            'paises', // <--- AGREGAR AQUÍ
+            'paises',
             'ciudades',
             'profesiones',
             'grados',
             'instituciones'
         ));
     }
-    /**
-     * Guarda el registro del estudiante vinculado al asesor
-     */
+
     public function store(Request $request)
     {
         $validated = $request->validate([
@@ -56,19 +51,17 @@ class InscripcionController extends Controller
             'id_personal' => 'required',
         ]);
 
-        // 1. Crear estudiante
         $estudiante = Estudiante::create($request->all());
 
-        // 2. Insertar en tabla pivote curso_estudiante
         \DB::table('curso_estudiante')->insert([
             'id_curso' => $validated['id_curso'],
             'id_estudiante' => $estudiante->id_estudiante,
+            'id_personal' => $validated['id_personal'],
             'estado' => 'pre_inscrito',
             'created_at' => now(),
             'updated_at' => now(),
         ]);
 
-        // 3. Redirigir
         return redirect()->route('inscripcion.public', [
             'id_curso' => $validated['id_curso'],
             'id_personal' => $validated['id_personal']
@@ -82,7 +75,7 @@ class InscripcionController extends Controller
 
         $query = DB::table('curso_estudiante')
             ->join('estudiante', 'curso_estudiante.id_estudiante', '=', 'estudiante.id_estudiante')
-            ->join('personal', 'estudiante.id_personal', '=', 'personal.id_personal')
+            ->join('personal', 'curso_estudiante.id_personal', '=', 'personal.id_personal')
             ->join('persona', 'personal.id_persona', '=', 'persona.id_persona')
             ->where('curso_estudiante.id_curso', $id)
             ->select(
@@ -94,18 +87,40 @@ class InscripcionController extends Controller
             );
 
         if ($usuario->rol === 'user') {
-            $query->where('estudiante.id_personal', $usuario->id_personal);
+            $query->where('curso_estudiante.id_personal', $usuario->id_personal);
         }
 
         if ($request->filled('id_personal')) {
-            $query->where('estudiante.id_personal', $request->id_personal);
+            $query->where('curso_estudiante.id_personal', $request->id_personal);
         }
 
         if ($request->filled('estado')) {
             $query->where('curso_estudiante.estado', $request->estado);
         }
 
-        $estudiantes = $query->get();
+        if ($request->filled('search')) {
+            $search = $request->search;
+
+            $query->where(function ($q) use ($search) {
+                $q->where('estudiante.nombre', 'ILIKE', "%$search%")
+                    ->orWhere('estudiante.apellido_p', 'ILIKE', "%$search%")
+                    ->orWhere('estudiante.apellido_m', 'ILIKE', "%$search%")
+                    ->orWhere('estudiante.ci', 'ILIKE', "%$search%");
+            });
+        }
+
+        if ($request->filled('fecha_inicio')) {
+            $query->whereDate('curso_estudiante.created_at', '>=', $request->fecha_inicio);
+        }
+
+        if ($request->filled('fecha_fin')) {
+            $query->whereDate('curso_estudiante.created_at', '<=', $request->fecha_fin);
+        }
+
+        $estudiantes = $query
+            ->orderBy('curso_estudiante.created_at', 'desc')
+            ->paginate(10)
+            ->withQueryString();
 
         $personales = Personal::with('persona')->get();
 
@@ -122,16 +137,14 @@ class InscripcionController extends Controller
         $usuario = auth()->user();
         $estudiante = Estudiante::findOrFail($id);
 
-        // Capturamos el id_curso que viene por la URL (?id_curso=X)
         $id_curso = $request->query('id_curso');
 
         if (!$id_curso) {
             return redirect()->back()->with('error', 'No se especificó un curso válido.');
         }
 
-        $curso = Curso::findOrFail($id_curso); // Ahora sí buscamos el curso real
+        $curso = Curso::findOrFail($id_curso);
 
-        // FILTRADO REAL: Solo planes de este curso
         $planes = PlanesPago::where('id_curso', $id_curso)->get();
         $descuentos = Descuento::all();
 
@@ -164,13 +177,11 @@ class InscripcionController extends Controller
 
                     $montoPlan = (float) $detallePlan->monto_cuota;
 
-                    // aplicar descuento si existe
                     if ($id_descuento) {
                         $descuento = Descuento::find($id_descuento);
                         $montoPlan -= ($montoPlan * ($descuento->porcentaje / 100));
                     }
 
-                    // 🔥 LO IMPORTANTE (ahora sí coincide con el frontend)
                     $montoPagado = isset($request->cuotas[$index]['monto_pagado'])
                         ? (float) $request->cuotas[$index]['monto_pagado']
                         : 0;
@@ -179,7 +190,6 @@ class InscripcionController extends Controller
                         ? $request->cuotas[$index]['fecha_pagada']
                         : null;
 
-                    // estado automático
                     if ($montoPagado == 0) {
                         $estado = 'pendiente';
                     } elseif ($montoPagado < $montoPlan) {
@@ -310,6 +320,32 @@ class InscripcionController extends Controller
             'id' => $inscripcion->id_estudiante,
             'id_curso' => $inscripcion->id_curso
         ])->with('success', '¡Pago actualizado con éxito!');
+    }
+
+    public function agregarEstudiante(Request $request)
+    {
+        $request->validate([
+            'id_estudiante' => 'required|exists:estudiante,id_estudiante',
+            'id_curso' => 'required|exists:curso,id_curso',
+            'id_personal' => 'required'
+        ]);
+
+        $exists = \App\Models\CursoEstudiante::where('id_estudiante', $request->id_estudiante)
+            ->where('id_curso', $request->id_curso)
+            ->exists();
+
+        if ($exists) {
+            return back()->with('error', 'El estudiante ya está en este curso');
+        }
+
+        \App\Models\CursoEstudiante::create([
+            'id_estudiante' => $request->id_estudiante,
+            'id_curso' => $request->id_curso,
+            'id_personal' => $request->id_personal,
+            'estado' => 'pre_inscrito'
+        ]);
+
+        return back()->with('success', 'Estudiante añadido correctamente');
     }
 
 }

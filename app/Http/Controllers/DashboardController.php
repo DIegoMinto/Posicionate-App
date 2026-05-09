@@ -43,12 +43,10 @@ class DashboardController extends Controller
                 'persona.apellido_p as asesor_apellido'
             );
 
-        // 🔒 filtro por rol
         if ($usuario->rol === 'user') {
             $query->where('estudiante.id_personal', $usuario->id_personal);
         }
 
-        // 🔎 filtros
         if ($request->filled('id_personal')) {
             $query->where('estudiante.id_personal', $request->id_personal);
         }
@@ -57,8 +55,27 @@ class DashboardController extends Controller
             $query->where('curso_estudiante.estado', $request->estado);
         }
 
+        if ($request->filled('search')) {
+            $search = $request->search;
+
+            $query->where(function ($q) use ($search) {
+                $q->where('estudiante.nombre', 'ILIKE', "%$search%")
+                    ->orWhere('estudiante.apellido_p', 'ILIKE', "%$search%")
+                    ->orWhere('estudiante.apellido_m', 'ILIKE', "%$search%")
+                    ->orWhere('estudiante.ci', 'ILIKE', "%$search%");
+            });
+        }
+
+        if ($request->filled('fecha_inicio')) {
+            $query->whereDate('curso_estudiante.created_at', '>=', $request->fecha_inicio);
+        }
+
+        if ($request->filled('fecha_fin')) {
+            $query->whereDate('curso_estudiante.created_at', '<=', $request->fecha_fin);
+        }
+
         $estudiantes = $query
-            ->orderBy('curso_estudiante.created_at', 'desc') // 🟢 FIX FINAL
+            ->orderBy('curso_estudiante.created_at', 'desc')
             ->get();
 
         $personales = Personal::with('persona')->get();
@@ -80,10 +97,10 @@ class DashboardController extends Controller
     {
         $usuario = auth()->user()->load('persona');
 
-        // Traer sedes para el select
+
         $sedes = Sede::all();
 
-        // Traer personal con relaciones necesarias y filtros
+
         $query = Personal::with('persona', 'sede');
 
         if ($request->has('id_sede') && $request->id_sede != '') {
@@ -107,10 +124,10 @@ class DashboardController extends Controller
             });
         }
 
-        // Paginación
+
         $personales = $query->paginate(25);
 
-        // Traer áreas únicas del campo cargo
+
         $areas = Personal::select('cargo')
             ->distinct()
             ->orderBy('cargo')
@@ -159,11 +176,15 @@ class DashboardController extends Controller
         $sedes = \App\Models\Sede::all();
         $instituciones = \App\Models\Institucion::all();
 
+
+        $allEstudiantes = \App\Models\Estudiante::orderBy('nombre')->get();
+
         return view('dashboard.programs', compact(
             'usuario',
             'cursos',
             'sedes',
-            'instituciones'
+            'instituciones',
+            'allEstudiantes'
         ));
     }
 
@@ -212,14 +233,14 @@ class DashboardController extends Controller
         $data['inscritos'] = 0;
         $data['pre_inscritos'] = 0;
 
-        // 1. Crear el Curso
+
         $curso = \App\Models\Curso::create($data);
 
-        // 2. Guardar Docentes Adicionales (Si vienen en el array dinámico)
+
         if ($request->has('docentes_adicionales')) {
             foreach ($request->docentes_adicionales as $doc_id) {
                 if ($doc_id) {
-                    // Esto inserta automáticamente en la tabla docentes_adicionales
+
                     $curso->docentesAdicionales()->create([
                         'id_docente' => $doc_id
                     ]);
@@ -227,7 +248,7 @@ class DashboardController extends Controller
             }
         }
 
-        // 3. REDIRECCIÓN KING: A la configuración de pagos
+
         return redirect()->route('programs.payments.setup', $curso->id_curso)
             ->with('success', 'Programa creado. Ahora define los planes de pago.');
     }
@@ -245,13 +266,13 @@ class DashboardController extends Controller
 
     public function setup($id)
     {
-        // lógica aquí
+
         return view('plans.setup', compact('id'));
     }
 
     public function programsShow($id)
     {
-        // Traemos el curso con todas sus relaciones cargadas
+
         $curso = Curso::with([
             'institucion',
             'docente',
@@ -272,13 +293,13 @@ class DashboardController extends Controller
             abort(403, 'No autorizado');
         }
         $request->validate([
-            // Cambiado de confirmation a confirm
+
             'password_confirm' => 'required',
         ]);
 
-        // Verificar si la contraseña coincide con la del usuario autenticado
+
         if (!Hash::check($request->password_confirm, auth()->user()->password)) {
-            // Regresamos con un error específico si falla
+
             return back()->withErrors(['password_confirm' => 'La contraseña es incorrecta.']);
         }
 
@@ -306,7 +327,7 @@ class DashboardController extends Controller
         $curso = Curso::with(['institucion', 'clases', 'docente', 'sede'])->findOrFail($id);
         $usuario = auth()->user();
 
-        // Necesitamos estos para los selects
+
         $docentes = Docente::all();
         $sedes = Sede::all();
         $instituciones = Institucion::all();
@@ -314,7 +335,7 @@ class DashboardController extends Controller
         return view('programs.edit', compact('curso', 'usuario', 'docentes', 'sedes', 'instituciones'));
     }
 
-    // 2. Procesar Actualización
+
     public function programsUpdate(Request $request, $id)
     {
         if (auth()->user()->rol !== 'super_admin') {
@@ -322,7 +343,7 @@ class DashboardController extends Controller
         }
         $curso = Curso::findOrFail($id);
 
-        // Actualizar Curso
+
         $dataCurso = $request->only([
             'nombre',
             'codigo_curso',
@@ -337,7 +358,7 @@ class DashboardController extends Controller
         ]);
 
         if ($request->hasFile('codigo_qr')) {
-            // Borrar anterior si existe
+
             if ($curso->codigo_qr) {
                 Storage::disk('public')->delete($curso->codigo_qr);
             }
@@ -346,7 +367,7 @@ class DashboardController extends Controller
 
         $curso->update($dataCurso);
 
-        // Actualizar Institución (Si se permite editar info básica desde aquí)
+
         if ($curso->id_institucion) {
             $institucion = Institucion::find($curso->id_institucion);
             $institucion->update($request->only(['direccion', 'telefono']));
@@ -360,7 +381,7 @@ class DashboardController extends Controller
             }
         }
 
-        // Actualizar Clases (Manejo de múltiples registros)
+
         if ($request->has('clases')) {
             foreach ($request->clases as $id_clase => $claseData) {
                 $clase = Clase::find($id_clase);
@@ -379,5 +400,15 @@ class DashboardController extends Controller
         return view('dashboard.wpsender', compact('usuario'));
     }
 
-
+    public function show_student($id)
+    {
+        $estudiante = \App\Models\Estudiante::with([
+            'ciudad.departamento',
+            'institucionEgreso',
+            'gradoAcademico',
+            'profesion'
+        ])->findOrFail($id);
+        $usuario = auth()->user();
+        return view('students.show', compact('estudiante', 'usuario'));
+    }
 }

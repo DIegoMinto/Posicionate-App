@@ -119,7 +119,7 @@
                             <div class="btn-sidebar-icon">
                                 <img src="/img/statitics_icon.png" class="w-20 object-contain" alt="">
                             </div>
-                            <span class="btn-sidebar-text leading-tight uppercase">ESTADÍSTICAS</span>
+                            <span class="btn-sidebar-text leading-tight uppercase">CONTEO</span>
                         </a>
                     @endif
 

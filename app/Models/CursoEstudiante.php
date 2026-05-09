@@ -17,6 +17,7 @@ class CursoEstudiante extends Model
     protected $fillable = [
         'id_curso',
         'id_estudiante',
+        'id_personal',
         'estado',
         'id_planes_pago',
         'id_descuento'
@@ -27,6 +28,16 @@ class CursoEstudiante extends Model
     {
         // OJO: Cambié PlanesPago por PlanPago para que coincida con tu modelo
         return $this->belongsTo(PlanesPago::class, 'id_planes_pago', 'id_planes_pago');
+    }
+
+    public function asesor(): BelongsTo
+    {
+        return $this->belongsTo(Personal::class, 'id_personal', 'id_personal');
+    }
+
+    public function curso(): BelongsTo
+    {
+        return $this->belongsTo(Curso::class, 'id_curso', 'id_curso');
     }
 
 

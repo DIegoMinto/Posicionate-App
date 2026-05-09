@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Inicio - Posicionate</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+    <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
 </head>
 
 <body>
@@ -231,17 +232,105 @@
                                                         </span>
                                                     </a>
                                                     @endif
-                                                    <a href="{{ route('inscripcion.public', ['id_curso' => $curso->id_curso, 'id_personal' => $usuario->id_personal]) }} " 
-                                                    class="group relative flex items-center justify-center"
-                                                    title="Añadir Clase" target="_blank">
-                                                        <div class="">
-                                                            <img src="/img/add_student.png" class="w-12 h-12 object-contain" alt="Añadir Clase">
-                                                        </div>
-                                                        
-                                                        <span class="absolute -top-8 scale-0 transition-all rounded bg-gray-800 p-1 text-[10px] text-white group-hover:scale-100">
-                                                            Añadir Estudiante
-                                                        </span>
-                                                    </a>
+                                                    
+                                                    <div x-data="{ openModal: false }">
+
+    <button @click="openModal = true"
+        class="group relative flex items-center justify-center cursor-pointer"
+        title="Añadir Estudiante">
+
+        <img src="/img/add_student.png" class="w-12 h-12 object-contain" alt="Añadir Estudiante">
+
+        <span class="absolute -top-8 scale-0 transition-all rounded bg-gray-800 p-1 text-[10px] text-white group-hover:scale-100">
+            Añadir Estudiante
+        </span>
+    </button>
+
+    <div x-show="openModal"
+        class="fixed inset-0 z-[999] flex items-center justify-center bg-black/50 backdrop-blur-sm"
+        x-cloak>
+
+        <div class="bg-white w-[600px] max-h-[80vh] overflow-y-auto rounded-sm shadow-2xl"
+            @click.away="openModal = false">
+
+            <h2 class="font-sans font-bold mb-4 uppercase text-brand-green bg-brand-green text-white p-6">
+                Seleccionar Estudiante
+            </h2>
+
+            <div 
+    x-data="{
+        search: '',
+        estudiantes: @js($allEstudiantes)
+    }"
+    class="p-6"
+>
+
+    <input type="text"
+        x-model="search"
+        placeholder="Buscar por nombre o CI..."
+        class="w-full border p-2 text-sm mb-4 rounded-sm focus:outline-none">
+
+    <!-- 📋 LISTA -->
+    <div class="space-y-2 max-h-[400px] overflow-y-auto">
+
+        <template x-for="est in estudiantes.filter(e => 
+            (e.nombre + ' ' + e.apellido_p).toLowerCase().includes(search.toLowerCase()) ||
+            ((e.ci ?? '').toLowerCase().includes(search.toLowerCase()))
+        )" :key="est.id_estudiante">
+
+            <div class="flex justify-between items-center border p-2 rounded-sm">
+
+                <div>
+                    <div class="font-sans font-bold text-left"
+                        x-text="est.nombre + ' ' + est.apellido_p">
+                    </div>
+
+                    <div class="font-sans text-brand-green text-left">
+                        CI: <span x-text="est.ci"></span>
+                    </div>
+                </div>
+
+                <form method="POST" action="{{ route('curso.agregar.estudiante') }}">
+                    @csrf
+
+                    <input type="hidden" name="id_estudiante" :value="est.id_estudiante">
+                    <input type="hidden" name="id_curso" value="{{ $curso->id_curso }}">
+                    <input type="hidden" name="id_personal" value="{{ $usuario->id_personal }}">
+
+                    <button type="submit"
+                        class="btn-gold px-3 py-2 text-[10px]">
+                        Añadir
+                    </button>
+                </form>
+
+                
+            </div>
+
+        </template>
+<div class="text-right mt-4 p-2">
+                <button @click="openModal = false"
+                    class="text-xs text-red-600 font-bold font-sans uppercase cursor-pointer">
+                    Cerrar
+                </button>
+            </div>
+        <div x-show="estudiantes.filter(e => 
+            (e.nombre + ' ' + e.apellido_p).toLowerCase().includes(search.toLowerCase()) ||
+            ((e.ci ?? '').toLowerCase().includes(search.toLowerCase()))
+        ).length === 0"
+            class="text-center text-gray-400 text-xs py-4 italic">
+
+            No se encontraron estudiantes
+
+        </div>
+
+    </div>
+
+</div>
+
+        </div>
+    </div>
+
+</div>
                                                     
                                                     <a href="{{ route('curso.estudiantes', $curso->id_curso) }}" 
                                                     class="group relative flex items-center justify-center"

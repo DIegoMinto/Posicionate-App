@@ -10,8 +10,9 @@
 
 <body class="bg-brand-green font-sans min-h-screen flex">
 
-    <div class="hidden lg:block lg:w-1/3 h-screen border-r-4 border-brand-gold overflow-hidden"
+    <div class="hidden lg:block lg:w-1/3 h-full border-r-4 border-brand-gold overflow-hidden"
         style="background-color: white;">
+        <img src="/img/sky_fondo.jpg" class="w-full h-full object-cover" alt="">
     </div>
 
     <div class="w-full lg:w-2/3 p-6 md:p-8 overflow-y-auto">
