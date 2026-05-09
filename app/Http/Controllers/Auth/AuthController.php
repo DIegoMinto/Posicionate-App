@@ -19,8 +19,6 @@ class AuthController extends Controller
         return view('auth.login');
     }
 
-    // En AuthController.php
-
     public function loginVerify(Request $request)
     {
         $credentials = $request->validate([
@@ -28,7 +26,6 @@ class AuthController extends Controller
             'password' => 'required|min:4'
         ]);
 
-        // Intentamos loguear buscando por la columna 'user'
         if (Auth::attempt(['user' => $credentials['user'], 'password' => $credentials['password']])) {
             $request->session()->regenerate();
             return redirect()->intended('/dashboard');

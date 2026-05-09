@@ -21,7 +21,31 @@ class DashboardController extends Controller
     public function index()
     {
         $usuario = auth()->user()->load('persona');
-        return view('dashboard.index', compact('usuario'));
+
+        $rankingGeneral = Personal::with('persona')
+            ->withCount('cursoEstudiantes')
+            ->orderByDesc('curso_estudiantes_count')
+            ->take(3)
+            ->get();
+        $rankingMensual = Personal::with('persona')
+            ->withCount([
+                'cursoEstudiantes as inscritos_mes_count' => function ($q) {
+                    $q->whereMonth('created_at', now()->month)
+                        ->whereYear('created_at', now()->year);
+                }
+            ])
+            ->orderByDesc('inscritos_mes_count')
+            ->take(3)
+            ->get();
+
+        return view(
+            'dashboard.index',
+            compact(
+                'usuario',
+                'rankingGeneral',
+                'rankingMensual'
+            )
+        );
     }
 
     public function students(Request $request)

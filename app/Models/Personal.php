@@ -4,7 +4,7 @@ namespace App\Models;
 
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
-use Illuminate\Database\Eloquent\Relations\BelongsTo; // Opcional, para tipado
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Personal extends Authenticatable
 {
@@ -45,10 +45,7 @@ class Personal extends Authenticatable
     {
         return $this->belongsTo(Sede::class, 'id_sede', 'id_sede');
     }
-    public function getAuthIdentifier()
-    {
-        return $this->id_personal;
-    }
+
 
     public function getCargoNombreAttribute()
     {
@@ -71,6 +68,15 @@ class Personal extends Authenticatable
             'user' => 'Usuario',
             'viewer' => 'Solo Lectura',
         ][$this->rol] ?? $this->rol;
+    }
+
+    public function cursoEstudiantes()
+    {
+        return $this->hasMany(
+            \App\Models\CursoEstudiante::class,
+            'id_personal',
+            'id_personal'
+        );
     }
 
 
