@@ -16,7 +16,7 @@
         </x-page-header>
         <div class="flex flex-col items-center p-6">
 
-            <img src="/img/ranking_general.png" alt="Ranking General" class="w-200 object-contain">
+            <img src="{{ asset('img/ranking_general.png') }}" alt="Ranking General" class="w-200 object-contain">
 
             <div class="flex flex-col md:flex-row items-end justify-center gap-8">
 
