@@ -296,13 +296,12 @@ class DashboardController extends Controller
 
     public function programsShow($id)
     {
-
         $curso = Curso::with([
             'institucion',
             'docente',
             'sede',
-            'clases' => function ($query) {
-                $query->orderBy('fecha', 'asc')->orderBy('hora_inicio', 'asc');
+            'modulos' => function ($query) {
+                $query->orderBy('fecha_inicio', 'asc');
             }
         ])->findOrFail($id);
 

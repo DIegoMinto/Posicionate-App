@@ -41,6 +41,10 @@ class Curso extends Model
     {
         return $this->belongsTo(Institucion::class, 'id_institucion', 'id_institucion');
     }
+    public function modulos()
+    {
+        return $this->hasMany(Modulo::class, 'id_curso');
+    }
 
     public function sede(): BelongsTo
     {

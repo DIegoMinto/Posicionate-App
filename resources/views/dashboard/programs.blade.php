@@ -206,7 +206,7 @@
                                                             ]) 
                                                             || $usuario->rol === 'super_admin'
                                                         )
-                                                    <a href="{{ route('class.create', ['id_curso' => $curso->id_curso]) }}" 
+                                                    <a href="{{ route('modulo.create', ['id_curso' => $curso->id_curso]) }}" 
                                                     class="group relative flex items-center justify-center"
                                                     title="Añadir Clase">
                                                         <div class="">
@@ -214,7 +214,7 @@
                                                         </div>
                                                         
                                                         <span class="absolute -top-8 scale-0 transition-all rounded bg-gray-800 p-1 text-[10px] text-white group-hover:scale-100">
-                                                            Añadir Clase
+                                                            Añadir Módulo
                                                         </span>
                                                     </a>
                                                     
@@ -270,7 +270,6 @@
         placeholder="Buscar por nombre o CI..."
         class="w-full border p-2 text-sm mb-4 rounded-sm focus:outline-none">
 
-    <!-- 📋 LISTA -->
     <div class="space-y-2 max-h-[400px] overflow-y-auto">
 
         <template x-for="est in estudiantes.filter(e => 

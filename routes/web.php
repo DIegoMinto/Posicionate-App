@@ -13,6 +13,7 @@ use App\Http\Controllers\ClassController;
 use App\Http\Controllers\InscripcionController;
 use App\Http\Controllers\StatiticController;
 use App\Http\Controllers\PlanController;
+use App\Http\Controllers\ModuloController;
 use App\Models\PlanesPago;
 
 Route::get('/', function () {
@@ -112,6 +113,9 @@ Route::middleware(['auth', 'vigente'])->group(function () {
         Route::resource('sedes', SedeController::class)->names('sedes');
     });
 
+    //RUTAS MODULO
+    Route::get('/modulo/crear', [ModuloController::class, 'create'])->name('modulo.create');
+    Route::post('/modulo/guardar', [ModuloController::class, 'store'])->name('modulo.store');
 
     //RUTAS WHATSAPP
     Route::get('/wpsender', [WhatsappController::class, 'index'])->name('wpsender.index');

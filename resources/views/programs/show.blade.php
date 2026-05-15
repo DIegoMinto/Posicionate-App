@@ -96,68 +96,70 @@
             </div>
 
             <div class="bg-white rounded-sm shadow-md">
-                <div class="p-4 border-b border-gray-100 flex justify-between items-center bg-gray-50">
-                    <h3 class="text-brand-green font-sans font-bold uppercase tracking-tighter flex items-center gap-2">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24"
-                            stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                        </svg>
-                        Cronograma de Clases y Webinars
-                    </h3>
-                    <a href="{{ route('class.create', ['id_curso' => $curso->id_curso]) }}" class="btn-gold">
-                        + Añadir Sesión
-                    </a>
-                </div>
 
-                <div class="overflow-x-auto p-4">
-                    <div class="inline-block min-w-full overflow-hidden rounded-lg border border-gray-200">
-                        <table class="w-full text-left border-1 border-brand-green">
-                            <thead class="bg-brand-green font-sans font-bold text-white">
-                                <tr>
-                                    <th class="px-6 py-3 text-left">Sesión / Tema</th>
-                                    <th class="px-6 py-3 text-left">Tipo</th>
-                                    <th class="px-6 py-3 text-left">Fecha</th>
-                                    <th class="px-6 py-3 text-left">Horario</th>
-                                    <th class="px-6 py-3 text-center">Acciones</th>
-                                </tr>
-                            </thead>
-                            <tbody class="divide-y divide-gray-100 bg-white">
-                                @forelse($curso->clases as $clase)
-                                    <tr class="hover:bg-gray-50 transition-colors">
-                                        <td class="px-6 py-4 text-left">
-                                            <p class="font-sans">{{ $clase->nombre }}</p>
-                                        </td>
-                                        <td class="px-6 py-4 text-left">
-                                            <span class="font-sans">
-                                                {{ $clase->tipo }}
-                                            </span>
-                                        </td>
-                                        <td class="px-6 py-4 text-left font-sans">
-                                            {{ \Carbon\Carbon::parse($clase->fecha)->format('d/m/Y') }}
-                                        </td>
-                                        <td class="px-6 py-4 text-left font-sans">
-                                            {{ \Carbon\Carbon::parse($clase->hora_inicio)->format('H:i') }} -
-                                            {{ \Carbon\Carbon::parse($clase->hora_fin)->format('H:i') }}
-                                        </td>
-                                        <td class="px-6 py-4 text-center">
-                                            <div class="flex justify-center gap-2">
-                                                <button class="text-gray-400 hover:text-brand-gold">
-                                                    <i class="fas fa-edit"></i>
-                                                </button>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                @empty
+                <div class="bg-white rounded-sm shadow-md">
+                    <div class="p-4 border-b border-gray-100 flex justify-between items-center bg-gray-50">
+                        <h3
+                            class="text-brand-green font-sans font-bold uppercase tracking-tighter flex items-center gap-2">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24"
+                                stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+                            </svg>
+                            Módulos del Programa
+                        </h3>
+                        <a href="{{ route('modulo.create', ['id_curso' => $curso->id_curso]) }}" class="btn-gold">
+                            + Añadir Módulo
+                        </a>
+                    </div>
+
+                    <div class="overflow-x-auto p-4">
+                        <div class="inline-block min-w-full overflow-hidden rounded-lg border border-gray-200">
+                            <table class="w-full text-left border-1 border-brand-green">
+                                <thead class="bg-brand-green font-sans font-bold text-white">
                                     <tr>
-                                        <td colspan="5"
-                                            class="px-6 py-10 text-center text-gray-400 italic uppercase text-xs tracking-widest">
-                                            No hay clases programadas para este curso.
-                                        </td>
+                                        <th class="px-6 py-3 text-left">Nombre del Módulo</th>
+                                        <th class="px-6 py-3 text-left">Fecha de Inicio</th>
+                                        <th class="px-6 py-3 text-left">Fecha de Fin</th>
+                                        <th class="px-6 py-3 text-center">Acciones</th>
                                     </tr>
-                                @endforelse
-                            </tbody>
-                        </table>
+                                </thead>
+                                <tbody class="divide-y divide-gray-100 bg-white">
+                                    @forelse($curso->modulos as $modulo)
+                                        <tr class="hover:bg-gray-50 transition-colors">
+                                            <td class="px-6 py-4 text-left">
+                                                <p class="font-sans font-bold text-brand-green">{{ $modulo->nombre }}</p>
+                                            </td>
+                                            <td class="px-6 py-4 text-left font-sans">
+                                                {{ $modulo->fecha_inicio ? \Carbon\Carbon::parse($modulo->fecha_inicio)->format('d/m/Y') : 'Por definir' }}
+                                            </td>
+                                            <td class="px-6 py-4 text-left font-sans">
+                                                {{ $modulo->fecha_fin ? \Carbon\Carbon::parse($modulo->fecha_fin)->format('d/m/Y') : 'Por definir' }}
+                                            </td>
+                                            <td class="px-6 py-4 text-center">
+                                                <div class="flex justify-center gap-2">
+                                                    <button class="text-gray-400 hover:text-brand-gold"
+                                                        title="Editar Módulo">
+                                                        <i class="fas fa-edit"></i>
+                                                    </button>
+                                                    <button class="text-gray-400 hover:text-red-500"
+                                                        title="Eliminar Módulo">
+                                                        <i class="fas fa-trash"></i>
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    @empty
+                                        <tr>
+                                            <td colspan="4"
+                                                class="px-6 py-10 text-center text-gray-400 italic uppercase text-xs tracking-widest">
+                                                No hay módulos registrados para este curso.
+                                            </td>
+                                        </tr>
+                                    @endforelse
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                 </div>
             </div>
