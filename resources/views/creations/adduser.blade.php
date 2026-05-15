@@ -16,9 +16,21 @@
             <div class="max-w-3xl mx-auto bg-white rounded-sm border-2 border-brand-gold shadow-md">
                 <div class="mb-6 border-b border-gray-100 pb-4 bg-brand-green text-white p-8 rounded-sm">
                     <h2 class="text-lg font-black uppercase">Asignar Acceso a Sistema</h2>
-                    <p class="text-[11px] text-white">Persona: <span class="} font-bold">{{ $persona->nombre }}
+                    <p class="text-[11px] text-white">Persona: <span class="font-bold">{{ $persona->nombre }}
                             {{ $persona->apellido_p }}</span></p>
                 </div>
+
+                {{-- CONTROL DE ERRORES DE VALIDACIÓN --}}
+                @if ($errors->any())
+                    <div class="mb-4 mx-4 p-4 bg-red-50 border-l-4 border-red-500 text-red-700 rounded-sm">
+                        <p class="text-xs font-black uppercase mb-1">⚠️ Error en los datos ingresados:</p>
+                        <ul class="list-disc list-inside text-[11px] space-y-1">
+                            @foreach ($errors->all() as $error)
+                                <li>{{ $error }}</li>
+                            @endforeach
+                        </ul>
+                    </div>
+                @endif
 
                 <form action="{{ route('users.store_user') }}" method="POST" class="space-y-4 p-4">
                     @csrf
@@ -28,7 +40,7 @@
                         <div>
                             <label class="block text-xs font-black text-brand-green uppercase mb-1 ">Nombre de
                                 Usuario</label>
-                            <input type="text" name="user" required
+                            <input type="text" name="user" required value="{{ old('user') }}"
                                 class="form-input-pill text-xs border-1 border-brand-green outline-none">
                         </div>
 
@@ -38,7 +50,7 @@
                             <select name="id_sede" required
                                 class="w-full form-select-pill text-xs border-1 border-brand-green outline-none">
                                 @foreach($sedes as $sede)
-                                    <option value="{{ $sede->id_sede }}">{{ $sede->nombre }}</option>
+                                    <option value="{{ $sede->id_sede }}" {{ old('id_sede') == $sede->id_sede ? 'selected' : '' }}>{{ $sede->nombre }}</option>
                                 @endforeach
                             </select>
                         </div>
@@ -50,17 +62,18 @@
                                 class="form-select-pill text-xs border-1 border-brand-green outline-none">
                                 <option value="">Seleccionar</option>
 
-                                <option value="gerente_marketing">Gerente de marketing</option>
-                                <option value="supervisor_marketing">Supervisor de marketing</option>
-                                <option value="coordinador_marketing">Coordinador de marketing</option>
-                                <option value="asesor_marketing">Asesor de marketing</option>
+                                <option value="gerente_marketing" {{ old('cargo') == 'gerente_marketing' ? 'selected' : '' }}>Gerente de marketing</option>
+                                <option value="supervisor_marketing" {{ old('cargo') == 'supervisor_marketing' ? 'selected' : '' }}>Supervisor de marketing</option>
+                                <option value="coordinador_marketing" {{ old('cargo') == 'coordinador_marketing' ? 'selected' : '' }}>Coordinador de marketing</option>
+                                <option value="asesor_marketing" {{ old('cargo') == 'asesor_marketing' ? 'selected' : '' }}>Asesor de marketing</option>
 
-                                <option value="supervisor_academico">Supervisor académico</option>
-                                <option value="coordinador_academico">Coordinador académico</option>
-                                <option value="asistente_academico">Asistente académico</option>
+                                <option value="supervisor_academico" {{ old('cargo') == 'supervisor_academico' ? 'selected' : '' }}>Supervisor académico</option>
+                                <option value="coordinador_academico" {{ old('cargo') == 'coordinador_academico' ? 'selected' : '' }}>Coordinador académico</option>
+                                <option value="asistente_academico" {{ old('cargo') == 'asistente_academico' ? 'selected' : '' }}>Asistente académico</option>
 
-                                <option value="contador">Contador</option>
-                                <option value="asistente_contable">Asistente contable</option>
+                                <option value="contador" {{ old('cargo') == 'contador' ? 'selected' : '' }}>Contador
+                                </option>
+                                <option value="asistente_contable" {{ old('cargo') == 'asistente_contable' ? 'selected' : '' }}>Asistente contable</option>
                             </select>
                         </div>
 
@@ -70,9 +83,10 @@
                             <select name="rol" required
                                 class="form-select-pill text-xs border-1 border-brand-green outline-none">
                                 <option value="">Seleccionar</option>
-                                <option value="super_admin">Super Administrador</option>
-                                <option value="admin">Administrador</option>
-                                <option value="user">Usuario</option>
+                                <option value="super_admin" {{ old('rol') == 'super_admin' ? 'selected' : '' }}>Super
+                                    Administrador</option>
+                                <option value="admin" {{ old('rol') == 'admin' ? 'selected' : '' }}>Administrador</option>
+                                <option value="user" {{ old('rol') == 'user' ? 'selected' : '' }}>Usuario</option>
                             </select>
                         </div>
 

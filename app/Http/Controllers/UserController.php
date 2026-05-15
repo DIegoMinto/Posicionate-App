@@ -48,7 +48,8 @@ class UserController extends Controller
                 Rule::in([
                     'gerente_marketing',
                     'supervisor_marketing',
-                    'asesora_marketing',
+                    'coordinador_marketing',
+                    'asesor_marketing',
                     'supervisor_academico',
                     'coordinador_academico',
                     'asistente_academico',
