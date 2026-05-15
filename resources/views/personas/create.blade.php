@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Registro - Posicionate</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
 </head>
 
 <body class="bg-brand-green font-sans min-h-screen flex">
@@ -18,7 +19,6 @@
         <h2 class="text-white text-3xl font-bold text-center mb-10 tracking-widest uppercase">
             Formulario de Registro de Personal
         </h2>
-        {{-- Mensajes de Error de Validación --}}
         @if ($errors->any())
             <div class="max-w-5xl mx-auto mb-6 p-4 bg-red-500/20 border-2 border-red-500 text-white rounded-2xl">
                 <strong class="block font-bold mb-2 text-red-400 uppercase tracking-wide">¡Ups! Algo salió mal:</strong>
@@ -65,7 +65,7 @@
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <div>
                         <label class="form-label-bold">Fecha de Nacimiento</label>
-                        <input type="date" name="fecha_nacimiento" class="form-input-pill text-gray-400">
+                        <input type="date" name="fecha_nacimiento" class="form-input-pill text-black">
                     </div>
                     <div>
                         <label class="form-label-bold">Carnet de Identidad</label>
@@ -226,7 +226,7 @@
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                     <div>
                         <label class="form-label-bold">Profesión / Ocupación</label>
-                        <select name="id_profesion" class="form-select-pill">
+                        <select name="id_profesion" id="select-profesion" class="form-select-pill">
                             <option value="">Seleccione Profesión</option>
                             @foreach($profesiones as $prof)
                                 <option value="{{ $prof->id_profesion }}">{{ $prof->nombre }}</option>
@@ -236,7 +236,7 @@
 
                     <div>
                         <label class="form-label-bold">Grado Académico</label>
-                        <select name="id_grado_academico" class="form-select-pill">
+                        <select name="id_grado_academico" id="select-grado" class="form-select-pill">
                             <option value="">Seleccione Grado</option>
                             @foreach($grados as $grado)
                                 <option value="{{ $grado->id_grado_academico }}">{{ $grado->nombre }}</option>
@@ -246,7 +246,7 @@
 
                     <div>
                         <label class="form-label-bold">Institución de Egreso</label>
-                        <select name="id_institucion_egreso" class="form-select-pill">
+                        <select name="id_institucion_egreso" id="select-institucion" class="form-select-pill">
                             <option value="">Seleccione Institución</option>
                             @foreach($instituciones as $inst)
                                 <option value="{{ $inst->id_institucion_egreso }}">{{ $inst->nombre }}</option>
@@ -324,10 +324,11 @@
 
 
     </div>
-
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
     <script>
+
         document.addEventListener('DOMContentLoaded', () => {
-            // --- SELECTORES ---
             const paisSelect = document.getElementById('select-pais');
             const deptoSelect = document.getElementById('select-departamento');
             const ciudadSelect = document.getElementById('select-ciudad');
@@ -337,14 +338,11 @@
             const numeroMovilInput = document.getElementById('input-numero-movil');
             const telefonoHidden = document.getElementById('telefono_movil_hidden');
 
-            // --- 1. LÓGICA DE TELÉFONO (CONCATENACIÓN) ---
             const actualizarTelefonoCompleto = () => {
-                const codigo = codigoManual.value; // Ej: +591
-                const numero = numeroMovilInput.value.trim(); // Ej: 75780041
-
-                // Si hay un número escrito, concatenamos con espacio, si no, lo dejamos vacío o solo el código
+                const codigo = codigoManual.value;
+                const numero = numeroMovilInput.value.trim();
                 if (numero !== "") {
-                    telefonoHidden.value = `${codigo} ${numero}`; // Fíjate en el espacio aquí: "+591 75780041"
+                    telefonoHidden.value = `${codigo} ${numero}`;
                 } else {
                     telefonoHidden.value = "";
                 }
@@ -353,18 +351,17 @@
             codigoManual.addEventListener('change', actualizarTelefonoCompleto);
             numeroMovilInput.addEventListener('input', actualizarTelefonoCompleto);
 
-            // --- 2. LÓGICA DE EXTENSIÓN DE CARNET (INDEPENDIENTE) ---
             extensionSelect.addEventListener('change', function () {
                 if (this.value === 'OTRO') {
                     extensionOtroInput.classList.remove('hidden');
-                    extensionOtroInput.name = "extension_ci"; // El input de texto enviará el dato
-                    this.removeAttribute('name'); // El select deja de enviar dato para no duplicar
+                    extensionOtroInput.name = "extension_ci";
+                    this.removeAttribute('name');
                     extensionOtroInput.focus();
                 } else {
                     extensionOtroInput.classList.add('hidden');
                     extensionOtroInput.value = '';
                     extensionOtroInput.removeAttribute('name');
-                    this.name = "extension_ci"; // El select vuelve a ser el dueño del dato
+                    this.name = "extension_ci";
                 }
             });
 
@@ -385,7 +382,7 @@
                 deptoSelect.innerHTML = '<option value="">Seleccione Departamento</option>';
                 ciudadSelect.innerHTML = '<option value="">Seleccione depto primero</option>';
 
-                if (paisId == "1") { // Suponiendo que 1 es Bolivia
+                if (paisId == "1") {
                     departamentosBolivia.forEach(d => {
                         deptoSelect.innerHTML += `<option value="${d.id}">${d.nombre}</option>`;
                     });
@@ -394,7 +391,6 @@
                 }
             });
 
-            // --- 4. LÓGICA DE CIUDADES DINÁMICAS (SIN TOCAR CI) ---
             deptoSelect.addEventListener('change', async (e) => {
                 const deptoId = e.target.value;
                 if (!deptoId) return;
@@ -414,8 +410,30 @@
                 }
             });
 
-            // Inicialización
             actualizarTelefonoCompleto();
+        });
+        $('#select-profesion').select2({
+            placeholder: "Seleccione Profesión",
+            allowClear: true,
+            width: '100%'
+        });
+
+        $('#select-grado').select2({
+            placeholder: "Seleccione Grado",
+            allowClear: true,
+            width: '100%'
+        });
+
+        $('#select-institucion').select2({
+            placeholder: "Seleccione Institución",
+            allowClear: true,
+            width: '100%'
+        });
+
+        $('#select-banco').select2({
+            placeholder: "Seleccione banco",
+            allowClear: true,
+            width: '100%'
         });
     </script>
 </body>

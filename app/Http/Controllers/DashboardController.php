@@ -55,7 +55,7 @@ class DashboardController extends Controller
         $query = DB::table('curso_estudiante')
             ->join('estudiante', 'curso_estudiante.id_estudiante', '=', 'estudiante.id_estudiante')
             ->join('curso', 'curso_estudiante.id_curso', '=', 'curso.id_curso')
-            ->join('personal', 'estudiante.id_personal', '=', 'personal.id_personal')
+            ->join('personal', 'curso_estudiante.id_personal', '=', 'personal.id_personal')
             ->join('persona', 'personal.id_persona', '=', 'persona.id_persona')
             ->select(
                 'estudiante.*',

@@ -25,7 +25,10 @@ class Estudiante extends Model
         'telefono_movil',
         'correo_electronico',
         'genero',
-        'id_ciudad',
+
+        'id_departamento',
+        'ciudad_residencia',
+
         'id_institucion_egreso',
         'id_grado_academico',
         'id_profesion'
@@ -61,5 +64,10 @@ class Estudiante extends Model
     public function cursosEstudiante(): HasMany
     {
         return $this->hasMany(CursoEstudiante::class, 'id_estudiante', 'id_estudiante');
+    }
+
+    public function departamento()
+    {
+        return $this->belongsTo(Departamento::class, 'id_departamento');
     }
 }

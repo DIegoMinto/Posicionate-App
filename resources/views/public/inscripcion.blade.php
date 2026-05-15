@@ -4,8 +4,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Inscripción - {{ $curso->nombre }}</title>
+    <title>Registro - {{ $curso->nombre }}</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
 </head>
 
 <body class="bg-brand-green font-sans min-h-screen flex">
@@ -70,7 +71,7 @@
                     <div>
                         <label class="form-label-bold">Fecha de Nacimiento</label>
                         <input type="date" name="fecha_nacimiento" value="{{ old('fecha_nacimiento') }}"
-                            class="form-input-pill text-gray-400" required>
+                            class="form-input-pill text-black" required>
                     </div>
                     <div>
                         <label class="form-label-bold">Carnet de Identidad</label>
@@ -111,9 +112,8 @@
                     </div>
                     <div>
                         <label class="form-label-bold">Ciudad (Residencia)</label>
-                        <select name="id_ciudad" id="select-ciudad" class="form-select-pill" required>
-                            <option value="">Seleccione depto primero</option>
-                        </select>
+                        <input type="text" name="ciudad_residencia" value="{{ old('ciudad_residencia') }}"
+                            class="form-input-pill" placeholder="Ingrese su ciudad" required>
                     </div>
                 </div>
 
@@ -146,28 +146,32 @@
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                     <div>
                         <label class="form-label-bold">Profesión / Ocupación</label>
-                        <select name="id_profesion" class="form-select-pill">
+                        <select name="id_profesion" id="select-profesion" class="form-select-pill">
                             <option value="">Seleccione Profesión</option>
                             @foreach($profesiones as $prof)
                                 <option value="{{ $prof->id_profesion }}">{{ $prof->nombre }}</option>
                             @endforeach
                         </select>
                     </div>
+
                     <div>
                         <label class="form-label-bold">Grado Académico</label>
-                        <select name="id_grado_academico" class="form-select-pill">
+                        <select name="id_grado_academico" id="select-grado" class="form-select-pill">
                             <option value="">Seleccione Grado</option>
                             @foreach($grados as $grado)
                                 <option value="{{ $grado->id_grado_academico }}">{{ $grado->nombre }}</option>
                             @endforeach
                         </select>
                     </div>
+
                     <div>
                         <label class="form-label-bold">Institución de Egreso</label>
-                        <select name="id_institucion_egreso" class="form-select-pill">
+                        <select name="id_institucion_egreso" id="select-institucion" class="form-select-pill">
                             <option value="">Seleccione Institución</option>
                             @foreach($instituciones as $inst)
-                                <option value="{{ $inst->id_institucion_egreso }}">{{ $inst->nombre }}</option>
+                                <option value="{{ $inst->id_institucion_egreso }}">
+                                    {{ $inst->nombre }}
+                                </option>
                             @endforeach
                         </select>
                     </div>
@@ -206,14 +210,14 @@
             </div>
         </form>
     </div>
-
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 </body>
 <script>
     document.addEventListener('DOMContentLoaded', () => {
 
         const paisSelect = document.getElementById('select-pais');
         const deptoSelect = document.getElementById('select-departamento');
-        const ciudadSelect = document.getElementById('select-ciudad');
 
         const codigoManual = document.getElementById('select-codigo-manual');
         const numeroMovilInput = document.getElementById('input-numero-movil');
@@ -230,58 +234,57 @@
         codigoManual.addEventListener('change', actualizarTelefonoCompleto);
         numeroMovilInput.addEventListener('input', actualizarTelefonoCompleto);
 
-        // --- PAÍS -> DEPARTAMENTOS (DESDE BD) ---
+        // --- PAÍS -> DEPARTAMENTOS ---
         paisSelect.addEventListener('change', async (e) => {
+
             const paisId = e.target.value;
 
             deptoSelect.innerHTML = '<option value="">Cargando...</option>';
-            ciudadSelect.innerHTML = '<option value="">Seleccione depto primero</option>';
 
             if (!paisId) return;
 
             try {
-                const response = await fetch(`/api/paises/${paisId}/departamentos`)
+
+                const response = await fetch(`/api/paises/${paisId}/departamentos`);
                 const departamentos = await response.json();
 
-                deptoSelect.innerHTML = '<option value="">Seleccione Departamento</option>';
+                deptoSelect.innerHTML =
+                    '<option value="">Seleccione Departamento</option>';
 
                 departamentos.forEach(d => {
-                    deptoSelect.innerHTML += `<option value="${d.id_departamento}">${d.nombre}</option>`;
+                    deptoSelect.innerHTML +=
+                        `<option value="${d.id_departamento}">${d.nombre}</option>`;
                 });
 
             } catch (error) {
+
                 console.error(error);
-                deptoSelect.innerHTML = '<option value="">Error al cargar</option>';
-            }
-        });
 
-        // --- DEPARTAMENTO -> CIUDADES (DESDE BD) ---
-        deptoSelect.addEventListener('change', async (e) => {
-            const deptoId = e.target.value;
-
-            ciudadSelect.innerHTML = '<option value="">Cargando...</option>';
-
-            if (!deptoId) return;
-
-            try {
-                const response = await
-                    fetch(`/api/departamentos/${deptoId}/ciudades`)
-
-                const ciudades = await response.json();
-
-                ciudadSelect.innerHTML = '<option value="">Seleccione Ciudad</option>';
-
-                ciudades.forEach(c => {
-                    ciudadSelect.innerHTML += `<option value="${c.id_ciudad}">${c.nombre}</option>`;
-                });
-
-            } catch (error) {
-                console.error(error);
-                ciudadSelect.innerHTML = '<option value="">Error al cargar</option>';
+                deptoSelect.innerHTML =
+                    '<option value="">Error al cargar</option>';
             }
         });
 
         actualizarTelefonoCompleto();
+
+        $('#select-profesion').select2({
+            placeholder: "Seleccione Profesión",
+            allowClear: true,
+            width: '100%'
+        });
+
+        $('#select-grado').select2({
+            placeholder: "Seleccione Grado",
+            allowClear: true,
+            width: '100%'
+        });
+
+        $('#select-institucion').select2({
+            placeholder: "Seleccione Institución",
+            allowClear: true,
+            width: '100%'
+        });
+
     });
 </script>
 

@@ -77,3 +77,73 @@
 .card {
     @apply bg-brand-green text-white rounded-xl shadow-xl;
 }
+@layer components {
+
+
+    .select2-container {
+        width: 100% !important;
+    }
+
+    .select2-container--default .select2-selection--single {
+        height: 42px !important;
+        border-radius: 0.75rem !important;
+        border: none !important;
+        background: white !important;
+        display: flex !important;
+        align-items: center !important;
+        padding: 0 1rem !important;
+        transition: all .2s ease !important;
+    }
+
+    .select2-container--default .select2-selection--single:focus {
+        outline: none !important;
+    }
+
+    .select2-container--default .select2-selection--single .select2-selection__rendered {
+        color: black !important;
+        line-height: normal !important;
+        padding-left: 0 !important;
+    }
+
+    .select2-container--default .select2-selection--single .select2-selection__placeholder {
+        color: #6b7280 !important;
+    }
+
+    .select2-container--default .select2-selection--single .select2-selection__arrow {
+        height: 100% !important;
+        right: 12px !important;
+    }
+
+    .select2-dropdown {
+        border-radius: 1rem !important;
+        border: 1px solid #d1d5db !important;
+        overflow: hidden !important;
+    }
+
+    .select2-search--dropdown {
+        padding: 5px !important;
+        background: white !important;
+    }
+
+    .select2-search__field {
+        border-radius: 0.75rem !important;
+        border: 1px solid #d1d5db !important;
+        padding: 10px !important;
+        outline: none !important;
+    }
+
+    .select2-search__field:focus {
+        border-color: rgb(204, 180, 99) !important;
+        box-shadow: 0 0 0 1px rgb(204, 180, 99) !important;
+    }
+
+    .select2-results__option {
+        padding: 6px 6px !important;
+        font-size: 14px !important;
+    }
+
+    .select2-results__option--highlighted {
+        background: rgb(204, 180, 99) !important;
+        color: black !important;
+    }
+}

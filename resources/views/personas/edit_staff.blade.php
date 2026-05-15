@@ -174,6 +174,10 @@
                                         Supervisor de marketing
                                     </option>
 
+                                    <option value="supervisor_marketing" {{ $personal->cargo == 'coordinador_marketing' ? 'selected' : '' }}>
+                                        Coordinador de marketing
+                                    </option>
+
                                     <option value="asesora_marketing" {{ $personal->cargo == 'asesora_marketing' ? 'selected' : '' }}>
                                         Asesora de marketing
                                     </option>

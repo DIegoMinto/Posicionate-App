@@ -51,14 +51,18 @@
                     <div class="m-4">
                         <img src="/img/location_icon.png" class="w-12 h-12">
                     </div>
+
                     <div class="text-xl ml-3 pt-4">
+
                         <div>
-                            {{ optional($estudiante->ciudad)->nombre ?? 'Sin ciudad' }} -
-                            {{ optional(optional($estudiante->ciudad)->departamento)->nombre ?? 'Sin departamento' }}
+                            {{ $estudiante->ciudad_residencia ?? 'Sin ciudad' }} -
+                            {{ optional($estudiante->departamento)->nombre ?? 'Sin departamento' }}
                         </div>
+
                         <div>
                             {{ $estudiante->domicilio }}
                         </div>
+
                     </div>
                 </div>
 

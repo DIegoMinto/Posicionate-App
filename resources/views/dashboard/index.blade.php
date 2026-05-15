@@ -37,7 +37,7 @@
 
                             </div>
 
-                            <img src="{{ asset('img/segundo_lugar.png') }}" class="absolute top-0 right-0 w-20"
+                            <img src="{{ asset('img/segundo_lugar.PNG') }}" class="absolute top-0 right-0 w-20"
                                 alt="2do Lugar">
 
                         </div>
@@ -46,11 +46,6 @@
                             <p class="text-4xl font-black text-brand-green leading-none">
                                 {{ $segundo->curso_estudiantes_count }}
                             </p>
-
-                            <p class="text-xs uppercase tracking-[4px] text-[#072E2C] font-bold mt-1">
-                                Cierres
-                            </p>
-
                         </div>
 
                     </div>
@@ -78,11 +73,6 @@
                             <p class="text-4xl font-black text-brand-green leading-none">
                                 {{ $primero->curso_estudiantes_count }}
                             </p>
-
-                            <p class="text-xs uppercase tracking-[4px] text-[#072E2C] font-bold mt-1">
-                                Cierres
-                            </p>
-
                         </div>
 
                     </div>
@@ -113,10 +103,6 @@
 
                             <p class="text-4xl font-black text-brand-green leading-none">
                                 {{ $tercero->curso_estudiantes_count }}
-                            </p>
-
-                            <p class="text-xs uppercase tracking-[4px] text-[#072E2C] font-bold mt-1">
-                                Cierres
                             </p>
 
                         </div>
