@@ -5,7 +5,7 @@ use Illuminate\Http\Request;
 use App\Models\PlanesPago;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
-class PlanController extends controller
+class PlanController extends Controller
 {
 
     public function store(Request $request)
@@ -17,7 +17,6 @@ class PlanController extends controller
             'cuotas' => 'required|array|min:1',
             'cuotas.*.monto' => 'required|numeric',
             'cuotas.*.nro_cuota' => 'required',
-            // Validamos la matrícula si viene
             'monto_matricula' => 'nullable|numeric|min:0',
         ]);
 
@@ -32,18 +31,17 @@ class PlanController extends controller
                 'estado' => 'ACTIVO'
             ]);
 
-            // --- NUEVA LÓGICA PARA LA MATRÍCULA ---
+
             if ($request->has('incluye_matricula') && $request->monto_matricula > 0) {
                 $plan->detalles()->create([
                     'id_planes_pago' => $plan->id_planes_pago,
-                    'nro_cuota' => 0, // Usamos 0 para identificar que es la matrícula
+                    'nro_cuota' => 0,
                     'monto_cuota' => $request->monto_matricula,
-                    'fecha_vencimiento' => now(), // Se paga al momento
+                    'fecha_vencimiento' => now(),
                     'detalle' => 'PAGO DE MATRÍCULA'
                 ]);
             }
 
-            // Guardar el resto de las cuotas
             foreach ($request->cuotas as $detalle) {
                 $plan->detalles()->create([
                     'id_planes_pago' => $plan->id_planes_pago,

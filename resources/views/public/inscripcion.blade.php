@@ -29,7 +29,7 @@
                 <span class="text-white"> {{ $asesor->persona->nombre }} {{ $asesor->persona->apellido_p }}</span>
             </div>
         </div>
-        {{-- Mensajes de Error --}}
+
         @if ($errors->any())
             <div class="max-w-5xl mx-auto mb-6 p-4 bg-red-500/20 border-2 border-red-500 text-white rounded-2xl">
                 <ul class="list-disc list-inside text-sm">
