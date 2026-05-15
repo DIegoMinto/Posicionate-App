@@ -52,6 +52,7 @@
 
                                 <option value="gerente_marketing">Gerente de marketing</option>
                                 <option value="supervisor_marketing">Supervisor de marketing</option>
+                                <option value="asesora_marketing">Coordinador de marketing</option>
                                 <option value="asesora_marketing">Asesora de marketing</option>
 
                                 <option value="supervisor_academico">Supervisor académico</option>
