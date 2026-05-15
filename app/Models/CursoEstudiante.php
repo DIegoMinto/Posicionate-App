@@ -20,7 +20,8 @@ class CursoEstudiante extends Model
         'id_personal',
         'estado',
         'id_planes_pago',
-        'id_descuento'
+        'id_descuento',
+        'id_personal'
     ];
 
 
