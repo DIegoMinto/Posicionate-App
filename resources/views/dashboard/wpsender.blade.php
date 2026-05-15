@@ -72,8 +72,8 @@
                                 </div>
 
                                 <div class="mb-6">
-                                    <h2 class="text-white text-xl font-bold leading-tight">MARIBEL</h2>
-                                    <p class="text-brand-gold font-black text-2xl">ES MUY GENIAL</p>
+                                    <h2 class="text-white text-xl font-bold leading-tight">Extraer</h2>
+                                    <p class="text-brand-gold font-black text-2xl">Contactos</p>
                                 </div>
 
                                 <a href="#" class="btn-gold uppercase text-xs font-bold py-2 px-6 rounded-md">

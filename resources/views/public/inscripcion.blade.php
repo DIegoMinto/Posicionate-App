@@ -17,21 +17,15 @@
 
     <div class="w-full lg:w-2/3 p-6 md:p-8 overflow-y-auto">
         <h2 class="text-white text-3xl font-bold text-center mb-5 tracking-widest uppercase">
-            Formulario de Registro
+            Ficha de Inscripción
         </h2>
         <h3 class="text-white text-3xl text-center font-bold uppercase tracking-widest mb-4 ">
             {{ $curso->nombre }}
         </h3>
 
         <div class="flex flex-wrap justify-center gap-4 md:gap-8 mb-10">
-            <div
-                class="flex items-center gap-2 text-white/80 text-xs uppercase font-bold border-r border-white/20 pr-8">
-                <span class="text-brand-gold">Docente:</span>
-                <span class="text-white"> {{ $curso->docente->nombre }}
-                    {{ $curso->docente->apellido_p}} {{ $curso->docente->apellido_m }} </span>
-            </div>
             <div class="flex items-center gap-2 text-white/80 text-xs uppercase font-bold">
-                <span class="text-brand-gold">Asesor Comercial:</span>
+                <span class="text-brand-gold">Asesor:</span>
                 <span class="text-white"> {{ $asesor->persona->nombre }} {{ $asesor->persona->apellido_p }}</span>
             </div>
         </div>
