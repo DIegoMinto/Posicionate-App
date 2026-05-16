@@ -35,4 +35,14 @@ class AuthController extends Controller
             'user' => 'Las credenciales no coinciden.',
         ]);
     }
+
+    public function logout(Request $request)
+    {
+        Auth::logout();
+
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
+
+        return redirect('/auth/login');
+    }
 }

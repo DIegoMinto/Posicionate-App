@@ -31,6 +31,19 @@
             </div>
         </div>
 
+        @if (session('success'))
+            <div
+                class="max-w-5xl mx-auto mb-6 p-4 bg-emerald-500/20 border-2 border-emerald-500 text-white rounded-2xl flex items-center gap-3">
+                <svg class="w-6 h-6 text-emerald-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+                <div class="text-sm font-medium tracking-wide">
+                    {{ session('success') }}
+                </div>
+            </div>
+        @endif
+
         @if ($errors->any())
             <div class="max-w-5xl mx-auto mb-6 p-4 bg-red-500/20 border-2 border-red-500 text-white rounded-2xl">
                 <ul class="list-disc list-inside text-sm">

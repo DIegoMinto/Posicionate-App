@@ -14,6 +14,7 @@ use App\Http\Controllers\InscripcionController;
 use App\Http\Controllers\StatiticController;
 use App\Http\Controllers\PlanController;
 use App\Http\Controllers\ModuloController;
+use App\Http\Controllers\Auth\LoginController;
 use App\Models\PlanesPago;
 
 Route::get('/', function () {
@@ -65,12 +66,15 @@ Route::middleware(['auth', 'vigente'])->group(function () {
         Route::get('/userscreate', [UserController::class, 'create'])->name('users.create');
         Route::get('/userscreate/adduser/{id}', [UserController::class, 'create_user'])->name('users.create_user');
         Route::post('/userscreate/store', [UserController::class, 'store_user'])->name('users.store_user');
-        Route::get('/users/{id}/edit', [UserController::class, 'edit'])->name('users.edit');
-        Route::put('/personal/{id}', [UserController::class, 'update'])->name('personal.update');
         //RUTAS ELIMINACIÓN DE USUARIOS
         Route::delete('/users/{id}', [UserController::class, 'destroy'])->name('users.destroy');
         Route::delete('/personas/{id}', [PersonaController::class, 'destroy'])->name('personas.destroy');
+    });
+    Route::middleware('auth')->group(function () {
         Route::get('/users/{id}/info', [UserController::class, 'show'])->name('users.show');
+        Route::get('/users/{id}/edit', [UserController::class, 'edit'])->name('users.edit');
+        Route::put('/personal/{id}', [UserController::class, 'update'])->name('personal.update');
+        Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
     });
 
     //RUTAS MIDDLEWARE

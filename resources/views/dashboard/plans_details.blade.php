@@ -56,12 +56,29 @@
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="6" class="py-12 text-center text-gray-400 italic">
+                                    <td colspan="4" class="py-12 text-center text-gray-400 italic">
                                         No hay cuotas registradas para este plan.
                                     </td>
                                 </tr>
                             @endforelse
                         </tbody>
+
+                        @if($plan->detalles->isNotEmpty())
+                            @php
+                                $totalPlan = $plan->detalles->sum('monto_cuota');
+                            @endphp
+                            <tfoot>
+                                <tr class="bg-brand-green text-white text-[11px] font-bold">
+                                    <td colspan="2" class="py-3 px-4 text-right uppercase">
+                                        Monto Total
+                                    </td>
+                                    <td class="py-3 px-4 font-sans whitespace-nowrap">
+                                        {{ number_format($totalPlan, 2) }} Bs
+                                    </td>
+                                    <td></td>
+                                </tr>
+                            </tfoot>
+                        @endif
                     </table>
                 </div>
             </div>

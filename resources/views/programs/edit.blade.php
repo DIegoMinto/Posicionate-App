@@ -112,7 +112,7 @@
                                     <div class="flex flex-col items-center">
                                         <p class="text-[9px] uppercase text-gray-400 mb-2 font-bold tracking-tighter">Logo
                                             Institucional</p>
-                                        <img src="{{ asset('storage/' . $curso->institucion->imagen) }}"
+                                        <img src="{{ $curso->institucion->imagen }}"
                                             class="h-20 object-contain border border-gray-100 p-2 bg-gray-50 rounded">
                                     </div>
                                 @endif
@@ -159,54 +159,44 @@
                     <div class="bg-brand-green p-3">
                         <h3
                             class="text-white font-sans font-bold uppercase text-sm tracking-widest flex items-center gap-2">
-                            <i class="fas fa-graduation-cap"></i> Cronograma de Clases
+                            <i class="fas fa-cubes"></i> Cronograma de Módulos
                         </h3>
                     </div>
                     <div class="overflow-x-auto p-4">
                         <table class="w-full text-left">
                             <thead>
                                 <tr class="text-[10px] uppercase border-b text-left">
-                                    <th class="pb-2">Sesión</th>
-                                    <th class="pb-2">Tipo</th>
-                                    <th class="pb-2">Fecha</th>
-                                    <th class="pb-2">Inicio</th>
-                                    <th class="pb-2 text-center">Fin</th>
+                                    <th class="pb-2 pl-3">Nombre del Módulo</th>
+                                    <th class="pb-2">Fecha Inicio</th>
+                                    <th class="pb-2">Fecha Fin</th>
                                 </tr>
                             </thead>
                             <tbody class="divide-y divide-gray-100 text-left">
-                                @foreach($curso->clases as $clase)
+                                @forelse($curso->modulos as $modulo)
                                     <tr>
                                         <td class="p-3">
-                                            <input type="text" name="clases[{{ $clase->id_clase }}][nombre]"
-                                                value="{{ $clase->nombre }}"
-                                                class="form-input-pill py-1 w-full border-brand-gold border-2">
-                                        </td>
-                                        <td class="py-3">
-                                            <select name="clases[{{ $clase->id_clase }}][tipo]"
-                                                class="form-select-pill border-2 border-brand-gold">
-                                                <option value="Clase" {{ $clase->tipo == 'Clase' ? 'selected' : '' }}>Clase
-                                                </option>
-                                                <option value="Webinar" {{ $clase->tipo == 'Webinar' ? 'selected' : '' }}>
-                                                    Webinar</option>
-                                            </select>
+                                            <input type="text" name="modulos[{{ $modulo->id_modulo }}][nombre]"
+                                                value="{{ $modulo->nombre }}"
+                                                class="form-input-pill py-1 w-full border-brand-gold border-2" required>
                                         </td>
                                         <td class="p-3">
-                                            <input type="date" name="clases[{{ $clase->id_clase }}][fecha]"
-                                                value="{{ $clase->fecha }}"
+                                            <input type="date" name="modulos[{{ $modulo->id_modulo }}][fecha_inicio]"
+                                                value="{{ $modulo->fecha_inicio ? \Carbon\Carbon::parse($modulo->fecha_inicio)->format('Y-m-d') : '' }}"
                                                 class="form-input-pill py-1 w-full border-brand-gold border-2">
                                         </td>
-                                        <td class="py-3 px-1">
-                                            <input type="time" name="clases[{{ $clase->id_clase }}][hora_inicio]"
-                                                value="{{ \Carbon\Carbon::parse($clase->hora_inicio)->format('H:i') }}"
-                                                class="form-input-pill py-1 w-full border-brand-gold border-2">
-                                        </td>
-                                        <td class="py-3">
-                                            <input type="time" name="clases[{{ $clase->id_clase }}][hora_fin]"
-                                                value="{{ \Carbon\Carbon::parse($clase->hora_fin)->format('H:i') }}"
+                                        <td class="p-3">
+                                            <input type="date" name="modulos[{{ $modulo->id_modulo }}][fecha_fin]"
+                                                value="{{ $modulo->fecha_fin ? \Carbon\Carbon::parse($modulo->fecha_fin)->format('Y-m-d') : '' }}"
                                                 class="form-input-pill py-1 w-full border-brand-gold border-2">
                                         </td>
                                     </tr>
-                                @endforeach
+                                @empty
+                                    <tr>
+                                        <td colspan="3" class="p-6 text-center text-gray-400 italic text-xs uppercase">
+                                            No hay módulos registrados para este curso.
+                                        </td>
+                                    </tr>
+                                @endforelse
                             </tbody>
                         </table>
                     </div>

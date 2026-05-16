@@ -30,8 +30,8 @@
                             <div
                                 class="w-[220px] h-[220px] rounded-full border-[6px] border-[#BFC0C2] overflow-hidden bg-white relative">
 
-                                <img src="{{ asset('storage/' . $segundo->persona->fotografia) }}"
-                                    class="w-full h-full object-cover" alt="Foto">
+                                <img src="{{ $segundo->persona->fotografia }}" class="w-full h-full object-cover"
+                                    alt="Foto">
 
 
 
@@ -60,8 +60,7 @@
                             <div
                                 class="w-[250px] h-[250px] rounded-full border-[6px] border-[#CCB463] overflow-hidden bg-white">
 
-                                <img src="{{ asset('storage/' . $primero->persona->fotografia) }}"
-                                    class="w-full h-full object-cover">
+                                <img src="{{ $primero->persona->fotografia }}" class="w-full h-full object-cover">
 
                             </div>
 
@@ -88,8 +87,8 @@
                             <div
                                 class="w-[220px] h-[220px] rounded-full border-[6px] border-[#CD7F32] overflow-hidden bg-white relative">
 
-                                <img src="{{ asset('storage/' . $tercero->persona->fotografia) }}"
-                                    class="w-full h-full object-cover" alt="Foto">
+                                <img src="{{ $tercero->persona->fotografia }}" class="w-full h-full object-cover"
+                                    alt="Foto">
 
                             </div>
 
@@ -98,7 +97,6 @@
 
                         </div>
 
-                        {{-- CIERRES --}}
                         <div class="mt-2 text-center">
 
                             <p class="text-4xl font-black text-brand-green leading-none">

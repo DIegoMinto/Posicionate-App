@@ -16,13 +16,12 @@
 
         <div class="m-6 border-2 border-brand-green rounded-xl p-7">
 
-            <!-- 🔝 HEADER (NO TOCADO) -->
             <div class="flex flex-col lg:flex-row gap-4">
 
                 <div class="flex">
                     <div class="pt-4">
-                        <img src="{{ asset('storage/' . $personal->persona->fotografia) }}"
-                            class="w-25 h-25 rounded-xs">
+                        <img src="{{ $personal->persona->fotografia }}"
+                            class="w-25 h-25 rounded-xs border border-brand-green">
                     </div>
 
                     <div class="p-4 text-xl">
@@ -34,7 +33,7 @@
 
                         <div class="flex items-center">
                             <div class="font-black text-brand-green text-2xl">
-                                {{ $personal->cargo }}
+                                {{ $personal->cargo_nombre }}
                             </div>
                             <div class="ml-3">
                                 CI: {{ $personal->persona->ci }}
@@ -54,7 +53,6 @@
                     </div>
                 </div>
 
-                <!-- 📍 UBICACIÓN -->
                 <div class="ml-auto flex">
                     <div class="m-4">
                         <img src="/img/location_icon.png" class="w-12 h-12">
@@ -72,10 +70,8 @@
 
             </div>
 
-            <!-- 🔽 CONTENIDO -->
             <div class="mt-8 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 text-sm">
 
-                <!-- 📌 DATOS PERSONALES -->
                 <div class="bg-gray-50 p-4 rounded-lg border">
                     <h3 class="font-bold text-brand-green mb-2">Datos Personales</h3>
 
@@ -85,7 +81,6 @@
                     <p><strong>Fecha Nacimiento:</strong> {{ $personal->persona->fecha_nacimiento ?? '-' }}</p>
                 </div>
 
-                <!-- 🎓 DATOS ACADÉMICOS -->
                 <div class="bg-gray-50 p-4 rounded-lg border">
                     <h3 class="font-bold text-brand-green mb-2">Formación Académica</h3>
 
@@ -94,7 +89,6 @@
                     <p><strong>Institución:</strong> {{ $personal->persona->institucion->nombre ?? '-' }}</p>
                 </div>
 
-                <!-- 💼 DATOS LABORALES -->
                 <div class="bg-gray-50 p-4 rounded-lg border">
                     <h3 class="font-bold text-brand-green mb-2">Datos Laborales</h3>
 
@@ -102,7 +96,6 @@
                     <p><strong>Sede:</strong> {{ $personal->sede->nombre ?? 'N/A' }}</p>
                 </div>
 
-                <!-- 💳 DATOS BANCARIOS -->
                 <div class="bg-gray-50 p-4 rounded-lg border">
                     <h3 class="font-bold text-brand-green mb-2">Datos Bancarios</h3>
 
@@ -111,7 +104,6 @@
                     </p>
                 </div>
 
-                <!-- 👨‍👩‍👧 REFERENCIAS -->
                 <div class="bg-gray-50 p-4 rounded-lg border">
                     <h3 class="font-bold text-brand-green mb-2">Contactos de Referencia</h3>
 
@@ -122,7 +114,6 @@
                     <p><strong>Celular:</strong> {{ $personal->persona->celular_familiar_2 ?? '-' }}</p>
                 </div>
 
-                <!-- 🧠 HABILIDADES -->
                 <div class="bg-gray-50 p-4 rounded-lg border">
                     <h3 class="font-bold text-brand-green mb-2">Habilidades</h3>
 
@@ -133,14 +124,20 @@
                     <p class="mt-2"><strong>Blandas:</strong><br>
                         {{ $personal->persona->habilidades_blandas ?? '-' }}
                     </p>
-                </div>
 
+                </div>
+                @if(auth()->user()->id_personal === $personal->id_personal || auth()->user()->rol === 'super_admin')
+                    <a href="{{ route('users.edit', $personal->id_personal) }}">
+                        <button class="btn-gold">
+                            Editar Perfil
+                        </button>
+                    </a>
+                @endif
                 <div class="bg-gray-50 p-4 rounded-lg border col-span-1 md:col-span-2 lg:col-span-3">
                     <h3 class="font-bold text-brand-green mb-3">Información Adicional</h3>
 
                     <div class="flex flex-wrap gap-4">
 
-                        <!-- CV -->
                         @if($personal->persona->curriculum)
                             <a href="{{ asset('storage/' . $personal->persona->curriculum) }}" target="_blank"
                                 class="bg-brand-green text-white px-4 py-2 rounded text-xs font-bold hover:scale-105 transition">
@@ -148,7 +145,6 @@
                             </a>
                         @endif
 
-                        <!-- FOTO CARNET -->
                         @if($personal->persona->foto_carnet)
                             <a href="{{ asset('storage/' . $personal->persona->foto_carnet) }}" target="_blank"
                                 class="bg-brand-gold text-black px-4 py-2 rounded text-xs font-bold hover:scale-105 transition">
@@ -156,7 +152,6 @@
                             </a>
                         @endif
 
-                        <!-- GOOGLE MAPS -->
                         @if($personal->persona->enlace_ubicacion_maps)
                             <a href="{{ $personal->persona->enlace_ubicacion_maps }}" target="_blank"
                                 class="bg-blue-600 text-white px-4 py-2 rounded text-xs font-bold hover:scale-105 transition">

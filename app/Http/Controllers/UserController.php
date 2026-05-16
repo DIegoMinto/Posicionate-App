@@ -116,6 +116,14 @@ class UserController extends Controller
 
     public function show($id)
     {
+        $personal = Personal::findOrFail($id);
+        $persona = $personal->persona;
+        $auth = auth()->user();
+        $esSuperAdmin = $auth->rol === 'super_admin';
+        $esMismoUsuario = $auth->id_personal === $personal->id_personal;
+        if (!$esSuperAdmin && !$esMismoUsuario) {
+            abort(403, 'No autorizado');
+        }
         $personal = \App\Models\Personal::with([
             'persona.ciudad.departamento',
             'persona.institucion',
@@ -129,7 +137,12 @@ class UserController extends Controller
 
     public function edit($id)
     {
-        if (auth()->user()->rol !== 'super_admin') {
+        $personal = Personal::findOrFail($id);
+        $persona = $personal->persona;
+        $auth = auth()->user();
+        $esSuperAdmin = $auth->rol === 'super_admin';
+        $esMismoUsuario = $auth->id_personal === $personal->id_personal;
+        if (!$esSuperAdmin && !$esMismoUsuario) {
             abort(403, 'No autorizado');
         }
         $personal = Personal::with('persona')->findOrFail($id);
@@ -161,91 +174,130 @@ class UserController extends Controller
         $personal = Personal::findOrFail($id);
         $persona = $personal->persona;
 
-        $request->validate([
-            // Validación Persona
-            'nombre' => 'required|string|max:100',
-            'apellido_p' => 'required|string|max:100',
-            'ci' => 'required|unique:persona,ci,' . $persona->id_persona . ',id_persona',
-            'correo_electronico' => 'required|email|unique:persona,correo_electronico,' . $persona->id_persona . ',id_persona',
-            'user' => 'required|unique:personal,user,' . $personal->id_personal . ',id_personal',
-            'id_sede' => 'required|exists:sede,id_sede',
-            'cargo' => [
-                'required',
-                Rule::in([
-                    'gerente_marketing',
-                    'supervisor_marketing',
-                    'asesora_marketing',
-                    'supervisor_academico',
-                    'coordinador_academico',
-                    'asistente_academico',
-                    'contador',
-                    'asistente_contable'
-                ])
-            ],
+        $auth = auth()->user();
+        $esSuperAdmin = $auth->rol === 'super_admin';
+        $esMismoUsuario = $auth->id_personal === $personal->id_personal;
 
-            'rol' => 'required|in:super_admin,admin,user,viewer',
-            'password' => 'nullable|confirmed|min:6',
-        ]);
+        if (!$esSuperAdmin && !$esMismoUsuario) {
+            abort(403, 'No autorizado');
+        }
+
+        $rules = [
+            'direccion' => 'nullable|string|max:255',
+            'id_ciudad' => 'nullable|exists:ciudad,id_ciudad',
+            'id_institucion_bancaria' => 'nullable|exists:institucion_bancaria,id_institucion_bancaria',
+            'numero_cuenta_bancaria' => 'nullable|string|max:50',
+            'referencia_familiar_1' => 'nullable|string|max:100',
+            'celular_familiar_1' => 'nullable|string|max:30',
+            'referencia_familiar_2' => 'nullable|string|max:100',
+            'celular_familiar_2' => 'nullable|string|max:30',
+            'enlace_ubicacion_maps' => 'nullable|url',
+            'curriculum' => 'nullable|mimes:pdf|max:10240',
+            'foto_carnet' => 'nullable|mimes:pdf|max:5120',
+            'fotografia' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
+        ];
+
+        if ($esSuperAdmin) {
+            $rules = array_merge($rules, [
+                'nombre' => 'required|string|max:100',
+                'apellido_p' => 'required|string|max:100',
+                'correo_electronico' => 'required|email|unique:persona,correo_electronico,' . $persona->id_persona . ',id_persona',
+                'ci' => 'required|unique:persona,ci,' . $persona->id_persona . ',id_persona',
+                'user' => 'required|unique:personal,user,' . $personal->id_personal . ',id_personal',
+                'id_sede' => 'required|exists:sede,id_sede',
+                'cargo' => [
+                    'required',
+                    Rule::in([
+                        'gerente_marketing',
+                        'supervisor_marketing',
+                        'coordinador_marketing',
+                        'asesor_marketing',
+                        'supervisor_academico',
+                        'coordinador_academico',
+                        'asistente_academico',
+                        'contador',
+                        'asistente_contable'
+                    ])
+                ],
+                'rol' => 'required|in:super_admin,admin,user,viewer',
+            ]);
+        }
+
+        if ($request->filled('password')) {
+            $rules['password'] = 'required|min:6|confirmed';
+        }
+
+        $request->validate($rules);
 
         try {
             DB::beginTransaction();
 
             $personaData = $request->only([
-                'nombre',
-                'apellido_p',
-                'apellido_m',
-                'correo_electronico',
+                'direccion',
                 'id_ciudad',
-                'id_institucion_egreso',
-                'id_grado_academico',
-                'id_profesion',
                 'id_institucion_bancaria',
-                'telefono_movil'
+                'numero_cuenta_bancaria',
+                'referencia_familiar_1',
+                'celular_familiar_1',
+                'referencia_familiar_2',
+                'celular_familiar_2',
+                'enlace_ubicacion_maps'
             ]);
 
-            if ($request->hasFile('fotografia')) {
+            if ($esSuperAdmin) {
+                $personaData = array_merge($personaData, $request->only([
+                    'nombre',
+                    'apellido_p',
+                    'apellido_m',
+                    'correo_electronico',
+                    'telefono_movil',
+                    'id_grado_academico',
+                    'id_profesion',
+                    'id_institucion_egreso'
+                ]));
+            }
 
+            if ($request->hasFile('fotografia')) {
                 $cloudinary = new Cloudinary([
                     'cloud' => [
                         'cloud_name' => env('CLOUDINARY_CLOUD_NAME'),
                         'api_key' => env('CLOUDINARY_API_KEY'),
                         'api_secret' => env('CLOUDINARY_API_SECRET'),
                     ],
-                    'url' => [
-                        'secure' => true
-                    ]
+                    'url' => ['secure' => true]
                 ]);
 
                 $uploadFoto = $cloudinary->uploadApi()->upload(
                     $request->file('fotografia')->getRealPath(),
-                    [
-                        'folder' => 'fotografias'
-                    ]
+                    ['folder' => 'fotografias']
                 );
 
                 $personaData['fotografia'] = $uploadFoto['secure_url'];
             }
+
             $persona->update($personaData);
 
-            $personalData = [
-                'user' => $request->user,
-                'id_sede' => $request->id_sede,
-                'cargo' => $request->cargo,
-                'rol' => $request->rol,
-            ];
+            $personalData = [];
+            if ($esSuperAdmin) {
+                $personalData = $request->only(['user', 'id_sede', 'cargo', 'rol']);
+            } else {
+                $personalData['user'] = $request->user ?? $personal->user;
+            }
 
             if ($request->filled('password')) {
                 $personalData['password'] = Hash::make($request->password);
             }
 
-            $personal->update($personalData);
+            if (!empty($personalData)) {
+                $personal->update($personalData);
+            }
 
             DB::commit();
-            return redirect()->route('people.staff')->with('success', 'Personal y datos personales actualizados.');
+            return redirect()->route('users.show', $personal->id_personal)->with('error', 'Error al actualizar');
 
         } catch (\Exception $e) {
             DB::rollBack();
-            return back()->with('error', 'Error al actualizar: ' . $e->getMessage())->withInput();
+            return redirect()->route('users.show', $personal->id_personal)->with('error', 'Error al actualizar: ' . $e->getMessage());
         }
     }
 }

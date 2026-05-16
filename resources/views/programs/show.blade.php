@@ -79,8 +79,7 @@
                     <p class="text-brand-green font-sans font-bold text-xs uppercase mb-4 tracking-tighter">Institución
                         Perteneciente</p>
                     @if($curso->institucion && $curso->institucion->imagen)
-                        <img src="{{ asset('storage/' . $curso->institucion->imagen) }}"
-                            class="w-32 h-32 object-contain mb-4">
+                        <img src="{{$curso->institucion->imagen }}" class="w-32 h-32 object-contain mb-4">
                     @else
                         <div
                             class="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mb-4 border-2 border-dashed border-gray-300">
@@ -114,7 +113,7 @@
                     </div>
 
                     <div class="overflow-x-auto p-4">
-                        <div class="inline-block min-w-full overflow-hidden rounded-lg border border-gray-200">
+                        <div class="bg-white rounded-sm border-gray-800 shadow-md">
                             <table class="w-full text-left border-1 border-brand-green">
                                 <thead class="bg-brand-green font-sans font-bold text-white">
                                     <tr>

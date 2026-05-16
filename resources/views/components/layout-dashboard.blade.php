@@ -127,11 +127,10 @@
             </div>
         </div>
 
-        <div class="p-8 flex-shrink-0">
-            <form action="" method="POST">
+        <div class="p-8 flex justify-center align-center">
+            <form action="{{ route('logout') }}" method="POST">
                 @csrf
-                <button type="submit"
-                    class="w-full border-2 border-white text-white font-bold py-2 px-4 rounded-xl hover:bg-red-700 hover:border-red-700 transition-all text-xs uppercase tracking-tighter">
+                <button type="submit" class="btn-gold">
                     CERRAR SESIÓN
                 </button>
             </form>
@@ -167,7 +166,10 @@
                 </div>
                 <div class="flex items-center gap-4">
                     <div class="text-white text-s font-sans font-light">{{$usuario->codigo_personal}}</div>
-                    <button class="btn-gold">Ver mi perfil</button>
+                    <a href="{{ route('users.show', $usuario->id_personal) }}"
+                        class="btn-gold inline-flex items-center justify-center">
+                        Ver mi perfil
+                    </a>
                 </div>
             </header>
         </div>

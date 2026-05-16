@@ -52,7 +52,8 @@ class Personal extends Authenticatable
         return [
             'gerente_marketing' => 'Gerente de Marketing',
             'supervisor_marketing' => 'Supervisor de Marketing',
-            'asesora_marketing' => 'Asesora de Marketing',
+            'coordinador_marketing' => 'Coordinador de Marketing',
+            'asesor_marketing' => 'Asesor de Marketing',
             'supervisor_academico' => 'Supervisor Académico',
             'coordinador_academico' => 'Coordinador Académico',
             'asistente_academico' => 'Asistente Académico',

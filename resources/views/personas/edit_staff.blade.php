@@ -9,6 +9,10 @@
 </head>
 
 <body>
+    @php
+        $esSuperAdmin = auth()->user()->rol === 'super_admin';
+    @endphp
+
     <x-layout-dashboard :usuario="$usuario">
         <div class="p-6">
             <div class="bg-white rounded-sm border-2 border-brand-gold shadow-lg p-8">
@@ -46,19 +50,22 @@
                             <div>
                                 <label class="form-label-bold !text-brand-green">Nombre(s)</label>
                                 <input type="text" name="nombre" value="{{ old('nombre', $persona->nombre) }}"
-                                    class="form-input-pill border-2 border-brand-gold">
+                                    class="form-input-pill border-2 border-brand-gold {{ !$esSuperAdmin ? 'bg-gray-100 cursor-not-allowed text-gray-500' : '' }}"
+                                    {{ !$esSuperAdmin ? 'readonly' : '' }}>
                             </div>
 
                             <div class="grid grid-cols-2 gap-2">
                                 <div>
                                     <label class="form-label-bold !text-brand-green">Ap. Paterno</label>
                                     <input type="text" name="apellido_p" value="{{ old('apellido_p', $persona->apellido_p) }}"
-                                        class="form-input-pill border-2 border-brand-gold">
+                                        class="form-input-pill border-2 border-brand-gold {{ !$esSuperAdmin ? 'bg-gray-100 cursor-not-allowed text-gray-500' : '' }}"
+                                        {{ !$esSuperAdmin ? 'readonly' : '' }}>
                                 </div>
                                 <div>
                                     <label class="form-label-bold !text-brand-green">Ap. Materno</label>
                                     <input type="text" name="apellido_m" value="{{ old('apellido_m', $persona->apellido_m) }}"
-                                        class="form-input-pill border-2 border-brand-gold">
+                                        class="form-input-pill border-2 border-brand-gold {{ !$esSuperAdmin ? 'bg-gray-100 cursor-not-allowed text-gray-500' : '' }}"
+                                        {{ !$esSuperAdmin ? 'readonly' : '' }}>
                                 </div>
                             </div>
 
@@ -66,13 +73,17 @@
                                 <label class="form-label-bold !text-brand-green">Carnet de Identidad</label>
                                 <div class="flex gap-1">
                                     <input type="number" name="ci" value="{{ old('ci', $persona->ci) }}"
-                                        class="flex-1 form-input-pill border-2 border-brand-gold">
+                                        class="flex-1 form-input-pill border-2 border-brand-gold {{ !$esSuperAdmin ? 'bg-gray-100 cursor-not-allowed text-gray-500' : '' }}"
+                                        {{ !$esSuperAdmin ? 'readonly' : '' }}>
+                                    
                                     <select name="extension_ci" x-model="ext"
-                                        class="w-20 form-select-pill border-2 border-brand-gold">
+                                        class="w-20 form-select-pill border-2 border-brand-gold {{ !$esSuperAdmin ? 'bg-gray-100 cursor-not-allowed text-gray-500' : '' }}"
+                                        {{ !$esSuperAdmin ? 'disabled' : '' }}>
                                         @foreach(['CH','LP','CB','OR','PT','TJ','SC','BE','PD','OTRO'] as $ext)
                                             <option value="{{ $ext }}">{{ $ext }}</option>
                                         @endforeach
                                     </select>
+                                    @if(!$esSuperAdmin) <input type="hidden" name="extension_ci" value="{{ $persona->extension_ci }}"> @endif
                                 </div>
                             </div>
 
@@ -80,14 +91,17 @@
                                 <div>
                                     <label class="form-label-bold !text-brand-green">F. Nacimiento</label>
                                     <input type="date" name="fecha_nacimiento" value="{{ old('fecha_nacimiento', $persona->fecha_nacimiento) }}"
-                                        class="form-input-pill border-2 border-brand-gold">
+                                        class="form-input-pill border-2 border-brand-gold {{ !$esSuperAdmin ? 'bg-gray-100 cursor-not-allowed text-gray-500' : '' }}"
+                                        {{ !$esSuperAdmin ? 'readonly' : '' }}>
                                 </div>
                                 <div>
                                     <label class="form-label-bold !text-brand-green">Género</label>
-                                    <select name="genero" class="form-select-pill border-2 border-brand-gold">
+                                    <select name="genero" class="form-select-pill border-2 border-brand-gold {{ !$esSuperAdmin ? 'bg-gray-100 cursor-not-allowed text-gray-500' : '' }}"
+                                        {{ !$esSuperAdmin ? 'disabled' : '' }}>
                                         <option value="M" {{ $persona->genero == 'M' ? 'selected' : '' }}>Masculino</option>
                                         <option value="F" {{ $persona->genero == 'F' ? 'selected' : '' }}>Femenino</option>
                                     </select>
+                                    @if(!$esSuperAdmin) <input type="hidden" name="genero" value="{{ $persona->genero }}"> @endif
                                 </div>
                             </div>
 
@@ -100,12 +114,13 @@
                             <div>
                                 <label class="form-label-bold !text-brand-green">Correo Personal</label>
                                 <input type="email" name="correo_electronico" value="{{ old('correo_electronico', $persona->correo_electronico) }}"
-                                    class="form-input-pill border-2 border-brand-gold">
+                                    class="form-input-pill border-2 border-brand-gold {{ !$esSuperAdmin ? 'bg-gray-100 cursor-not-allowed text-gray-500' : '' }}"
+                                    {{ !$esSuperAdmin ? 'readonly' : '' }}>
                             </div>
 
                             <div>
                                 <label class="form-label-bold !text-brand-green">Domicilio Actual</label>
-                                <input type="text" name="domicilio" value="{{ old('domicilio', $persona->domicilio) }}"
+                                <input type="text" name="direccion" value="{{ old('direccion', $persona->direccion ?? $persona->domicilio) }}"
                                     class="form-input-pill border-2 border-brand-gold">
                             </div>
                         </div>
@@ -116,19 +131,30 @@
                             <div>
                                 <label class="form-label-bold !text-brand-green">Usuario de Acceso</label>
                                 <input type="text" name="user" value="{{ old('user', $personal->user) }}"
-                                    class="form-input-pill border-2 border-brand-gold bg-gray-50 font-semibold">
+                                    class="form-input-pill border-2 border-brand-gold bg-gray-50 font-semibold {{ !$esSuperAdmin ? 'bg-gray-100 cursor-not-allowed text-gray-500' : '' }}"
+                                    {{ !$esSuperAdmin ? 'readonly' : '' }}>
                             </div>
 
                             <div>
                                 <label class="form-label-bold !text-brand-green">Nueva Contraseña</label>
                                 <input type="password" name="password"
-                                    class="form-input-pill border-2 border-brand-gold"
-                                    placeholder="Dejar en blanco para no cambiar">
+                                    class="form-input-pill border-2 border-brand-gold {{ !$esSuperAdmin ? 'bg-gray-100 cursor-not-allowed text-gray-500' : '' }}" 
+                                    placeholder="Dejar en blanco para no cambiar"
+                                    {{ !$esSuperAdmin ? 'readonly' : '' }}>
+                            </div>
+
+                            <div>
+                                <label class="form-label-bold !text-brand-green">Confirmar Contraseña</label>
+                                <input type="password" name="password_confirmation"
+                                    class="form-input-pill border-2 border-brand-gold {{ !$esSuperAdmin ? 'bg-gray-100 cursor-not-allowed text-gray-500' : '' }}"
+                                    placeholder="Repite la nueva contraseña"
+                                    {{ !$esSuperAdmin ? 'readonly' : '' }}>
                             </div>
 
                             <div>
                                 <label class="form-label-bold !text-brand-green">Sede Asignada</label>
-                                <select name="id_sede" class="form-select-pill border-2 border-brand-gold">
+                                <select name="id_sede" class="form-select-pill border-2 border-brand-gold {{ !$esSuperAdmin ? 'bg-gray-100 cursor-not-allowed text-gray-500' : '' }}"
+                                    {{ !$esSuperAdmin ? 'disabled' : '' }}>
                                     @foreach($sedes as $sede)
                                         <option value="{{ $sede->id_sede }}"
                                             {{ old('id_sede', $personal->id_sede) == $sede->id_sede ? 'selected' : '' }}>
@@ -136,75 +162,39 @@
                                         </option>
                                     @endforeach
                                 </select>
+                                @if(!$esSuperAdmin) <input type="hidden" name="id_sede" value="{{ $personal->id_sede }}"> @endif
                             </div>
 
                             <div>
                                 <label class="form-label-bold !text-brand-green">Rol de Usuario</label>
-                                <select name="rol" class="form-select-pill border-2 border-brand-gold">
-                                            <option value="">Seleccionar</option>
-                                            <option value="super_admin" {{ $personal->rol == 'super_admin' ? 'selected' : '' }}>
-                                                Super Administrador
-                                            </option>
-
-                                            <option value="admin" {{ $personal->rol == 'admin' ? 'selected' : '' }}>
-                                                Administrador
-                                            </option>
-
-                                            <option value="user" {{ $personal->rol == 'user' ? 'selected' : '' }}>
-                                                Usuario
-                                            </option>
-
-                                            <option value="viewer" {{ $personal->rol == 'viewer' ? 'selected' : '' }}>
-                                                Espectador
-                                            </option>
+                                <select name="rol" class="form-select-pill border-2 border-brand-gold {{ !$esSuperAdmin ? 'bg-gray-100 cursor-not-allowed text-gray-500' : '' }}"
+                                    {{ !$esSuperAdmin ? 'disabled' : '' }}>
+                                    <option value="">Seleccionar</option>
+                                    <option value="super_admin" {{ $personal->rol == 'super_admin' ? 'selected' : '' }}>Super Administrador</option>
+                                    <option value="admin" {{ $personal->rol == 'admin' ? 'selected' : '' }}>Administrador</option>
+                                    <option value="user" {{ $personal->rol == 'user' ? 'selected' : '' }}>Usuario</option>
+                                    <option value="viewer" {{ $personal->rol == 'viewer' ? 'selected' : '' }}>Espectador</option>
                                 </select>
+                                @if(!$esSuperAdmin) <input type="hidden" name="rol" value="{{ $personal->rol }}"> @endif
                             </div>
 
                             <div>
                                 <label class="form-label-bold !text-brand-green">Cargo Institucional</label>
-                                <select name="cargo" class="form-select-pill border-2 border-brand-gold">
-
+                                <select name="cargo" class="form-select-pill border-2 border-brand-gold {{ !$esSuperAdmin ? 'bg-gray-100 cursor-not-allowed text-gray-500' : '' }}"
+                                    {{ !$esSuperAdmin ? 'disabled' : '' }}>
                                     <option value="">Seleccionar</option>
-
-                                    <option value="gerente_marketing" {{ $personal->cargo == 'gerente_marketing' ? 'selected' : '' }}>
-                                        Gerente de marketing
-                                    </option>
-
-                                    <option value="supervisor_marketing" {{ $personal->cargo == 'supervisor_marketing' ? 'selected' : '' }}>
-                                        Supervisor de marketing
-                                    </option>
-
-                                    <option value="supervisor_marketing" {{ $personal->cargo == 'coordinador_marketing' ? 'selected' : '' }}>
-                                        Coordinador de marketing
-                                    </option>
-
-                                    <option value="asesora_marketing" {{ $personal->cargo == 'asesora_marketing' ? 'selected' : '' }}>
-                                        Asesora de marketing
-                                    </option>
-
-                                    <option value="supervisor_academico" {{ $personal->cargo == 'supervisor_academico' ? 'selected' : '' }}>
-                                        Supervisor académico
-                                    </option>
-
-                                    <option value="coordinador_academico" {{ $personal->cargo == 'coordinador_academico' ? 'selected' : '' }}>
-                                        Coordinador académico
-                                    </option>
-
-                                    <option value="asistente_academico" {{ $personal->cargo == 'asistente_academico' ? 'selected' : '' }}>
-                                        Asistente académico
-                                    </option>
-
-                                    <option value="contador" {{ $personal->cargo == 'contador' ? 'selected' : '' }}>
-                                        Contador
-                                    </option>
-
-                                    <option value="asistente_contable" {{ $personal->cargo == 'asistente_contable' ? 'selected' : '' }}>
-                                        Asistente contable
-                                    </option>
-
+                                    <option value="gerente_marketing" {{ $personal->cargo == 'gerente_marketing' ? 'selected' : '' }}>Gerente de marketing</option>
+                                    <option value="supervisor_marketing" {{ $personal->cargo == 'supervisor_marketing' ? 'selected' : '' }}>Supervisor de marketing</option>
+                                    <option value="coordinador_marketing" {{ $personal->cargo == 'coordinador_marketing' ? 'selected' : '' }}>Coordinador de marketing</option>
+                                    <option value="asesor_marketing" {{ $personal->cargo == 'asesor_marketing' ? 'selected' : '' }}>Asesor de marketing</option>
+                                    <option value="supervisor_academico" {{ $personal->cargo == 'supervisor_academico' ? 'selected' : '' }}>Supervisor académico</option>
+                                    <option value="coordinador_academico" {{ $personal->cargo == 'coordinador_academico' ? 'selected' : '' }}>Coordinador académico</option>
+                                    <option value="asistente_academico" {{ $personal->cargo == 'asistente_academico' ? 'selected' : '' }}>Asistente académico</option>
+                                    <option value="contador" {{ $personal->cargo == 'contador' ? 'selected' : '' }}>Contador</option>
+                                    <option value="asistente_contable" {{ $personal->cargo == 'asistente_contable' ? 'selected' : '' }}>Asistente contable</option>
                                 </select>
+                                @if(!$esSuperAdmin) <input type="hidden" name="cargo" value="{{ $personal->cargo }}"> @endif
                             </div>
-
 
                             <div>
                                 <label class="form-label-bold !text-brand-green">Ubicación Maps (Link)</label>
@@ -213,6 +203,7 @@
                             </div>
                         </div>
 
+                        {{-- COLUMNA 3: OTROS DATOS Y ARCHIVOS --}}
                         <div class="space-y-4">
                             <h3 class="font-bold text-brand-green text-sm uppercase border-b border-brand-gold/30 pb-1">Otros Datos y Archivos</h3>
 

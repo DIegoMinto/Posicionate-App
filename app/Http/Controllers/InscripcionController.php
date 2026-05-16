@@ -65,7 +65,7 @@ class InscripcionController extends Controller
         return redirect()->route('inscripcion.public', [
             'id_curso' => $validated['id_curso'],
             'id_personal' => $validated['id_personal']
-        ])->with('success', 'Registro exitoso');
+        ])->with('success', '¡Registro exitoso!');
     }
 
     public function list(Request $request, $id)

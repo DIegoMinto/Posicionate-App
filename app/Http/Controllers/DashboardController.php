@@ -347,9 +347,9 @@ class DashboardController extends Controller
         if (auth()->user()->rol !== 'super_admin') {
             abort(403, 'No autorizado');
         }
-        $curso = Curso::with(['institucion', 'clases', 'docente', 'sede'])->findOrFail($id);
-        $usuario = auth()->user();
 
+        $curso = Curso::with(['institucion', 'modulos', 'docente', 'sede'])->findOrFail($id);
+        $usuario = auth()->user();
 
         $docentes = Docente::all();
         $sedes = Sede::all();
@@ -364,8 +364,8 @@ class DashboardController extends Controller
         if (auth()->user()->rol !== 'super_admin') {
             abort(403, 'No autorizado');
         }
-        $curso = Curso::findOrFail($id);
 
+        $curso = Curso::findOrFail($id);
 
         $dataCurso = $request->only([
             'nombre',
@@ -381,7 +381,6 @@ class DashboardController extends Controller
         ]);
 
         if ($request->hasFile('codigo_qr')) {
-
             if ($curso->codigo_qr) {
                 Storage::disk('public')->delete($curso->codigo_qr);
             }
@@ -389,7 +388,6 @@ class DashboardController extends Controller
         }
 
         $curso->update($dataCurso);
-
 
         if ($curso->id_institucion) {
             $institucion = Institucion::find($curso->id_institucion);
@@ -404,12 +402,11 @@ class DashboardController extends Controller
             }
         }
 
-
-        if ($request->has('clases')) {
-            foreach ($request->clases as $id_clase => $claseData) {
-                $clase = Clase::find($id_clase);
-                if ($clase) {
-                    $clase->update($claseData);
+        if ($request->has('modulos')) {
+            foreach ($request->modulos as $id_modulo => $moduloData) {
+                $modulo = Modulo::find($id_modulo);
+                if ($modulo) {
+                    $modulo->update($moduloData);
                 }
             }
         }
