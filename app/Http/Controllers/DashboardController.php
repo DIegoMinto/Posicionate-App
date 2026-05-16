@@ -68,11 +68,11 @@ class DashboardController extends Controller
             );
 
         if ($usuario->rol === 'user') {
-            $query->where('estudiante.id_personal', $usuario->id_personal);
+            $query->where('curso_estudiante.id_personal', $usuario->id_personal);
         }
 
         if ($request->filled('id_personal')) {
-            $query->where('estudiante.id_personal', $request->id_personal);
+            $query->where('curso_estudiante.id_personal', $request->id_personal);
         }
 
         if ($request->filled('estado')) {
