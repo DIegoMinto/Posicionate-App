@@ -11,7 +11,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
-
+use Cloudinary\Cloudinary;
 
 class UserController extends Controller
 {
@@ -190,7 +190,6 @@ class UserController extends Controller
         try {
             DB::beginTransaction();
 
-            // 1. Actualizar Datos de Persona
             $personaData = $request->only([
                 'nombre',
                 'apellido_p',
@@ -204,15 +203,30 @@ class UserController extends Controller
                 'telefono_movil'
             ]);
 
-            // Manejo de archivos (similar a tu PersonaController)
             if ($request->hasFile('fotografia')) {
-                if ($persona->fotografia)
-                    Storage::disk('public')->delete($persona->fotografia);
-                $personaData['fotografia'] = $request->file('fotografia')->store('uploads/fotos', 'public');
+
+                $cloudinary = new Cloudinary([
+                    'cloud' => [
+                        'cloud_name' => env('CLOUDINARY_CLOUD_NAME'),
+                        'api_key' => env('CLOUDINARY_API_KEY'),
+                        'api_secret' => env('CLOUDINARY_API_SECRET'),
+                    ],
+                    'url' => [
+                        'secure' => true
+                    ]
+                ]);
+
+                $uploadFoto = $cloudinary->uploadApi()->upload(
+                    $request->file('fotografia')->getRealPath(),
+                    [
+                        'folder' => 'fotografias'
+                    ]
+                );
+
+                $personaData['fotografia'] = $uploadFoto['secure_url'];
             }
             $persona->update($personaData);
 
-            // 2. Actualizar Datos de Personal
             $personalData = [
                 'user' => $request->user,
                 'id_sede' => $request->id_sede,

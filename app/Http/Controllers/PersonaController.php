@@ -11,7 +11,7 @@ use App\Models\InstitucionEgreso;
 use App\Models\InstitucionBancaria;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
-
+use Cloudinary\Cloudinary;
 class PersonaController extends Controller
 {
     public function create()
@@ -47,6 +47,7 @@ class PersonaController extends Controller
             ]);
 
             $extension = $request->extension_select;
+
             if ($extension === 'OTRO') {
                 $extension = strtoupper(trim($request->extension_otro));
             }
@@ -64,16 +65,56 @@ class PersonaController extends Controller
 
             $folderCI = str_replace(' ', '_', $ciFinal);
 
+            $cloudinary = new Cloudinary([
+                'cloud' => [
+                    'cloud_name' => env('CLOUDINARY_CLOUD_NAME'),
+                    'api_key' => env('CLOUDINARY_API_KEY'),
+                    'api_secret' => env('CLOUDINARY_API_SECRET'),
+                ],
+                'url' => [
+                    'secure' => true
+                ]
+            ]);
+
             if ($request->hasFile('curriculum')) {
-                $data['curriculum'] = $request->file('curriculum')->storeAs('uploads/cvs', "CV_$folderCI." . $request->file('curriculum')->extension(), 'public');
+
+                $uploadCV = $cloudinary->uploadApi()->upload(
+                    $request->file('curriculum')->getRealPath(),
+                    [
+                        'folder' => 'curriculums',
+                        'resource_type' => 'raw',
+                        'public_id' => "CV_$folderCI"
+                    ]
+                );
+
+                $data['curriculum'] = $uploadCV['secure_url'];
             }
 
             if ($request->hasFile('foto_carnet')) {
-                $data['foto_carnet'] = $request->file('foto_carnet')->storeAs('uploads/carnets', "CARNET_$folderCI." . $request->file('foto_carnet')->extension(), 'public');
+
+                $uploadCarnet = $cloudinary->uploadApi()->upload(
+                    $request->file('foto_carnet')->getRealPath(),
+                    [
+                        'folder' => 'carnets',
+                        'resource_type' => 'raw',
+                        'public_id' => "CARNET_$folderCI"
+                    ]
+                );
+
+                $data['foto_carnet'] = $uploadCarnet['secure_url'];
             }
 
             if ($request->hasFile('fotografia')) {
-                $data['fotografia'] = $request->file('fotografia')->storeAs('uploads/fotos', "FOTO_$folderCI." . $request->file('fotografia')->extension(), 'public');
+
+                $uploadFoto = $cloudinary->uploadApi()->upload(
+                    $request->file('fotografia')->getRealPath(),
+                    [
+                        'folder' => 'fotografias',
+                        'public_id' => "FOTO_$folderCI"
+                    ]
+                );
+
+                $data['fotografia'] = $uploadFoto['secure_url'];
             }
 
             Persona::create($data);

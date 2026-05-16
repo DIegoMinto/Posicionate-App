@@ -146,8 +146,7 @@
                     <div
                         class="w-16 h-16 rounded-full border-2 border-brand-gold overflow-hidden bg-gray-200 shadow-md">
                         @if($usuario->persona && $usuario->persona->fotografia)
-                            <img src="{{ asset('storage/' . $usuario->persona->fotografia) }}"
-                                class="w-full h-full object-cover" alt="Perfil">
+                            <img src="{{ $usuario->persona->fotografia }}" class="w-full h-full object-cover" alt="Perfil">
                         @else
                             <div class="flex items-center justify-center h-full text-brand-green font-bold bg-gray-300">
                                 {{ substr($usuario->persona->nombre, 0, 1) }}

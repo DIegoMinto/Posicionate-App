@@ -108,7 +108,7 @@
 
                                         <div class="flex-shrink-0">
                                             @if($curso->institucion && $curso->institucion->imagen)
-                                                <img src="{{ asset('storage/' . $curso->institucion->imagen) }}"
+                                                <img src="{{ $curso->institucion->imagen }}"
                                                     class="object-contain w-20 h-20 rounded-md border border-gray-100 bg-gray-50">
                                             @else
                                                 <div
