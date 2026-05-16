@@ -165,7 +165,6 @@ class DocenteController extends Controller
             $request->validate([
                 'nombre' => 'required|string|max:100',
                 'apellido_p' => 'required|string|max:100',
-                // Ignoramos el CI del docente actual en la validación unique
                 'ci' => 'required|numeric|unique:docente,ci,' . $docente->id_docente . ',id_docente',
                 'extension_select' => 'required',
                 'correo_electronico' => 'required|email|unique:docente,correo_electronico,' . $docente->id_docente . ',id_docente',
@@ -188,7 +187,6 @@ class DocenteController extends Controller
 
             $idArchivo = $request->ci . '_' . $extensionFinal;
 
-            // Procesamiento de archivos (Solo actualiza si se sube uno nuevo)
             if ($request->hasFile('curriculum')) {
                 $data['curriculum'] = $request->file('curriculum')->storeAs('uploads/cvs', "CV_$idArchivo." . $request->file('curriculum')->extension(), 'public');
             }
@@ -216,7 +214,6 @@ class DocenteController extends Controller
             abort(403, 'No autorizado');
         }
         try {
-            // 1. Validación de seguridad (Ya comprobaste que esto funciona)
             $request->validate([
                 'password_confirm' => 'required',
             ]);
@@ -225,7 +222,7 @@ class DocenteController extends Controller
                 return back()->withErrors(['password_confirm' => 'La contraseña es incorrecta.']);
             }
 
-            // 2. Limpieza de archivos (Storage)
+
             $archivos = ['curriculum', 'fotocarnet', 'fotografia'];
             foreach ($archivos as $campo) {
                 if ($docente->$campo && Storage::disk('public')->exists($docente->$campo)) {
@@ -233,16 +230,12 @@ class DocenteController extends Controller
                 }
             }
 
-            // 3. DESVINCULAR RELACIONES (Paso crítico)
-            // Esto pone en NULL el id_docente en la tabla cursos para evitar el CASCADE
             if ($docente->cursos()->exists()) {
                 $docente->cursos()->update(['id_docente' => null]);
             }
 
-            // 4. ELIMINACIÓN FINAL
             $nombreCompleto = $docente->nombre . ' ' . $docente->apellido_p;
 
-            // Usamos una transacción simple o forzamos el delete
             $eliminado = $docente->delete();
 
             if ($eliminado) {

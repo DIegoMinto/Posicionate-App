@@ -11,10 +11,10 @@ php artisan storage:link || true
 echo "Running migrations..."
 php artisan migrate --force
 
-echo "Caching config..."
-php artisan config:cache
-php artisan route:cache || true
-php artisan view:cache
+echo "Clearing optimization configs..."
+php artisan config:clear
+php artisan route:clear
+php artisan view:clear
 
 echo "Starting server..."
-exec php -S 0.0.0.0:10000 -t public
+exec php -S 0.0.0.0:$PORT -t public
