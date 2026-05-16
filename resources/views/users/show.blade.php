@@ -139,14 +139,14 @@
                     <div class="flex flex-wrap gap-4">
 
                         @if($personal->persona->curriculum)
-                            <a href="{{ asset('storage/' . $personal->persona->curriculum) }}" target="_blank"
+                            <a href="{{ $personal->persona->curriculum }}" target="_blank"
                                 class="bg-brand-green text-white px-4 py-2 rounded text-xs font-bold hover:scale-105 transition">
                                 Ver Curriculum
                             </a>
                         @endif
 
                         @if($personal->persona->foto_carnet)
-                            <a href="{{ asset('storage/' . $personal->persona->foto_carnet) }}" target="_blank"
+                            <a href="{{ $personal->persona->foto_carnet }}" target="_blank"
                                 class="bg-brand-gold text-black px-4 py-2 rounded text-xs font-bold hover:scale-105 transition">
                                 Ver Foto Carnet
                             </a>

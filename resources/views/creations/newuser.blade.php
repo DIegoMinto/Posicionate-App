@@ -85,20 +85,19 @@
 
                                     <td class="py-3 px-4">
                                         @if($p->curriculum)
-                                            <a href="{{ asset('storage/' . $p->curriculum) }}" target="_blank"
-                                                class="text-red-500 font-bold">PDF CV</a>
+                                            <a href="{{ $p->curriculum }}" target="_blank" class="text-red-500 font-bold">PDF
+                                                CV</a>
                                         @else - @endif
                                     </td>
                                     <td class="py-3 px-4">
                                         @if($p->foto_carnet)
-                                            <a href="{{ asset('storage/' . $p->foto_carnet) }}" target="_blank"
+                                            <a href="{{ $p->foto_carnet }}" target="_blank"
                                                 class="text-brand-green underline">Ver CI</a>
                                         @else - @endif
                                     </td>
                                     <td class="py-3 px-4">
                                         @if($p->fotografia)
-                                            <img src="{{ asset('storage/' . $p->fotografia) }}"
-                                                class="w-10 h-10 rounded-full object-cover border">
+                                            <img src="{{ $p->fotografia }}" class="w-10 h-10 rounded-full object-cover border">
                                         @else - @endif
                                     </td>
 
@@ -127,8 +126,8 @@
                                                     <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none"
                                                         viewBox="0 0 24 24" stroke="currentColor">
                                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-1 12a2 2 0 01-2 2H8a2 2 0 01-2-2L5 
-                                                                                        7m5-4h4m-4 0a1 1 0 00-1 1v1h6V4a1 
-                                                                                        1 0 00-1-1m-4 0h4" />
+                                                                                                7m5-4h4m-4 0a1 1 0 00-1 1v1h6V4a1 
+                                                                                                1 0 00-1-1m-4 0h4" />
                                                     </svg>
                                                 </button>
                                             @endif
