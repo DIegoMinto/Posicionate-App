@@ -17,4 +17,4 @@ php artisan route:clear
 php artisan view:clear
 
 echo "Starting server..."
-exec php -S 0.0.0.0:$PORT -t public
+exec php artisan serve --host=0.0.0.0 --port=$PORT
