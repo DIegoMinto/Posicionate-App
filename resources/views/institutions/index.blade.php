@@ -54,7 +54,7 @@
                                     <td class="py-3 px-4">{{ $index + 1 }}</td>
                                     <td class="py-2 px-4">
                                         @if($ins->imagen)
-                                            <img src="{{ asset('storage/' . $ins->imagen) }}" alt="Logo" class="w-10 h-10 object-contain rounded-md border border-gray-200 bg-white">
+                                            <img src="{{ $ins->imagen }}" alt="Logo" class="w-10 h-10 object-contain rounded-md border border-gray-200 bg-white">
                                         @else
                                             <div class="w-10 h-10 bg-gray-100 rounded-md flex items-center justify-center text-[8px] text-gray-400 uppercase">S/L</div>
                                         @endif

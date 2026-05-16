@@ -4,13 +4,10 @@ namespace App\Http\Controllers;
 
 use App\Models\Institucion;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
+use Cloudinary\Cloudinary;
 
 class InstitucionController extends Controller
 {
-    /**
-     * Muestra la lista de instituciones.
-     */
     public function index()
     {
         $instituciones = Institucion::all();
@@ -36,9 +33,26 @@ class InstitucionController extends Controller
         $data = $request->all();
 
         if ($request->hasFile('imagen')) {
-            // Se guarda en storage/app/public/instituciones
-            $path = $request->file('imagen')->store('instituciones', 'public');
-            $data['imagen'] = $path;
+
+            $cloudinary = new Cloudinary([
+                'cloud' => [
+                    'cloud_name' => env('CLOUDINARY_CLOUD_NAME'),
+                    'api_key' => env('CLOUDINARY_API_KEY'),
+                    'api_secret' => env('CLOUDINARY_API_SECRET'),
+                ],
+                'url' => [
+                    'secure' => true
+                ]
+            ]);
+
+            $upload = $cloudinary->uploadApi()->upload(
+                $request->file('imagen')->getRealPath(),
+                [
+                    'folder' => 'instituciones'
+                ]
+            );
+
+            $data['imagen'] = $upload['secure_url'];
         }
 
         Institucion::create($data);
@@ -68,11 +82,26 @@ class InstitucionController extends Controller
         $data = $request->all();
 
         if ($request->hasFile('imagen')) {
-            // Borramos la imagen antigua si existe para no llenar el server de basura
-            if ($institucion->imagen) {
-                Storage::disk('public')->delete($institucion->imagen);
-            }
-            $data['imagen'] = $request->file('imagen')->store('instituciones', 'public');
+
+            $cloudinary = new Cloudinary([
+                'cloud' => [
+                    'cloud_name' => env('CLOUDINARY_CLOUD_NAME'),
+                    'api_key' => env('CLOUDINARY_API_KEY'),
+                    'api_secret' => env('CLOUDINARY_API_SECRET'),
+                ],
+                'url' => [
+                    'secure' => true
+                ]
+            ]);
+
+            $upload = $cloudinary->uploadApi()->upload(
+                $request->file('imagen')->getRealPath(),
+                [
+                    'folder' => 'instituciones'
+                ]
+            );
+
+            $data['imagen'] = $upload['secure_url'];
         }
 
         $institucion->update($data);
@@ -80,15 +109,9 @@ class InstitucionController extends Controller
         return redirect()->route('institutions.index')
             ->with('success', 'Institución actualizada correctamente.');
     }
-
     public function destroy(string $id)
     {
         $institucion = Institucion::findOrFail($id);
-
-        // Borrar imagen del storage antes de eliminar el registro
-        if ($institucion->imagen) {
-            Storage::disk('public')->delete($institucion->imagen);
-        }
 
         $institucion->delete();
 
