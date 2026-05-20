@@ -90,6 +90,7 @@ Route::middleware(['auth', 'vigente'])->group(function () {
         Route::patch('/programs/{id}/status', [DashboardController::class, 'updateStatus'])->name('programs.updateStatus');
         Route::put('/programs/{id}/update', [DashboardController::class, 'programsUpdate'])->name('programs.update');
         Route::delete('/programs/{id}', [DashboardController::class, 'programsDestroy'])->name('programs.destroy');
+        Route::delete('/modules/{id}', [ModuloController::class, 'destroy'])->name('modules.destroy');
     });
 
     Route::get('/programs/{id}/show', [DashboardController::class, 'programsShow'])->name('programs.show');

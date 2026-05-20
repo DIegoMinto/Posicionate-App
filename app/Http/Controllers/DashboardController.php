@@ -13,7 +13,7 @@ use App\Models\Clase;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\DB;
-
+use App\Models\Modulo;
 
 class DashboardController extends Controller
 {
@@ -348,14 +348,22 @@ class DashboardController extends Controller
             abort(403, 'No autorizado');
         }
 
-        $curso = Curso::with(['institucion', 'modulos', 'docente', 'sede'])->findOrFail($id);
+        $curso = Curso::with(['institucion', 'modulos', 'docente', 'sede'])
+            ->findOrFail($id);
+
         $usuario = auth()->user();
 
         $docentes = Docente::all();
         $sedes = Sede::all();
         $instituciones = Institucion::all();
 
-        return view('programs.edit', compact('curso', 'usuario', 'docentes', 'sedes', 'instituciones'));
+        return view('programs.edit', compact(
+            'curso',
+            'usuario',
+            'docentes',
+            'sedes',
+            'instituciones'
+        ));
     }
 
 
@@ -403,10 +411,18 @@ class DashboardController extends Controller
         }
 
         if ($request->has('modulos')) {
-            foreach ($request->modulos as $id_modulo => $moduloData) {
+
+            foreach ($request->modulos as $id_modulo => $data) {
+
                 $modulo = Modulo::find($id_modulo);
+
                 if ($modulo) {
-                    $modulo->update($moduloData);
+
+                    $modulo->update([
+                        'nombre' => $data['nombre'],
+                        'fecha_inicio' => $data['fecha_inicio'] ?? null,
+                        'fecha_fin' => $data['fecha_fin'] ?? null,
+                    ]);
                 }
             }
         }

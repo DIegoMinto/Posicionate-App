@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
 use App\Models\Modulo;
 
 class ModuloController extends Controller
@@ -39,4 +40,35 @@ class ModuloController extends Controller
         return redirect()->route('programs.index')
             ->with('success', '¡Módulo registrado exitosamente!');
     }
+
+    public function destroy(Request $request, $id)
+    {
+        if (auth()->user()->rol !== 'super_admin') {
+            abort(403, 'No autorizado');
+        }
+
+        $request->validate([
+            'password_confirm' => 'required'
+        ]);
+
+        $usuario = auth()->user();
+
+        if (!Hash::check($request->password_confirm, $usuario->password)) {
+
+            return back()->with(
+                'error',
+                'Contraseña incorrecta.'
+            );
+        }
+
+        $modulo = Modulo::findOrFail($id);
+
+        $modulo->delete();
+
+        return back()->with(
+            'success',
+            'Módulo eliminado correctamente.'
+        );
+    }
+
 }
