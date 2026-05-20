@@ -5,6 +5,7 @@ use Illuminate\Http\Request;
 use App\Models\PlanesPago;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use App\Models\PlanCuotaDetalle;
 class PlanController extends Controller
 {
 
@@ -84,5 +85,55 @@ class PlanController extends Controller
         $nombrePlan = $plan->nombre;
         $plan->delete();
         return redirect()->back()->with('success', 'El plan "' . $nombrePlan . '" y sus cuotas han sido eliminados.');
+    }
+    public function edit($id)
+    {
+        $usuario = auth()->user();
+
+        $plan = PlanesPago::with(['detalles', 'curso.sede'])
+            ->findOrFail($id);
+
+        return view('plans.edit', compact(
+            'plan',
+            'usuario'
+        ));
+    }
+    public function update(Request $request, $id)
+    {
+        $plan = PlanesPago::findOrFail($id);
+
+        $plan->update([
+            'nombre' => $request->nombre,
+            'precio_base' => $request->precio_base,
+            'incluye_matricula' => $request->has('incluye_matricula'),
+        ]);
+
+        PlanCuotaDetalle::where(
+            'id_planes_pago',
+            $plan->id_planes_pago
+        )->delete();
+
+        if ($request->has('cuotas')) {
+
+            foreach ($request->cuotas as $cuota) {
+
+                PlanCuotaDetalle::create([
+                    'id_planes_pago' => $plan->id_planes_pago,
+                    'nro_cuota' => $cuota['nro_cuota'],
+                    'monto_cuota' => $cuota['monto'],
+                    'fecha_vencimiento' => $cuota['fecha_vencimiento'] ?: null,
+                    'detalle' => ($cuota['nro_cuota'] == 1)
+                        ? 'PAGO INICIAL'
+                        : 'CUOTA ' . $cuota['nro_cuota']
+                ]);
+            }
+        }
+
+        return redirect()
+            ->route('programs.payments.setup', $plan->id_curso)
+            ->with(
+                'success',
+                'Plan actualizado correctamente'
+            );
     }
 }

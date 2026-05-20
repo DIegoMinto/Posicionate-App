@@ -140,7 +140,20 @@
                                         <a href="{{ route('plans.installments', $plan->id_planes_pago) }}" class="btn-gold">
                                             Ver Detalle
                                         </a>
+                                        <a href="{{ route('plans.edit', $plan->id_planes_pago) }}"
+                                            class="group relative flex items-center justify-center text-black hover:text-brand-gold transition">
 
+                                            <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z">
+                                                </path>
+                                            </svg>
+
+                                            <span
+                                                class="absolute -top-8 scale-0 transition-all rounded bg-gray-800 px-2 py-1 text-[10px] text-white group-hover:scale-100 whitespace-nowrap z-30 shadow-lg font-sans">
+                                                Editar Plan
+                                            </span>
+                                        </a>
                                         <div x-data="{ openDelete: false }">
                                             <button @click="openDelete = true"
                                                 class="group relative flex items-center justify-center pb-1 cursor-pointer">
@@ -236,7 +249,6 @@
 
                     const montoDividido = (total / nroCuotas).toFixed(2);
 
-                    // 2. GENERACIÓN DE CUOTAS
                     for (let i = 1; i <= nroCuotas; i++) {
                         const esPrimera = (i === 1);
                         const row = document.createElement('div');

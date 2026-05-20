@@ -22,4 +22,12 @@ class PlanesPago extends Model
     {
         return $this->hasMany(PlanCuotaDetalle::class, 'id_planes_pago', 'id_planes_pago');
     }
+    public function curso()
+    {
+        return $this->belongsTo(
+            Curso::class,
+            'id_curso',
+            'id_curso'
+        );
+    }
 }
