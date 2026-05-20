@@ -30,7 +30,6 @@
             </div>
         @endif
 
-        {{-- Mensaje de Éxito (opcional) --}}
         @if (session('success'))
             <div
                 class="max-w-5xl mx-auto mb-6 p-4 bg-green-500/20 border-2 border-green-500 text-white rounded-2xl text-center font-bold">

@@ -101,7 +101,7 @@
                                 <th class="py-3 px-4 whitespace-nowrap">Asesor</th>
                                 <th class="py-3 px-4 whitespace-nowrap">Fecha de Registro</th>
                                 <th class="py-3 px-4 text-center whitespace-nowrap">Estado</th>
-                                <th class="py-3 px-4 text-right sticky right-0 bg-brand-green">Adicionales</th>
+                                <th class="py-3 px-4 text-center sticky right-0 bg-brand-green">Adicionales</th>
                             </tr>
                         </thead>
 
@@ -154,8 +154,8 @@
                                     <td class="py-3 px-4 text-center">
                                         <span
                                             class="px-2 py-0.5 rounded-full text-[9px] font-black uppercase
-                                                                    {{ $e->estado == 'pre_inscrito' ? 'bg-yellow-100 text-yellow-700' : '' }}
-                                                                    {{ $e->estado == 'inscrito' ? 'bg-green-100 text-green-700' : '' }}">
+                                                                                        {{ $e->estado == 'pre_inscrito' ? 'bg-yellow-100 text-yellow-700' : '' }}
+                                                                                        {{ $e->estado == 'inscrito' ? 'bg-green-100 text-green-700' : '' }}">
                                             {{ $e->estado }}
                                         </span>
                                     </td>
@@ -172,7 +172,7 @@
                                                         d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                                         d="M2.458 12C3.732 7.943 7.523 5 12 5c4.477 0 8.268 2.943 9.542 7-1.274 
-                                                                                                                                                                                                                                                                                                                                4.057-5.065 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                                                                                                                                                                                                                                                                                                                                    4.057-5.065 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                                                 </svg>
                                             </a>
 
@@ -181,7 +181,8 @@
                                                     class="group relative flex items-center justify-center"
                                                     title="Cambiar Estado">
                                                     <div>
-                                                        <img src="/img/change_icon.png" class="w-5 h-5 object-contain"
+                                                        <img src="/img/change_icon.png"
+                                                            class="w-5 h-5 min-w-[24px] min-h-[24px] object-contain"
                                                             alt="Cambiar Estado">
                                                     </div>
 
@@ -195,7 +196,8 @@
                                             <a href="{{ route('students.facturacion', $e->id_estudiante) }}?id_curso={{ $e->id_curso }}"
                                                 class="group relative flex items-center justify-center" title="Facturación">
                                                 <div>
-                                                    <img src="/img/bill_icon.png" class="w-5 h-5 object-contain"
+                                                    <img src="/img/bill_icon.png"
+                                                        class="w-5 h-5 min-w-[24px] min-h-[24px] object-contain"
                                                         alt="Facturación">
                                                 </div>
 

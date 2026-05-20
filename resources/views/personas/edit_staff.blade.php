@@ -203,7 +203,6 @@
                             </div>
                         </div>
 
-                        {{-- COLUMNA 3: OTROS DATOS Y ARCHIVOS --}}
                         <div class="space-y-4">
                             <h3 class="font-bold text-brand-green text-sm uppercase border-b border-brand-gold/30 pb-1">Otros Datos y Archivos</h3>
 
