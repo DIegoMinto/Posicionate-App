@@ -163,7 +163,19 @@ class DashboardController extends Controller
     {
         $usuario = auth()->user()->load('persona');
 
-        $query = \App\Models\Curso::with(['institucion', 'sede']);
+        $query = \App\Models\Curso::with(['institucion', 'sede'])
+
+            ->withCount([
+
+                'estudiantes as inscritos' => function ($q) {
+                    $q->where('curso_estudiante.estado', 'inscrito');
+                },
+
+                'estudiantes as pre_inscritos' => function ($q) {
+                    $q->where('curso_estudiante.estado', 'pre_inscrito');
+                }
+
+            ]);
 
         if ($request->search) {
             $searchTerm = $request->search;
@@ -199,7 +211,6 @@ class DashboardController extends Controller
 
         $sedes = \App\Models\Sede::all();
         $instituciones = \App\Models\Institucion::all();
-
 
         $allEstudiantes = \App\Models\Estudiante::orderBy('nombre')->get();
 

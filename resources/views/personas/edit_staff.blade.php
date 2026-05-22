@@ -15,10 +15,10 @@
 
     <x-layout-dashboard :usuario="$usuario">
         <div class="p-6">
-            <div class="bg-white rounded-sm border-2 border-brand-gold shadow-lg p-8">
+            <div class="bg-white rounded-sm border-2 border-brand-green shadow-lg">
 
-                <div class="flex justify-between items-center mb-6 border-b-2 border-brand-gold pb-4">
-                    <h1 class="text-2xl font-sans font-bold text-brand-green tracking-wider">
+                <div class="flex justify-between items-center mb-6 p-8 bg-brand-green">
+                    <h1 class="text-2xl font-sans font-bold text-white tracking-wider">
                         Editar Personal:
                         <span class="font-sans">
                             {{ $persona->nombre }} {{ $persona->apellido_p }} {{ $persona->apellido_m }}
@@ -36,7 +36,7 @@
                         </ul>
                     </div>
                 @endif
-
+ <div class="flex justify-between items-center mb-6 p-8 pt-2">
                 <form action="{{ route('personal.update', $personal->id_personal) }}" method="POST"
                     enctype="multipart/form-data" class="space-y-6">
                     @csrf
@@ -290,7 +290,9 @@
                     </div>
 
                 </form>
+                </div>
             </div>
+            
         </div>
     </x-layout-dashboard>
 </body>

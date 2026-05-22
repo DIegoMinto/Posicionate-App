@@ -14,7 +14,7 @@ use App\Http\Controllers\InscripcionController;
 use App\Http\Controllers\StatiticController;
 use App\Http\Controllers\PlanController;
 use App\Http\Controllers\ModuloController;
-use App\Http\Controllers\Auth\LoginController;
+use App\Http\Controllers\EstudianteController;
 use App\Models\PlanesPago;
 
 Route::get('/', function () {
@@ -154,6 +154,8 @@ Route::middleware(['auth', 'vigente'])->group(function () {
     Route::get('/estudiantes/facturacion/{id}', [InscripcionController::class, 'facturacion'])->name('students.facturacion');
     Route::middleware('role:super_admin,admin')->group(function () {
         Route::delete('/students/{id}', [InscripcionController::class, 'destroy'])->name('students.destroy');
+        Route::get('/{estudiante}/edit', [EstudianteController::class, 'edit'])->name('estudiantes.edit');
+        Route::put('/estudiante/{estudiante}', [EstudianteController::class, 'update'])->name('estudiantes.update');
         Route::get('/pagos/{id}/edit', [InscripcionController::class, 'editPago'])->name('pagos.edit');
         Route::put('/pagos/{id}', [InscripcionController::class, 'updatePago'])->name('pagos.update');
     });

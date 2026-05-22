@@ -13,14 +13,12 @@
         <x-page-header titulo="Configuración de Credenciales" />
 
         <div class="p-6 font-sans">
-            <div class="max-w-3xl mx-auto bg-white rounded-sm border-2 border-brand-gold shadow-md">
-                <div class="mb-6 border-b border-gray-100 pb-4 bg-brand-green text-white p-8 rounded-sm">
-                    <h2 class="text-lg font-black uppercase">Asignar Acceso a Sistema</h2>
+            <div class="max-w-3xl mx-auto bg-white rounded-sm border-2 border-brand-green shadow-md">
+                <div class="mb-6 border-b border-gray-100 pb-4 bg-brand-green text-white p-8">
+                    <h2 class="text-lg font-sans font-bold uppercase">Asignar Acceso a Sistema</h2>
                     <p class="text-[11px] text-white">Persona: <span class="font-bold">{{ $persona->nombre }}
                             {{ $persona->apellido_p }}</span></p>
                 </div>
-
-                {{-- CONTROL DE ERRORES DE VALIDACIÓN --}}
                 @if ($errors->any())
                     <div class="mb-4 mx-4 p-4 bg-red-50 border-l-4 border-red-500 text-red-700 rounded-sm">
                         <p class="text-xs font-black uppercase mb-1">⚠️ Error en los datos ingresados:</p>

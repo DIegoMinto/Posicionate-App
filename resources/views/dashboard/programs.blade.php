@@ -380,33 +380,31 @@
                                                             class="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 backdrop-blur-sm"
                                                             x-cloak>
                                                             
-                                                            <div class="bg-white p-6 rounded-sm shadow-2xl w-[85%] max-w-5xl text-left border-t-4 border-brand-green font-sans max-h-[90vh] overflow-y-auto"
+                                                            <div class="bg-white rounded-md shadow-2xl w-full max-w-2xl text-left border border-brand-green font-sans max-h-[85vh] overflow-hidden"
                                                                 @click.away="openEstudiantes = false">
                                                                 
-                                                                <div class="flex justify-between items-center mb-6 border-b border-gray-100 pb-3">
-                                                                    <div class="flex items-center gap-2">
+                                                                <div class="flex justify-between items-center bg-brand-green">
+                                                                    <div class="flex items-center gap-2 p-2">
                                                                         <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-brand-green" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                                                             <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                                                                         </svg>
-                                                                        <h3 class="text-brand-green uppercase font-sans font-bold tracking-tighter">
+                                                                        <h3 class="text-white font-sans font-semibold uppercase tracking-tighter">
                                                                             Formulario de Registro de: 
                                                                             <span>
                                                                                 {{ auth()->user()->persona?->nombre }} 
                                                                                 {{ auth()->user()->persona?->apellido_p }} 
                                                                             </span>
-                                                                            <span>
-                                                                                - {{ auth()->user()->cargo }}
-                                                                            </span>
                                                                         </h3>
                                                                     </div>
-                                                                    <button @click="openEstudiantes = false" class="text-black hover:text-red-600 transition-colors cursor-pointer">
+                                                                    
+                                                                    <button @click="openEstudiantes = false" class="text-white hover:text-red-600 transition-colors cursor-pointer p-6">
                                                                         <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
                                                                         </svg>
                                                                     </button>
                                                                 </div>
-
-                                                                <div class="py-6" x-data="{ 
+<div class="p-5 bg-white overflow-y-auto max-h-[70vh]">
+                                                                <div class="" x-data="{ 
                                                                     url: '{{ url('/inscripcion/' . $curso->id_curso . '/' . auth()->user()->id_personal) }}',
                                                                     copied: false,
                                                                     copyToClipboard() {
@@ -420,7 +418,7 @@
                                                                         <h4 class="text-lg font-sans font-bold text-black uppercase">{{ $curso->nombre }}</h4>
                                                                     </div>
 
-                                                                    <div class="bg-gray-50 p-6 rounded-sm border border-gray-100">
+                                                                    <div class="bg-gray-50 p-4 rounded-md border border-gray-200">
                                                                         <label class="block uppercase font-sans font-bold text-brand-green mb-2">Copia y envía el formulario al estudiante:</label>
                                                                         
                                                                         <div class="flex gap-2">
@@ -428,7 +426,7 @@
                                                                                 class="flex-1 bg-white border border-gray-200 p-3 text-xs font-mono focus:outline-none rounded-sm shadow-inner">
                                                                             
                                                                             <button @click="copyToClipboard()" class="btn-gold flex items-center gap-2">
-                                                                                <svg x-show="!copied" xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                                                <svg x-show="!copied" xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" />
                                                                                 </svg>
 
@@ -440,6 +438,7 @@
                                                                             </button>
                                                                         </div>
                                                                     </div>
+                                                                </div>
                                                                 </div>
                                                             </div>
                                                         </div>

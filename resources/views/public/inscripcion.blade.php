@@ -109,7 +109,7 @@
 
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                     <div>
-                        <label class="form-label-bold">País</label>
+                        <label class="form-label-bold">País de Residencia</label>
                         <select name="id_pais" id="select-pais" class="form-select-pill">
                             <option value="">Seleccione País</option>
                             @foreach($paises as $pais)
@@ -118,13 +118,13 @@
                         </select>
                     </div>
                     <div>
-                        <label class="form-label-bold">Departamento</label>
+                        <label class="form-label-bold">Departamento de Residencia</label>
                         <select name="id_departamento" id="select-departamento" class="form-select-pill">
                             <option value="">Seleccione un país primero</option>
                         </select>
                     </div>
                     <div>
-                        <label class="form-label-bold">Ciudad (Residencia)</label>
+                        <label class="form-label-bold">Ciudad de Residencia</label>
                         <input type="text" name="ciudad_residencia" value="{{ old('ciudad_residencia') }}"
                             class="form-input-pill" placeholder="Ingrese su ciudad" required>
                     </div>
