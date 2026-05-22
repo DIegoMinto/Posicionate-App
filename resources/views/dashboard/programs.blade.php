@@ -120,7 +120,7 @@
                                         </div>
 
                                         <div class="flex-1 min-w-0">
-                                            <div class="font-sans text-brand-green font-bold truncate leading-tight">
+                                            <div class="font-sans text-brand-green font-bold leading-tight break-words">
                                                 {{ $curso->nombre }}
                                             </div>
                                             <div class="font-sans flex items-center gap-1 mt-0.5 italic">
