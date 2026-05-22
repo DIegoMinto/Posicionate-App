@@ -66,19 +66,21 @@
 
                 <div class="overflow-x-auto rounded-xl border border-brand-green">
 
-                    <table class="w-full text-left border-collapse">
+                    <table class="min-w-max text-left border-collapse">
 
                         <thead>
                             <tr
                                 class="border-b-2 border-brand-gold uppercase text-[10px] font-black bg-brand-green text-white">
-                                <th class="py-3 px-4">N°</th>
-                                <th class="py-3 px-4">Código</th>
-                                <th class="py-3 px-4">Asesor</th>
-                                <th class="py-3 px-4 text-center">Total</th>
+                                <th class="py-3 px-4 text-center whitespace-nowrap min-w-[160px]">N°</th>
+                                <th class="py-3 px-4 text-center whitespace-nowrap min-w-[160px]">Código</th>
+                                <th class="py-3 px-4 text-center whitespace-nowrap min-w-[160px]">Asesor</th>
+                                <th class="py-3 px-4 text-center whitespace-nowrap min-w-[160px]">Total</th>
 
                                 @foreach($cursos as $curso)
-                                    <th class="py-3 px-4 text-center break-words max-w-[140px]">
-                                        {{ strtoupper($curso->nombre) }}
+                                    <th class="py-3 px-4 text-center min-w-[220px] max-w-[220px]">
+                                        <div class="line-clamp-2 leading-tight overflow-hidden text-ellipsis">
+                                            {{ strtoupper($curso->nombre) }}
+                                        </div>
                                     </th>
                                 @endforeach
                             </tr>
@@ -89,21 +91,21 @@
                             @forelse($data as $index => $row)
                                 <tr class="border-b border-gray-100 hover:bg-gray-50 text-black">
 
-                                    <td class="py-3 px-4 font-bold">
+                                    <td class="py-3 px-4 text-center whitespace-nowrap min-w-[160px]">
                                         {{ $index + 1 }}
                                     </td>
 
-                                    <td class="py-3 px-4">
+                                    <td class="py-3 px-4 text-center whitespace-nowrap min-w-[160px]">
                                         {{ $row['personal']->codigo_personal }}
                                     </td>
 
-                                    <td class="py-3 px-4">
+                                    <td class="py-3 px-4 text-center whitespace-nowrap min-w-[160px]">
                                         {{ $row['personal']->persona->apellido_p }}
                                         {{ $row['personal']->persona->apellido_m }}
                                         {{ $row['personal']->persona->nombre }}
                                     </td>
 
-                                    <td class="py-3 px-4 text-center">
+                                    <td class="py-3 px-4 text-center whitespace-nowrap min-w-[160px]">
                                         <span
                                             class="px-2 py-1 rounded-full bg-green-100 text-green-700 text-[10px] font-black">
                                             {{ $row['total'] }}
@@ -111,7 +113,7 @@
                                     </td>
 
                                     @foreach($cursos as $curso)
-                                        <td class="py-3 px-4 text-center">
+                                        <td class="py-3 px-4 text-center whitespace-nowrap min-w-[160px]">
                                             {{ $row['cursos'][$curso->id_curso] ?? 0 }}
                                         </td>
                                     @endforeach
