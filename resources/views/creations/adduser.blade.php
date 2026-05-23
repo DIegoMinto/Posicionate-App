@@ -10,7 +10,11 @@
 
 <body>
     <x-layout-dashboard :usuario="$usuario">
-        <x-page-header titulo="Configuración de Credenciales" />
+        <x-page-header titulo="Configuración de Credenciales">
+            <a href="{{ route('users.create') }}" class="btn-back">
+                ← Volver
+            </a>
+        </x-page-header>
 
         <div class="p-6 font-sans">
             <div class="max-w-3xl mx-auto bg-white rounded-sm border-2 border-brand-green shadow-md">

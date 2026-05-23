@@ -11,6 +11,9 @@
 <body>
     <x-layout-dashboard :usuario="$usuario">
         <x-page-header titulo="Instituciones">
+            <a href="{{ route('institutions.index') }}" class="btn-back">
+                ← Volver
+            </a>
         </x-page-header>
 
         <div class="p-6 flex justify-center">

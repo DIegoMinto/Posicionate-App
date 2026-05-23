@@ -10,7 +10,10 @@
 
 <body class="bg-gray-50">
     <x-layout-dashboard :usuario="$usuario">
-        <x-page-header titulo="Configuración de Inversión y Planes"></x-page-header>
+        <x-page-header titulo="Configuración de Inversión y Planes"><a href="{{ route('programs.index') }}"
+                class="btn-back">
+                ← Volver
+            </a></x-page-header>
 
         <div class="p-6 space-y-6">
             <div class="bg-white border-2 border-brand-gold p-6 shadow-md flex justify-between items-center rounded-sm">

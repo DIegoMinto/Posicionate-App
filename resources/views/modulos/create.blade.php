@@ -11,6 +11,9 @@
 <body>
     <x-layout-dashboard :usuario="$usuario">
         <x-page-header titulo="Gestión de Módulos">
+            <a href="{{ route('programs.index') }}" class="btn-back">
+                ← Volver
+            </a>
         </x-page-header>
 
         <div class="p-6">

@@ -10,7 +10,11 @@
 
 <body>
     <x-layout-dashboard :usuario="$usuario">
-        <x-page-header titulo="Sedes"></x-page-header>
+        <x-page-header titulo="Sedes">
+            <a href="{{ route('sedes.index') }}" class="btn-back">
+                ← Volver
+            </a>
+        </x-page-header>
 
         <div class="p-6 flex justify-center">
             <div class="w-full max-w-xl bg-white rounded-sm border-2 border-brand-green shadow-md">

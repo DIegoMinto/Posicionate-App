@@ -11,6 +11,9 @@
 <body>
     <x-layout-dashboard :usuario="$usuario">
         <x-page-header titulo="Detalles del Programa">
+            <a href="{{ route('programs.index') }}" class="btn-back">
+                ← Volver
+            </a>
         </x-page-header>
 
         <div class="p-6 space-y-6">

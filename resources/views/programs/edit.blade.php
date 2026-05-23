@@ -11,9 +11,8 @@
 <body>
     <x-layout-dashboard :usuario="$usuario">
         <x-page-header titulo="Editar Programa: {{ $curso->nombre }}">
-            <a href="{{ route('programs.show', ['id' => $curso->id_curso]) }}"
-                class="text-gray-500 hover:text-brand-gold font-bold text-xs uppercase flex items-center gap-2">
-                <i class="fas fa-times"></i> Cancelar
+            <a href="{{ route('programs.index') }}" class="btn-back">
+                ← Volver
             </a>
         </x-page-header>
 

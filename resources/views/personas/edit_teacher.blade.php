@@ -10,6 +10,9 @@
 
 <body>
     <x-layout-dashboard :usuario="$usuario">
+        <x-page-header titulo="Editar Docente"><a href="{{ route('teachers.index') }}" class="btn-back">
+                ← Volver
+            </a></x-page-header>
         <div class="p-6">
             <div class="bg-white rounded-sm border-2 shadow-lg">
                 <div class="flex justify-between items-center p-8 bg-brand-green">

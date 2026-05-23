@@ -24,6 +24,32 @@
                     </div>
                 </form>
             </x-slot>
+            <div class="flex items-center gap-3">
+
+                <a href="{{ route('people.staff') }}" class="btn-back">
+                    ← Volver
+                </a>
+
+                <x-slot name="search">
+                    <form action="{{ route('people.staff') }}" method="GET" class="relative bg-white rounded-full">
+
+                        <input type="text" name="search" value="{{ request('search') }}" placeholder="Buscar"
+                            class="pl-10 pr-4 py-1.5 text-xs w-64 outline-none rounded-full">
+
+                        <div class="absolute left-3 top-1/2 -translate-y-1/2 text-black">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z">
+                                </path>
+
+                            </svg>
+                        </div>
+
+                    </form>
+                </x-slot>
+
+            </div>
         </x-page-header>
 
         <div class="p-6">
@@ -125,9 +151,10 @@
                                                     class="text-red-600 hover:text-red-800 transition cursor-pointer">
                                                     <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none"
                                                         viewBox="0 0 24 24" stroke="currentColor">
-                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-1 12a2 2 0 01-2 2H8a2 2 0 01-2-2L5 
-                                                                                                7m5-4h4m-4 0a1 1 0 00-1 1v1h6V4a1 
-                                                                                                1 0 00-1-1m-4 0h4" />
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                            d="M19 7l-1 12a2 2 0 01-2 2H8a2 2 0 01-2-2L5 
+                                                                                                                                                                                                                                7m5-4h4m-4 0a1 1 0 00-1 1v1h6V4a1 
+                                                                                                                                                                                                                                1 0 00-1-1m-4 0h4" />
                                                     </svg>
                                                 </button>
                                             @endif

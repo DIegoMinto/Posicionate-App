@@ -45,6 +45,15 @@
         @apply flex justify-center w-full mt-6;
     }
 
+.btn-back {
+    @apply bg-brand-green border border-black text-white
+           p-1 rounded-md text-center
+           text-[10px] font-sans font-semibold uppercase
+           transition-all duration-200
+           hover:scale-105
+           shadow-sm cursor-pointer;
+}
+
 .btn-sidebar {
 
         @apply flex items-center justify-start w-full py-4 px-6;

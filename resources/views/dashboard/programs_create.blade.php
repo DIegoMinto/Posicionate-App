@@ -10,7 +10,9 @@
 
 <body>
     <x-layout-dashboard :usuario="$usuario">
-        <x-page-header titulo="Nuevo Programa"></x-page-header>
+        <x-page-header titulo="Nuevo Programa"><a href="{{ route('programs.index') }}" class="btn-back">
+                ← Volver
+            </a></x-page-header>
 
         <div class="p-6 flex justify-center">
             <div class="w-full max-w-4xl bg-white rounded-sm border-2 border-brand-green shadow-md">

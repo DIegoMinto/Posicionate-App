@@ -11,7 +11,10 @@
 <body>
     <x-layout-dashboard :usuario="$usuario">
 
-        <x-page-header titulo="Perfil de Docente: {{ $docente->nombre }} {{ $docente->apellido_p }}" />
+        <x-page-header titulo="Perfil de Docente: {{ $docente->nombre }} {{ $docente->apellido_p }}"><a
+                href="{{ route('teachers.index') }}" class="btn-back">
+                ← Volver
+            </a></x-page-header>
 
         <div class="m-6 border-2 border-brand-green rounded-xl p-7">
 

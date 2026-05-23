@@ -11,6 +11,9 @@
 <body>
     <x-layout-dashboard :usuario="$usuario">
         <x-page-header titulo="Configuración">
+            <a href="{{ route('creations.index') }}" class="btn-back">
+    ← Volver
+</a>
             <x-slot name="search">
                 <form action="{{ route('institutions.index') }}" method="GET" class="relative bg-white rounded-full">
                     <input type="text" name="search" value="{{ request('search') }}" placeholder="Buscar institución..."
