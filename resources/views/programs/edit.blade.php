@@ -67,11 +67,18 @@
                         <div>
                             <label class="form-label-bold text-black">Sede</label>
                             <select name="id_sede" class="form-select-pill border-2 border-brand-gold">
+
+                                <option value="" {{ is_null($curso->id_sede) ? 'selected' : '' }}>
+                                    -- Sin Sede Asignada --
+                                </option>
+
                                 @foreach($sedes as $sede)
-                                    <option value="{{ $sede->id_sede }}" {{ $curso->id_sede == $sede->id_sede ? 'selected' : '' }}>
+                                    <option value="{{ $sede->id_sede }}"
+                                        {{ $curso->id_sede == $sede->id_sede ? 'selected' : '' }}>
                                         {{ $sede->nombre }}
                                     </option>
                                 @endforeach
+
                             </select>
                         </div>
                         <div>
@@ -100,11 +107,18 @@
                                 <label class="form-label-bold font-sans font-bold text-black">Institución
                                     Perteneciente:</label>
                                 <select name="id_institucion" class="form-select-pill border-1 border-brand-gold">
+
+                                    <option value=""
+                                        {{ is_null($curso->id_institucion) ? 'selected' : '' }}>
+                                    </option>
+
                                     @foreach($instituciones as $inst)
-                                        <option value="{{ $inst->id_institucion }}" {{ $curso->id_institucion == $inst->id_institucion ? 'selected' : '' }}>
+                                        <option value="{{ $inst->id_institucion }}"
+                                            {{ $curso->id_institucion == $inst->id_institucion ? 'selected' : '' }}>
                                             {{ $inst->nombre }}
                                         </option>
                                     @endforeach
+
                                 </select>
                             </div>
                             <div class="flex justify-center items-center mt-6">

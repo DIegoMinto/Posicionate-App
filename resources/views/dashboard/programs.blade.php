@@ -107,18 +107,20 @@
                                     <div class="bg-white pl-4 pr-4 pt-4 flex items-center gap-4 hover:shadow-md transition-shadow">
 
                                         <div class="flex-shrink-0">
-                                            @if($curso->institucion && $curso->institucion->imagen)
+                                            @if($curso->institucion?->imagen)
                                                 <img src="{{ $curso->institucion->imagen }}"
                                                     class="object-contain w-20 h-20 rounded-md border border-gray-100 bg-gray-50">
                                             @else
                                                 <div
-                                                    class="w-14 h-14 bg-gray-100 flex items-center justify-center rounded-md border border-dashed border-gray-300">
-                                                    <span class="text-[8px] text-gray-400 uppercase font-black text-center">Sin
-                                                        Foto</span>
+                                                    class="w-20 h-20 bg-gray-100 flex items-center justify-center rounded-md border border-dashed border-gray-300">
+                                                    
+                                                    <span class="text-[8px] text-gray-400 uppercase font-black text-center px-1">
+                                                        {{ $curso->institucion ? 'Sin Foto' : 'Sin Designar' }}
+                                                    </span>
+
                                                 </div>
                                             @endif
                                         </div>
-
                                         <div class="flex-1 min-w-0">
                                             <div class="font-sans text-brand-green font-bold leading-tight break-words">
                                                 {{ $curso->nombre }}
@@ -507,7 +509,7 @@
                                     </div>
                                     <div class="flex items-center mt-2 px-4 mb-2">
                                         <div class="text-brand-green font-bold tracking-wider flex items-center gap-1">
-                                            {{ $curso->sede->nombre }}
+                                            {{ $curso->sede?->nombre ?? 'Sin sede asignada' }}
                                         </div>
 
                                         <div

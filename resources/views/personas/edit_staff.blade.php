@@ -151,19 +151,31 @@
                                     {{ !$esSuperAdmin ? 'readonly' : '' }}>
                             </div>
 
-                            <div>
-                                <label class="form-label-bold !text-brand-green">Sede Asignada</label>
-                                <select name="id_sede" class="form-select-pill border-2 border-brand-gold {{ !$esSuperAdmin ? 'bg-gray-100 cursor-not-allowed text-gray-500' : '' }}"
-                                    {{ !$esSuperAdmin ? 'disabled' : '' }}>
-                                    @foreach($sedes as $sede)
-                                        <option value="{{ $sede->id_sede }}"
-                                            {{ old('id_sede', $personal->id_sede) == $sede->id_sede ? 'selected' : '' }}>
-                                            {{ $sede->nombre }}
-                                        </option>
-                                    @endforeach
-                                </select>
-                                @if(!$esSuperAdmin) <input type="hidden" name="id_sede" value="{{ $personal->id_sede }}"> @endif
-                            </div>
+                          <div>
+    <label class="form-label-bold !text-brand-green">Sede Asignada</label>
+
+    <select name="id_sede"
+        class="form-select-pill border-2 border-brand-gold {{ !$esSuperAdmin ? 'bg-gray-100 cursor-not-allowed text-gray-500' : '' }}"
+        {{ !$esSuperAdmin ? 'disabled' : '' }}>
+
+        <option value=""
+            {{ is_null(old('id_sede', $personal->id_sede)) ? 'selected' : '' }}>
+            -- Sin Sede Asignada --
+        </option>
+
+        @foreach($sedes as $sede)
+            <option value="{{ $sede->id_sede }}"
+                {{ old('id_sede', $personal->id_sede) == $sede->id_sede ? 'selected' : '' }}>
+                {{ $sede->nombre }}
+            </option>
+        @endforeach
+
+    </select>
+
+    @if(!$esSuperAdmin)
+        <input type="hidden" name="id_sede" value="{{ $personal->id_sede }}">
+    @endif
+</div>
 
                             <div>
                                 <label class="form-label-bold !text-brand-green">Rol de Usuario</label>

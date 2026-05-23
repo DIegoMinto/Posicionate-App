@@ -60,10 +60,6 @@ class SedeController extends Controller
     public function destroy(string $id)
     {
         $sede = Sede::findOrFail($id);
-        if ($sede->personal()->count() > 0) {
-            return redirect()->route('sedes.index')
-                ->with('error', 'No se puede eliminar la sede porque tiene personal asignado.');
-        }
 
         $sede->delete();
 
