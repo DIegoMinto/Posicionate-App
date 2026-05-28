@@ -26,7 +26,7 @@
 
             <div class="text-center mb-8">
                 <h3 class="text-2xl font-bold tracking-[0.2em] uppercase">
-                    MENSAJE DE PRUEBA
+                    BIENVENIDO
                 </h3>
             </div>
             @if ($errors->any())
