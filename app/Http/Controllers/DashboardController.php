@@ -348,20 +348,18 @@ class DashboardController extends Controller
 
     public function programsUpdate(Request $request, $id)
     {
+        if (auth()->user()->rol !== 'super_admin') {
+            abort(403, 'No autorizado');
+        }
 
         $curso = Curso::findOrFail($id);
 
-        try {
-            $request->validate([
-                'nombre' => 'required|string|max:255',
-                'imagen_formulario' => 'nullable|file|image|mimes:jpg,jpeg,png,webp|max:5120',
-                'id_institucion' => 'nullable|exists:institucion,id_institucion',
-                'id_sede' => 'nullable|exists:sede,id_sede',
-                'id_docente' => 'nullable|exists:docente,id_docente',
-            ]);
-        } catch (\Illuminate\Validation\ValidationException $e) {
-            dd('VALIDACIÓN FALLÓ', $e->errors());
-        }
+        $request->validate([
+            'nombre' => 'required|string|max:255',
+            'id_institucion' => 'nullable|exists:institucion,id_institucion',
+            'id_sede' => 'nullable|exists:sede,id_sede',
+            'id_docente' => 'nullable|exists:docente,id_docente',
+        ]);
 
         $dataCurso = $request->only([
             'nombre',
@@ -375,6 +373,14 @@ class DashboardController extends Controller
         ]);
 
         if ($request->hasFile('imagen_formulario')) {
+            $file = $request->file('imagen_formulario');
+
+            // Validación manual
+            $allowedMimes = ['image/jpeg', 'image/png', 'image/webp'];
+            if (!in_array($file->getMimeType(), $allowedMimes)) {
+                return back()->withErrors(['imagen_formulario' => 'Formato de imagen no válido.']);
+            }
+
             $cloudinary = new \Cloudinary\Cloudinary([
                 'cloud' => [
                     'cloud_name' => env('CLOUDINARY_CLOUD_NAME'),
@@ -385,7 +391,7 @@ class DashboardController extends Controller
             ]);
 
             $upload = $cloudinary->uploadApi()->upload(
-                $request->file('imagen_formulario')->getRealPath(),
+                $file->getRealPath(),
                 ['folder' => 'cursos_formularios']
             );
 
@@ -393,7 +399,7 @@ class DashboardController extends Controller
         }
 
         $curso->update($dataCurso);
-        dd($curso->wasChanged(), $curso->getChanges(), $dataCurso);
+
         if ($request->has('modulos')) {
             foreach ($request->modulos as $id_modulo => $data) {
                 $modulo = Modulo::find($id_modulo);
