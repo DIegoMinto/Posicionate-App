@@ -373,64 +373,26 @@ class DashboardController extends Controller
         ]);
 
         if ($request->hasFile('imagen_formulario')) {
-            $file = $request->file('imagen_formulario');
+            try {
+                $cloudinary = new Cloudinary([
+                    'cloud' => [
+                        'cloud_name' => env('CLOUDINARY_CLOUD_NAME'),
+                        'api_key' => env('CLOUDINARY_API_KEY'),
+                        'api_secret' => env('CLOUDINARY_API_SECRET'),
+                    ],
+                    'url' => ['secure' => true]
+                ]);
 
-            \Log::info('Imagen recibida', [
-                'nombre' => $file->getClientOriginalName(),
-                'mime' => $file->getMimeType(),
-                'tamaño' => $file->getSize(),
-                'valid' => $file->isValid(),
-                'error' => $file->getError(),
-            ]);
+                $upload = $cloudinary->uploadApi()->upload(
+                    $request->file('imagen_formulario')->getRealPath(),
+                    ['folder' => 'cursos_formularios']
+                );
 
-            $allowedMimes = ['image/jpeg', 'image/png', 'image/webp'];
-            if (!in_array($file->getMimeType(), $allowedMimes)) {
-                return back()->withErrors(['imagen_formulario' => 'Formato de imagen no válido.']);
+                $dataCurso['imagen_formulario'] = $upload['secure_url'];
+
+            } catch (\Exception $e) {
+                return back()->withErrors(['imagen_formulario' => 'Error Cloudinary: ' . $e->getMessage()]);
             }
-            if ($request->hasFile('imagen_formulario')) {
-                $file = $request->file('imagen_formulario');
-
-                $allowedMimes = ['image/jpeg', 'image/png', 'image/webp'];
-                if (!in_array($file->getMimeType(), $allowedMimes)) {
-                    return back()->withErrors(['imagen_formulario' => 'Formato de imagen no válido.']);
-                }
-
-                try {
-                    $cloudinary = new \Cloudinary\Cloudinary([
-                        'cloud' => [
-                            'cloud_name' => env('CLOUDINARY_CLOUD_NAME'),
-                            'api_key' => env('CLOUDINARY_API_KEY'),
-                            'api_secret' => env('CLOUDINARY_API_SECRET'),
-                        ],
-                        'url' => ['secure' => true]
-                    ]);
-
-                    $upload = $cloudinary->uploadApi()->upload(
-                        $file->getRealPath(),
-                        ['folder' => 'cursos_formularios']
-                    );
-
-                    $dataCurso['imagen_formulario'] = $upload['secure_url'];
-
-                } catch (\Exception $e) {
-                    return back()->withErrors(['imagen_formulario' => 'Error Cloudinary: ' . $e->getMessage()]);
-                }
-            }
-            $cloudinary = new \Cloudinary\Cloudinary([
-                'cloud' => [
-                    'cloud_name' => env('CLOUDINARY_CLOUD_NAME'),
-                    'api_key' => env('CLOUDINARY_API_KEY'),
-                    'api_secret' => env('CLOUDINARY_API_SECRET'),
-                ],
-                'url' => ['secure' => true]
-            ]);
-
-            $upload = $cloudinary->uploadApi()->upload(
-                $file->getRealPath(),
-                ['folder' => 'cursos_formularios']
-            );
-
-            $dataCurso['imagen_formulario'] = $upload['secure_url'];
         }
 
         $curso->update($dataCurso);
