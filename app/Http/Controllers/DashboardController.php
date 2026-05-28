@@ -387,7 +387,18 @@ class DashboardController extends Controller
             if (!in_array($file->getMimeType(), $allowedMimes)) {
                 return back()->withErrors(['imagen_formulario' => 'Formato de imagen no válido.']);
             }
-
+            if ($request->hasFile('imagen_formulario')) {
+                $file = $request->file('imagen_formulario');
+                dd([
+                    'hasFile' => true,
+                    'valid' => $file->isValid(),
+                    'error' => $file->getError(),
+                    'mime' => $file->getMimeType(),
+                    'size' => $file->getSize(),
+                ]);
+            } else {
+                dd('NO HAY ARCHIVO - hasFile es false');
+            }
             $cloudinary = new \Cloudinary\Cloudinary([
                 'cloud' => [
                     'cloud_name' => env('CLOUDINARY_CLOUD_NAME'),
