@@ -14,6 +14,7 @@ php artisan migrate --force
 echo "Clearing optimization configs..."
 php artisan config:clear
 php artisan route:clear
+php artisan cache:clear
 php artisan view:clear
 
 echo "Starting server..."
