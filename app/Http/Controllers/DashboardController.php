@@ -375,7 +375,14 @@ class DashboardController extends Controller
         if ($request->hasFile('imagen_formulario')) {
             $file = $request->file('imagen_formulario');
 
-            // Validación manual
+            \Log::info('Imagen recibida', [
+                'nombre' => $file->getClientOriginalName(),
+                'mime' => $file->getMimeType(),
+                'tamaño' => $file->getSize(),
+                'valid' => $file->isValid(),
+                'error' => $file->getError(),
+            ]);
+
             $allowedMimes = ['image/jpeg', 'image/png', 'image/webp'];
             if (!in_array($file->getMimeType(), $allowedMimes)) {
                 return back()->withErrors(['imagen_formulario' => 'Formato de imagen no válido.']);
