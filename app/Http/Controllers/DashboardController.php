@@ -346,6 +346,26 @@ class DashboardController extends Controller
         return view('plans.setup', compact('id'));
     }
 
+
+
+    public function wpsender()
+    {
+        $usuario = auth()->user()->load('persona');
+        return view('dashboard.wpsender', compact('usuario'));
+    }
+
+    public function show_student($id)
+    {
+        $estudiante = \App\Models\Estudiante::with([
+            'ciudad.departamento',
+            'institucionEgreso',
+            'gradoAcademico',
+            'profesion'
+        ])->findOrFail($id);
+        $usuario = auth()->user();
+        return view('students.show', compact('estudiante', 'usuario'));
+    }
+
     public function programsUpdate(Request $request, $id)
     {
         if (auth()->user()->rol !== 'super_admin') {
@@ -412,23 +432,5 @@ class DashboardController extends Controller
 
         return redirect()->route('programs.index')
             ->with('success', 'Programa actualizado correctamente');
-    }
-
-    public function wpsender()
-    {
-        $usuario = auth()->user()->load('persona');
-        return view('dashboard.wpsender', compact('usuario'));
-    }
-
-    public function show_student($id)
-    {
-        $estudiante = \App\Models\Estudiante::with([
-            'ciudad.departamento',
-            'institucionEgreso',
-            'gradoAcademico',
-            'profesion'
-        ])->findOrFail($id);
-        $usuario = auth()->user();
-        return view('students.show', compact('estudiante', 'usuario'));
     }
 }
