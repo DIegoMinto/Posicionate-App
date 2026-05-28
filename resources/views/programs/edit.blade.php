@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 
 <head>
     <meta charset="UTF-8">
@@ -12,7 +12,7 @@
     <x-layout-dashboard :usuario="$usuario">
         <x-page-header titulo="Editar Programa: {{ $curso->nombre }}">
             <a href="{{ route('programs.index') }}" class="btn-back">
-                ← Volver
+                &larr; Volver
             </a>
         </x-page-header>
 
@@ -20,7 +20,7 @@
             <form action="{{ route('programs.update', $curso->id_curso) }}" method="POST" enctype="multipart/form-data"
                 class="space-y-8">
                 @csrf
-                @method('PUT')
+                @method('PATCH')
 
                 <div class="bg-white rounded-sm border-1 border-brand-green shadow-md overflow-hidden">
                     <div class="bg-brand-green p-3">
@@ -38,10 +38,10 @@
                         <div>
                             <label class="form-label-bold text-black">Estado</label>
                             <select name="estado" class="form-select-pill border-2 border-brand-gold">
-                                <option value="activo" {{ $curso->estado == 'activo' ? 'selected' : '' }}>Activo</option>
-                                <option value="en proceso" {{ $curso->estado == 'en proceso' ? 'selected' : '' }}>En
-                                    Proceso</option>
-                                <option value="finalizado" {{ $curso->estado == 'finalizado' ? 'selected' : '' }}>
+                                <option value="Activo" {{ $curso->estado == 'Activo' ? 'selected' : '' }}>Activo</option>
+                                <option value="Pendiente" {{ $curso->estado == 'Pendiente' ? 'selected' : '' }}>Pendiente
+                                </option>
+                                <option value="Finalizado" {{ $curso->estado == 'Finalizado' ? 'selected' : '' }}>
                                     Finalizado</option>
                             </select>
                         </div>
@@ -66,18 +66,14 @@
                         <div>
                             <label class="form-label-bold text-black">Sede</label>
                             <select name="id_sede" class="form-select-pill border-2 border-brand-gold">
-
                                 <option value="" {{ is_null($curso->id_sede) ? 'selected' : '' }}>
-                                    -- Sin Sede Asignada --
-                                </option>
 
+                                </option>
                                 @foreach($sedes as $sede)
-                                    <option value="{{ $sede->id_sede }}"
-                                        {{ $curso->id_sede == $sede->id_sede ? 'selected' : '' }}>
+                                    <option value="{{ $sede->id_sede }}" {{ $curso->id_sede == $sede->id_sede ? 'selected' : '' }}>
                                         {{ $sede->nombre }}
                                     </option>
                                 @endforeach
-
                             </select>
                         </div>
                         <div>
@@ -98,7 +94,7 @@
                         <div class="bg-brand-green p-3">
                             <h3
                                 class="text-white font-sans font-bold uppercase text-sm tracking-widest flex items-center gap-2">
-                                <i class="fas fa-graduation-cap"></i> Datos de la Institución
+                                <i class="fas fa-university"></i> Datos de la Institución
                             </h3>
                         </div>
                         <div class="p-4">
@@ -106,18 +102,12 @@
                                 <label class="form-label-bold font-sans font-bold text-black">Institución
                                     Perteneciente:</label>
                                 <select name="id_institucion" class="form-select-pill border-1 border-brand-gold">
-
-                                    <option value=""
-                                        {{ is_null($curso->id_institucion) ? 'selected' : '' }}>
-                                    </option>
-
+                                    <option value="" {{ is_null($curso->id_institucion) ? 'selected' : '' }}></option>
                                     @foreach($instituciones as $inst)
-                                        <option value="{{ $inst->id_institucion }}"
-                                            {{ $curso->id_institucion == $inst->id_institucion ? 'selected' : '' }}>
+                                        <option value="{{ $inst->id_institucion }}" {{ $curso->id_institucion == $inst->id_institucion ? 'selected' : '' }}>
                                             {{ $inst->nombre }}
                                         </option>
                                     @endforeach
-
                                 </select>
                             </div>
                             <div class="flex justify-center items-center mt-6">
@@ -133,34 +123,36 @@
                         </div>
                     </div>
 
-                    <div class="rounded-sm border-1 border-brand-green shadow-md">
+                    <div class="bg-white rounded-sm border-1 border-brand-green shadow-md">
                         <div class="bg-brand-green p-3">
                             <h3
                                 class="text-white font-sans font-bold uppercase text-sm tracking-widest flex items-center gap-2">
-                                <i class="fas fa-qrcode"></i> Código QR
+                                <i class="fas fa-image"></i> Imagen del Formulario Promocional
                             </h3>
                         </div>
                         <div class="p-4">
                             <div class="grid gap-4">
                                 <div class="flex justify-center items-center">
-                                    @if($curso->codigo_qr)
-                                        <img src="{{ asset('storage/' . $curso->codigo_qr) }}"
-                                            class="h-16 w-16 object-contain border border-gray-100 p-1">
+                                    @if($curso->imagen_formulario)
+                                        <img src="{{ $curso->imagen_formulario }}"
+                                            class="h-24 w-full object-cover border border-gray-100 p-1 rounded shadow-sm">
                                     @else
                                         <div
-                                            class="h-16 w-16 bg-gray-50 flex items-center justify-center border border-dashed border-gray-200">
-                                            <span class="text-[8px] text-gray-400">SIN QR</span>
+                                            class="h-24 w-full bg-gray-50 flex items-center justify-center border border-dashed border-gray-200 rounded">
+                                            <span class="text-xs text-gray-400 uppercase font-sans">Sin imagen
+                                                asignada</span>
                                         </div>
                                     @endif
                                 </div>
                                 <div
-                                    class="text-center p-2 border-2 border-dashed border-gray-100 rounded flex flex-col justify-center items-center">
-                                    <p class="font-sans font-bold text-xs mb-2">Cambiar QR</p>
-                                    <label class="cursor-pointer">
-                                        <span id="qr-text" class="text-[10px] text-gray-500 block mb-1">Seleccionar
-                                            archivo</span>
-                                        <input type="file" name="codigo_qr" class="text-[10px] w-full"
-                                            onchange="document.getElementById('qr-text').innerText = this.files[0].name">
+                                    class="text-center p-3 border-2 border-dashed border-gray-100 rounded flex flex-col justify-center items-center bg-gray-50/50">
+                                    <p class="font-sans font-bold text-xs mb-1 text-gray-700">Actualizar Imagen</p>
+                                    <label class="cursor-pointer w-full text-center">
+                                        <span id="image-text"
+                                            class="text-[11px] text-brand-green font-medium block mb-1 underline">Seleccionar
+                                            archivo nuevo</span>
+                                        <input type="file" name="imagen_formulario" class="hidden" accept="image/*"
+                                            onchange="document.getElementById('image-text').innerText = this.files[0].name">
                                     </label>
                                 </div>
                             </div>
@@ -178,7 +170,7 @@
                     <div class="overflow-x-auto p-4">
                         <table class="w-full text-left">
                             <thead>
-                                <tr class="text-[10px] uppercase border-b text-left">
+                                <tr class="text-[10px] uppercase border-b text-left text-gray-500">
                                     <th class="pb-2 pl-3">Nombre del Módulo</th>
                                     <th class="pb-2">Fecha Inicio</th>
                                     <th class="pb-2">Fecha Fin</th>

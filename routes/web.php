@@ -15,6 +15,7 @@ use App\Http\Controllers\StatiticController;
 use App\Http\Controllers\PlanController;
 use App\Http\Controllers\ModuloController;
 use App\Http\Controllers\EstudianteController;
+
 use App\Models\PlanesPago;
 
 Route::get('/', function () {
@@ -88,7 +89,7 @@ Route::middleware(['auth', 'vigente'])->group(function () {
         Route::post('/programs/store', [DashboardController::class, 'programsStore'])->name('programs.store');
         Route::get('/programs/{id}/payments-setup', [DashboardController::class, 'programsPaymentsSetup'])->name('programs.payments.setup');
         Route::patch('/programs/{id}/status', [DashboardController::class, 'updateStatus'])->name('programs.updateStatus');
-        Route::put('/programs/{id}/update', [DashboardController::class, 'programsUpdate'])->name('programs.update');
+        Route::patch('/programs/{id}/update', [DashboardController::class, 'programsUpdate'])->name('programs.update');
         Route::delete('/programs/{id}', [DashboardController::class, 'programsDestroy'])->name('programs.destroy');
         Route::delete('/modules/{id}', [ModuloController::class, 'destroy'])->name('modules.destroy');
     });

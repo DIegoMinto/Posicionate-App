@@ -9,6 +9,7 @@ use App\Models\Sede;
 use App\Models\Curso;
 use App\Models\Institucion;
 use App\Models\Docente;
+use Cloudinary\Cloudinary;
 use App\Models\Clase;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Hash;
@@ -223,136 +224,6 @@ class DashboardController extends Controller
         ));
     }
 
-
-    public function programsCreate()
-    {
-        if (auth()->user()->rol !== 'super_admin') {
-            abort(403, 'No autorizado');
-        }
-        $usuario = auth()->user()->load('persona');
-        $instituciones = \App\Models\Institucion::all();
-        $docentes = \App\Models\Docente::all();
-        $personas = \App\Models\Persona::all();
-        $sedes = \App\Models\Sede::all();
-
-        return view('dashboard.programs_create', compact('usuario', 'instituciones', 'docentes', 'personas', 'sedes'));
-    }
-
-    public function programsStore(Request $request)
-    {
-        if (auth()->user()->rol !== 'super_admin') {
-            abort(403, 'No autorizado');
-        }
-        $request->validate([
-            'nombre' => 'required|string|max:255',
-            'id_institucion' => 'required|exists:institucion,id_institucion',
-            'id_sede' => 'required|exists:sede,id_sede',
-            'id_docente' => 'nullable|exists:docente,id_docente',
-            'codigo_curso' => 'required|string|unique:curso,codigo_curso',
-            'codigo_qr' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
-            'fecha_inicio' => 'required|date',
-            'fecha_fin' => 'nullable|date|after_or_equal:fecha_inicio',
-            'tipo' => 'required|in:CURSO,PROGRAMA,DIPLOMADO',
-            'costo_matricula' => 'required_if:tipo,DIPLOMADO,PROGRAMA|numeric|min:0',
-            'docentes_adicionales' => 'nullable|array',
-            'docentes_adicionales.*' => 'exists:docente,id_docente'
-        ]);
-
-        $data = $request->all();
-
-        if ($request->hasFile('codigo_qr')) {
-            $data['codigo_qr'] = $request->file('codigo_qr')->store('qrs', 'public');
-        }
-
-        $data['estado'] = $data['estado'] ?? 'Activo';
-        $data['inscritos'] = 0;
-        $data['pre_inscritos'] = 0;
-
-
-        $curso = \App\Models\Curso::create($data);
-
-
-        if ($request->has('docentes_adicionales')) {
-            foreach ($request->docentes_adicionales as $doc_id) {
-                if ($doc_id) {
-
-                    $curso->docentesAdicionales()->create([
-                        'id_docente' => $doc_id
-                    ]);
-                }
-            }
-        }
-
-
-        return redirect()->route('programs.payments.setup', $curso->id_curso)
-            ->with('success', 'Programa creado. Ahora define los planes de pago.');
-    }
-
-    public function programsPaymentsSetup($id)
-    {
-        $usuario = auth()->user()->load('persona');
-
-        $curso = \App\Models\Curso::findOrFail($id);
-
-        $planes = \App\Models\PlanesPago::where('id_curso', $id)->with('detalles')->get();
-
-        return view('dashboard.programs_payments_setup', compact('usuario', 'curso', 'planes'));
-    }
-
-    public function setup($id)
-    {
-
-        return view('plans.setup', compact('id'));
-    }
-
-    public function programsShow($id)
-    {
-        $curso = Curso::with([
-            'institucion',
-            'docente',
-            'sede',
-            'modulos' => function ($query) {
-                $query->orderBy('fecha_inicio', 'asc');
-            }
-        ])->findOrFail($id);
-
-        $usuario = auth()->user();
-
-        return view('programs.show', compact('curso', 'usuario'));
-    }
-
-    public function programsDestroy(Request $request, $id)
-    {
-        if (auth()->user()->rol !== 'super_admin') {
-            abort(403, 'No autorizado');
-        }
-        $request->validate([
-
-            'password_confirm' => 'required',
-        ]);
-
-
-        if (!Hash::check($request->password_confirm, auth()->user()->password)) {
-
-            return back()->withErrors(['password_confirm' => 'La contraseña es incorrecta.']);
-        }
-
-        $curso = Curso::findOrFail($id);
-        $curso->delete();
-
-        return redirect()->route('programs.index')->with('success', 'Programa eliminado correctamente.');
-    }
-
-    public function updateStatus(Request $request, $id)
-    {
-        if (auth()->user()->rol !== 'super_admin') {
-            abort(403, 'No autorizado');
-        }
-        $curso = Curso::findOrFail($id);
-        $curso->update(['estado' => $request->estado]);
-        return back()->with('success', 'Estado actualizado');
-    }
-
     public function programsEdit($id)
     {
         if (auth()->user()->rol !== 'super_admin') {
@@ -377,14 +248,120 @@ class DashboardController extends Controller
         ));
     }
 
+    public function programsCreate()
+    {
+        if (auth()->user()->rol !== 'super_admin') {
+            abort(403, 'No autorizado');
+        }
+        $usuario = auth()->user()->load('persona');
+        $instituciones = \App\Models\Institucion::all();
+        $docentes = \App\Models\Docente::all();
+        $personas = \App\Models\Persona::all();
+        $sedes = \App\Models\Sede::all();
 
-    public function programsUpdate(Request $request, $id)
+        return view('dashboard.programs_create', compact('usuario', 'instituciones', 'docentes', 'personas', 'sedes'));
+    }
+
+    public function programsStore(Request $request)
     {
         if (auth()->user()->rol !== 'super_admin') {
             abort(403, 'No autorizado');
         }
 
+        $request->validate([
+            'nombre' => 'required|string|max:255',
+            'id_institucion' => 'required|exists:institucion,id_institucion',
+            'id_sede' => 'required|exists:sede,id_sede',
+            'id_docente' => 'nullable|exists:docente,id_docente',
+            'codigo_curso' => 'required|string|unique:curso,codigo_curso',
+
+            'imagen_formulario' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:5120',
+
+            'fecha_inicio' => 'required|date',
+            'fecha_fin' => 'nullable|date|after_or_equal:fecha_inicio',
+            'tipo' => 'required|in:CURSO,PROGRAMA,DIPLOMADO',
+            'costo_matricula' => 'required_if:tipo,DIPLOMADO,PROGRAMA|numeric|min:0',
+            'docentes_adicionales' => 'nullable|array',
+            'docentes_adicionales.*' => 'exists:docente,id_docente'
+        ]);
+
+        $data = $request->all();
+
+        if ($request->hasFile('imagen_formulario')) {
+            $cloudinary = new Cloudinary([
+                'cloud' => [
+                    'cloud_name' => env('CLOUDINARY_CLOUD_NAME'),
+                    'api_key' => env('CLOUDINARY_API_KEY'),
+                    'api_secret' => env('CLOUDINARY_API_SECRET'),
+                ],
+                'url' => [
+                    'secure' => true
+                ]
+            ]);
+
+            $upload = $cloudinary->uploadApi()->upload(
+                $request->file('imagen_formulario')->getRealPath(),
+                [
+                    'folder' => 'cursos_formularios'
+                ]
+            );
+
+            $data['imagen_formulario'] = $upload['secure_url'];
+        }
+
+        $data['estado'] = $data['estado'] ?? 'Activo';
+        $data['inscritos'] = 0;
+        $data['pre_inscritos'] = 0;
+
+        $curso = \App\Models\Curso::create($data);
+
+        if ($request->has('docentes_adicionales')) {
+            foreach ($request->docentes_adicionales as $doc_id) {
+                if ($doc_id) {
+                    $curso->docentesAdicionales()->create([
+                        'id_docente' => $doc_id
+                    ]);
+                }
+            }
+        }
+
+        return redirect()->route('programs.payments.setup', $curso->id_curso)
+            ->with('success', 'Programa creado. Ahora define los planes de pago.');
+    }
+
+    public function programsPaymentsSetup($id)
+    {
+        $usuario = auth()->user()->load('persona');
+
+        $curso = \App\Models\Curso::findOrFail($id);
+
+        $planes = \App\Models\PlanesPago::where('id_curso', $id)->with('detalles')->get();
+
+        return view('dashboard.programs_payments_setup', compact('usuario', 'curso', 'planes'));
+    }
+
+    public function setup($id)
+    {
+
+        return view('plans.setup', compact('id'));
+    }
+
+    public function programsUpdate(Request $request, $id)
+    {
+
         $curso = Curso::findOrFail($id);
+
+        try {
+            $request->validate([
+                'nombre' => 'required|string|max:255',
+                'imagen_formulario' => 'nullable|file|image|mimes:jpg,jpeg,png,webp|max:5120',
+                'id_institucion' => 'nullable|exists:institucion,id_institucion',
+                'id_sede' => 'nullable|exists:sede,id_sede',
+                'id_docente' => 'nullable|exists:docente,id_docente',
+            ]);
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            dd('VALIDACIÓN FALLÓ', $e->errors());
+        }
 
         $dataCurso = $request->only([
             'nombre',
@@ -392,53 +369,46 @@ class DashboardController extends Controller
             'fecha_inicio',
             'fecha_fin',
             'estado',
-            'inscritos',
-            'pre_inscritos',
             'id_docente',
             'id_institucion',
-            'id_sede'
+            'id_sede',
         ]);
 
-        if ($request->hasFile('codigo_qr')) {
-            if ($curso->codigo_qr) {
-                Storage::disk('public')->delete($curso->codigo_qr);
-            }
-            $dataCurso['codigo_qr'] = $request->file('codigo_qr')->store('qrs', 'public');
+        if ($request->hasFile('imagen_formulario')) {
+            $cloudinary = new \Cloudinary\Cloudinary([
+                'cloud' => [
+                    'cloud_name' => env('CLOUDINARY_CLOUD_NAME'),
+                    'api_key' => env('CLOUDINARY_API_KEY'),
+                    'api_secret' => env('CLOUDINARY_API_SECRET'),
+                ],
+                'url' => ['secure' => true]
+            ]);
+
+            $upload = $cloudinary->uploadApi()->upload(
+                $request->file('imagen_formulario')->getRealPath(),
+                ['folder' => 'cursos_formularios']
+            );
+
+            $dataCurso['imagen_formulario'] = $upload['secure_url'];
         }
 
         $curso->update($dataCurso);
-
-        if ($curso->id_institucion) {
-            $institucion = Institucion::find($curso->id_institucion);
-            $institucion->update($request->only(['direccion', 'telefono']));
-
-            if ($request->hasFile('logo_institucion')) {
-                if ($institucion->imagen) {
-                    Storage::disk('public')->delete($institucion->imagen);
-                }
-                $institucion->imagen = $request->file('logo_institucion')->store('instituciones', 'public');
-                $institucion->save();
-            }
-        }
-
+        dd($curso->wasChanged(), $curso->getChanges(), $dataCurso);
         if ($request->has('modulos')) {
-
             foreach ($request->modulos as $id_modulo => $data) {
-
                 $modulo = Modulo::find($id_modulo);
-
                 if ($modulo) {
-
                     $modulo->update([
                         'nombre' => $data['nombre'],
-                        'fecha_inicio' => $data['fecha_inicio'] ?? null,
-                        'fecha_fin' => $data['fecha_fin'] ?? null,
+                        'fecha_inicio' => !empty($data['fecha_inicio']) ? $data['fecha_inicio'] : null,
+                        'fecha_fin' => !empty($data['fecha_fin']) ? $data['fecha_fin'] : null,
                     ]);
                 }
             }
         }
 
-        return redirect()->route('programs.show', $id)->with('success', 'Programa actualizado correctamente');
+        return redirect()->route('programs.index')
+            ->with('success', 'Programa actualizado correctamente');
     }
 
     public function wpsender()

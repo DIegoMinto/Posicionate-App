@@ -11,9 +11,9 @@
 
 <body class="bg-brand-green font-sans min-h-screen flex">
 
-    <div class="hidden lg:block lg:w-1/3 h-full border-r-4 border-brand-gold overflow-hidden"
-        style="background-color: white;">
-        <img src="/img/sky_fondo.jpg" class="w-full h-full object-cover" alt="">
+    <div
+        class="w-full lg:w-1/3 h-64 lg:h-full border-b-4 lg:border-b-0 lg:border-r-4 border-brand-gold overflow-hidden bg-white">
+        <img src="{{ $curso->imagen_formulario  }}" class="w-full h-full object-cover" alt="Imagen del curso">
     </div>
 
     <div class="w-full lg:w-2/3 p-6 md:p-8 overflow-y-auto">
