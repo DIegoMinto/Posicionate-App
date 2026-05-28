@@ -388,17 +388,17 @@ class DashboardController extends Controller
                 return back()->withErrors(['imagen_formulario' => 'Formato de imagen no válido.']);
             }
             if ($request->hasFile('imagen_formulario')) {
-                $file = $request->file('imagen_formulario');
-                dd([
-                    'hasFile' => true,
-                    'valid' => $file->isValid(),
-                    'error' => $file->getError(),
-                    'mime' => $file->getMimeType(),
-                    'size' => $file->getSize(),
-                ]);
-            } else {
-                dd('NO HAY ARCHIVO - hasFile es false');
-            }
+    try {
+        $cloudinary = new \Cloudinary\Cloudinary([...]);
+        $upload = $cloudinary->uploadApi()->upload(
+            $request->file('imagen_formulario')->getRealPath(),
+            ['folder' => 'cursos_formularios']
+        );
+        $dataCurso['imagen_formulario'] = $upload['secure_url'];
+    } catch (\Exception $e) {
+        return back()->withErrors(['imagen_formulario' => 'Error Cloudinary: ' . $e->getMessage()]);
+    }
+}
             $cloudinary = new \Cloudinary\Cloudinary([
                 'cloud' => [
                     'cloud_name' => env('CLOUDINARY_CLOUD_NAME'),
