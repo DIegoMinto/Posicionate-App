@@ -433,4 +433,17 @@ class DashboardController extends Controller
         return redirect()->route('programs.index')
             ->with('success', 'Programa actualizado correctamente');
     }
+
+    public function programsDestroy($id)
+    {
+        if (auth()->user()->rol !== 'super_admin') {
+            abort(403, 'No autorizado');
+        }
+
+        $curso = Curso::findOrFail($id);
+        $curso->delete();
+
+        return redirect()->route('programs.index')
+            ->with('success', 'Programa eliminado correctamente');
+    }
 }

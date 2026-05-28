@@ -11,12 +11,18 @@
 
 <body class="bg-brand-green font-sans min-h-screen flex">
 
+    {{-- Imagen fixed desktop --}}
     <div
-        class="w-full lg:w-1/3 h-64 lg:h-full border-b-4 lg:border-b-0 lg:border-r-4 border-brand-gold overflow-hidden bg-white">
-        <img src="{{ $curso->imagen_formulario  }}" class="w-full h-full object-cover" alt="Imagen del curso">
+        class="hidden lg:block fixed top-0 left-0 w-1/3 h-screen border-r-4 border-brand-gold overflow-hidden bg-white">
+        <img src="{{ $curso->imagen_formulario }}" class="w-full h-full object-cover" alt="Imagen del curso">
     </div>
 
-    <div class="w-full lg:w-2/3 p-6 md:p-8 overflow-y-auto">
+    {{-- Imagen mobile --}}
+    <div class="lg:hidden w-full h-64 border-b-4 border-brand-gold overflow-hidden bg-white shrink-0">
+        <img src="{{ $curso->imagen_formulario }}" class="w-full h-full object-cover" alt="Imagen del curso">
+    </div>
+
+    <div class="w-full lg:w-2/3 lg:ml-[33.333333%] p-6 md:p-8">
         <h2 class="text-white text-3xl font-bold text-center mb-5 tracking-widest uppercase">
             Ficha de Inscripción
         </h2>
