@@ -9,31 +9,29 @@
     <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
 </head>
 
-<body class="bg-brand-green font-sans min-h-screen flex">
+<body class="bg-brand-green font-sans min-h-screen">
 
-    {{-- Imagen fixed desktop --}}
     <div
         class="hidden lg:block fixed top-0 left-0 w-1/3 h-screen border-r-4 border-brand-gold overflow-hidden bg-white">
         <img src="{{ $curso->imagen_formulario }}" class="w-full h-full object-cover" alt="Imagen del curso">
     </div>
 
-    {{-- Imagen mobile --}}
-    <div class="lg:hidden w-full h-64 border-b-4 border-brand-gold overflow-hidden bg-white shrink-0">
+    <div class="lg:hidden w-full h-40 border-b-4 border-brand-gold overflow-hidden bg-white">
         <img src="{{ $curso->imagen_formulario }}" class="w-full h-full object-cover" alt="Imagen del curso">
     </div>
 
-    <div class="w-full lg:w-2/3 lg:ml-[33.333333%] p-6 md:p-8">
-        <h2 class="text-white text-3xl font-bold text-center mb-5 tracking-widest uppercase">
+    <div class="w-full lg:w-2/3 lg:ml-[33.333333%] p-4 md:p-8">
+        <h2 class="text-white text-2xl md:text-3xl font-bold text-center mb-4 tracking-widest uppercase">
             Ficha de Inscripción
         </h2>
-        <h3 class="text-white text-3xl text-center font-bold uppercase tracking-widest mb-4 ">
+        <h3 class="text-white text-xl md:text-3xl text-center font-bold uppercase tracking-widest mb-4">
             {{ $curso->nombre }}
         </h3>
 
-        <div class="flex flex-wrap justify-center gap-4 md:gap-8 mb-10">
+        <div class="flex flex-wrap justify-center gap-4 md:gap-8 mb-8">
             <div class="flex items-center gap-2 text-white/80 text-xs uppercase font-bold">
                 <span class="text-brand-gold">Asesor:</span>
-                <span class="text-white"> {{ $asesor->persona->nombre }} {{ $asesor->persona->apellido_p }}</span>
+                <span class="text-white">{{ $asesor->persona->nombre }} {{ $asesor->persona->apellido_p }}</span>
             </div>
         </div>
 
@@ -44,9 +42,7 @@
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                         d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                 </svg>
-                <div class="text-sm font-medium tracking-wide">
-                    {{ session('success') }}
-                </div>
+                <div class="text-sm font-medium tracking-wide">{{ session('success') }}</div>
             </div>
         @endif
 
@@ -65,12 +61,13 @@
             @csrf
             <input type="hidden" name="id_curso" value="{{ $curso->id_curso }}">
             <input type="hidden" name="id_personal" value="{{ $asesor->id_personal }}">
-            <div class="space-y-6">
-                <h3 class="text-white text-xl font-bold border-b border-brand-gold pb-2">
+
+            <div class="space-y-5">
+                <h3 class="text-white text-lg md:text-xl font-bold border-b border-brand-gold pb-2">
                     DATOS PERSONALES
                 </h3>
 
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <div>
                         <label class="form-label-bold">Nombre</label>
                         <input type="text" name="nombre" value="{{ old('nombre') }}" class="form-input-pill" required>
@@ -98,7 +95,7 @@
                     </div>
                     <div>
                         <label class="form-label-bold">Extensión</label>
-                        <select id="select-extension" name="extension_ci" class="form-select-pill" required>
+                        <select name="extension_ci" class="form-select-pill" required>
                             <option value="" selected disabled>Seleccione extensión</option>
                             <option value="LP">LP</option>
                             <option value="SC">SC</option>
@@ -113,7 +110,7 @@
                     </div>
                 </div>
 
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <div>
                         <label class="form-label-bold">País de Residencia</label>
                         <select name="id_pais" id="select-pais" class="form-select-pill">
@@ -136,7 +133,7 @@
                     </div>
                 </div>
 
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                         <label class="form-label-bold">Domicilio</label>
                         <input type="text" name="domicilio" value="{{ old('domicilio') }}" class="form-input-pill"
@@ -158,11 +155,11 @@
                 </div>
             </div>
 
-            <div class="space-y-6">
-                <h3 class="text-white text-xl font-bold border-b border-brand-gold pb-2 uppercase">
+            <div class="space-y-5">
+                <h3 class="text-white text-lg md:text-xl font-bold border-b border-brand-gold pb-2 uppercase">
                     Información Académica
                 </h3>
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <div>
                         <label class="form-label-bold">Profesión / Ocupación</label>
                         <select name="id_profesion" id="select-profesion" class="form-select-pill">
@@ -172,7 +169,6 @@
                             @endforeach
                         </select>
                     </div>
-
                     <div>
                         <label class="form-label-bold">Grado Académico</label>
                         <select name="id_grado_academico" id="select-grado" class="form-select-pill">
@@ -182,26 +178,23 @@
                             @endforeach
                         </select>
                     </div>
-
                     <div>
                         <label class="form-label-bold">Institución de Egreso</label>
                         <select name="id_institucion_egreso" id="select-institucion" class="form-select-pill">
                             <option value="">Seleccione Institución</option>
                             @foreach($instituciones as $inst)
-                                <option value="{{ $inst->id_institucion_egreso }}">
-                                    {{ $inst->nombre }}
-                                </option>
+                                <option value="{{ $inst->id_institucion_egreso }}">{{ $inst->nombre }}</option>
                             @endforeach
                         </select>
                     </div>
                 </div>
             </div>
 
-            <div class="space-y-6">
-                <h3 class="text-white text-xl font-bold border-b border-brand-gold pb-2">
+            <div class="space-y-5">
+                <h3 class="text-white text-lg md:text-xl font-bold border-b border-brand-gold pb-2">
                     DATOS DE CONTACTO
                 </h3>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                         <label class="form-label-bold">Teléfono Móvil</label>
                         <div class="flex gap-2">
@@ -222,89 +215,58 @@
                 </div>
             </div>
 
-            <div class="flex justify-center pt-6 pb-12">
-                <button type="submit" class="btn-gold">
+            <div class="flex justify-center pt-6 pb-16">
+                <button type="submit" class="btn-gold w-full md:w-auto">
                     Registrar
                 </button>
             </div>
         </form>
     </div>
+
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const paisSelect = document.getElementById('select-pais');
+            const deptoSelect = document.getElementById('select-departamento');
+            const codigoManual = document.getElementById('select-codigo-manual');
+            const numeroMovilInput = document.getElementById('input-numero-movil');
+            const telefonoHidden = document.getElementById('telefono_movil_hidden');
+
+            const actualizarTelefonoCompleto = () => {
+                const codigo = codigoManual.value;
+                const numero = numeroMovilInput.value.trim();
+                telefonoHidden.value = numero ? `${codigo} ${numero}` : "";
+            };
+
+            codigoManual.addEventListener('change', actualizarTelefonoCompleto);
+            numeroMovilInput.addEventListener('input', actualizarTelefonoCompleto);
+
+            paisSelect.addEventListener('change', async (e) => {
+                const paisId = e.target.value;
+                deptoSelect.innerHTML = '<option value="">Cargando...</option>';
+                if (!paisId) return;
+                try {
+                    const response = await fetch(`/api/paises/${paisId}/departamentos`);
+                    const departamentos = await response.json();
+                    deptoSelect.innerHTML = '<option value="">Seleccione Departamento</option>';
+                    departamentos.forEach(d => {
+                        deptoSelect.innerHTML += `<option value="${d.id_departamento}">${d.nombre}</option>`;
+                    });
+                } catch (error) {
+                    console.error(error);
+                    deptoSelect.innerHTML = '<option value="">Error al cargar</option>';
+                }
+            });
+
+            actualizarTelefonoCompleto();
+
+            $('#select-profesion').select2({ placeholder: "Seleccione Profesión", allowClear: true, width: '100%' });
+            $('#select-grado').select2({ placeholder: "Seleccione Grado", allowClear: true, width: '100%' });
+            $('#select-institucion').select2({ placeholder: "Seleccione Institución", allowClear: true, width: '100%' });
+        });
+    </script>
 </body>
-<script>
-    document.addEventListener('DOMContentLoaded', () => {
-
-        const paisSelect = document.getElementById('select-pais');
-        const deptoSelect = document.getElementById('select-departamento');
-
-        const codigoManual = document.getElementById('select-codigo-manual');
-        const numeroMovilInput = document.getElementById('input-numero-movil');
-        const telefonoHidden = document.getElementById('telefono_movil_hidden');
-
-        // --- TELÉFONO ---
-        const actualizarTelefonoCompleto = () => {
-            const codigo = codigoManual.value;
-            const numero = numeroMovilInput.value.trim();
-
-            telefonoHidden.value = numero ? `${codigo} ${numero}` : "";
-        };
-
-        codigoManual.addEventListener('change', actualizarTelefonoCompleto);
-        numeroMovilInput.addEventListener('input', actualizarTelefonoCompleto);
-
-        // --- PAÍS -> DEPARTAMENTOS ---
-        paisSelect.addEventListener('change', async (e) => {
-
-            const paisId = e.target.value;
-
-            deptoSelect.innerHTML = '<option value="">Cargando...</option>';
-
-            if (!paisId) return;
-
-            try {
-
-                const response = await fetch(`/api/paises/${paisId}/departamentos`);
-                const departamentos = await response.json();
-
-                deptoSelect.innerHTML =
-                    '<option value="">Seleccione Departamento</option>';
-
-                departamentos.forEach(d => {
-                    deptoSelect.innerHTML +=
-                        `<option value="${d.id_departamento}">${d.nombre}</option>`;
-                });
-
-            } catch (error) {
-
-                console.error(error);
-
-                deptoSelect.innerHTML =
-                    '<option value="">Error al cargar</option>';
-            }
-        });
-
-        actualizarTelefonoCompleto();
-
-        $('#select-profesion').select2({
-            placeholder: "Seleccione Profesión",
-            allowClear: true,
-            width: '100%'
-        });
-
-        $('#select-grado').select2({
-            placeholder: "Seleccione Grado",
-            allowClear: true,
-            width: '100%'
-        });
-
-        $('#select-institucion').select2({
-            placeholder: "Seleccione Institución",
-            allowClear: true,
-            width: '100%'
-        });
-
-    });
-</script>
 
 </html>
