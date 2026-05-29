@@ -35,6 +35,26 @@
     background-position: right 0.7rem center;
     background-size: 0.9em;
 }
+
+    .form-input-pill-2 {
+    @apply w-full bg-white text-black rounded-lg px-3 py-2 text-sm border border-brand-green
+    outline-none focus:ring-1 focus:ring-brand-green transition-all;
+}
+    
+.form-label-bold-2 {
+    @apply block text-brand-green font-sans font-bold text-sm mb-1 tracking-wide m-1;
+}
+
+.form-select-pill-2 {
+    @apply w-full bg-white text-black rounded-lg px-3 py-2 text-sm border border-brand-green
+    outline-none focus:ring-1 focus:ring-brand-green transition-all appearance-none;
+
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%236b7280'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
+
+    background-repeat: no-repeat;
+    background-position: right 0.7rem center;
+    background-size: 0.9em;
+}
 .btn-gold {
         @apply bg-brand-gold text-black font-bold py-2 px-4 rounded-xl 
                hover:scale-105 transition-transform uppercase 
@@ -102,7 +122,7 @@
 .select2-container--default .select2-selection--single {
     height: 38px !important;
     border-radius: 0.5rem !important;
-    border: 2px solid rgb(204, 180, 99) !important;
+    border: 1px solid rgb(7, 44, 46) !important;
     background: white !important;
 
     display: flex !important;
@@ -161,7 +181,7 @@
 }
 
 .select2-search__field:focus {
-    border-color: rgb(204, 180, 99) !important;
+    border-color: rgb(7, 44, 46) !important;
     box-shadow: 0 0 0 1px rgb(204, 180, 99) !important;
 }
 
@@ -173,5 +193,13 @@
 .select2-results__option--highlighted {
     background: rgb(204, 180, 99) !important;
     color: black !important;
+}
+
+.hero-card {
+    @apply bg-white rounded-[2.5rem] overflow-hidden shadow-2xl;
+}
+
+.form-section-card {
+    @apply bg-white rounded-[2rem] p-5 md:p-8 shadow-sm border border-gray-100;
 }
 }
