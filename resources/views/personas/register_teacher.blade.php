@@ -355,7 +355,7 @@
 
                 if (!paisId) return;
 
-                if (paisId == "1") {
+                if (paisId == "3") {
                     departamentosBolivia.forEach(d => {
                         deptoSelect.innerHTML += `<option value="${d.id}" data-ext="${d.ext}">${d.nombre}</option>`;
                     });
