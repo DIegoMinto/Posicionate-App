@@ -381,7 +381,7 @@
                 deptoSelect.innerHTML = '<option value="">Seleccione Departamento</option>';
                 ciudadSelect.innerHTML = '<option value="">Seleccione depto primero</option>';
 
-                if (paisId == "1") {
+                if (paisId == "3") {
                     departamentosBolivia.forEach(d => {
                         deptoSelect.innerHTML += `<option value="${d.id}">${d.nombre}</option>`;
                     });

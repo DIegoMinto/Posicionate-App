@@ -16,9 +16,6 @@
         <section
             class="w-screen h-screen flex-shrink-0 bg-brand-green relative overflow-hidden flex items-center justify-center px-4 py-8">
 
-            <div class="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(204,180,99,0.18),transparent_45%)]">
-            </div>
-
             <div class="relative z-10 w-full max-w-[380px]">
 
                 <div class="hero-card">
@@ -113,8 +110,8 @@
                     </script>
 
                     <div id="success-alert" class="mb-8 opacity-0 translate-y-5 transition-all duration-700
-                           p-5 rounded-[2rem]
-                           bg-emerald-50 border border-emerald-200 shadow-sm">
+                               p-5 rounded-[2rem]
+                               bg-emerald-50 border border-emerald-200 shadow-sm">
 
                         <div class="flex items-start gap-4">
 
