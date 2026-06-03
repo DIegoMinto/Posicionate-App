@@ -77,43 +77,42 @@ class PersonaController extends Controller
             ]);
 
             if ($request->hasFile('curriculum')) {
-
                 $uploadCV = $cloudinary->uploadApi()->upload(
                     $request->file('curriculum')->getRealPath(),
                     [
                         'folder' => 'curriculums',
                         'resource_type' => 'raw',
-                        'public_id' => "CV_$folderCI"
+                        'public_id' => "CV_$folderCI",
+                        'access_mode' => 'public',
+                        'format' => 'pdf'
                     ]
                 );
-
                 $data['curriculum'] = $uploadCV['secure_url'];
             }
 
             if ($request->hasFile('foto_carnet')) {
-
                 $uploadCarnet = $cloudinary->uploadApi()->upload(
                     $request->file('foto_carnet')->getRealPath(),
                     [
                         'folder' => 'carnets',
                         'resource_type' => 'raw',
-                        'public_id' => "CARNET_$folderCI"
+                        'public_id' => "CARNET_$folderCI",
+                        'access_mode' => 'public',
+                        'format' => 'pdf'
                     ]
                 );
-
                 $data['foto_carnet'] = $uploadCarnet['secure_url'];
             }
 
             if ($request->hasFile('fotografia')) {
-
                 $uploadFoto = $cloudinary->uploadApi()->upload(
                     $request->file('fotografia')->getRealPath(),
                     [
                         'folder' => 'fotografias',
-                        'public_id' => "FOTO_$folderCI"
+                        'public_id' => "FOTO_$folderCI",
+                        'access_mode' => 'public'
                     ]
                 );
-
                 $data['fotografia'] = $uploadFoto['secure_url'];
             }
 

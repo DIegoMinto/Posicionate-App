@@ -277,7 +277,7 @@ class UserController extends Controller
             if ($request->hasFile('curriculum')) {
                 $upload = $cloudinary->uploadApi()->upload(
                     $request->file('curriculum')->getRealPath(),
-                    ['folder' => 'curriculums', 'resource_type' => 'raw']
+                    ['folder' => 'curriculums', 'resource_type' => 'auto', 'access_mode' => 'public']
                 );
                 $personaData['curriculum'] = $upload['secure_url'];
             }
@@ -285,7 +285,7 @@ class UserController extends Controller
             if ($request->hasFile('foto_carnet')) {
                 $upload = $cloudinary->uploadApi()->upload(
                     $request->file('foto_carnet')->getRealPath(),
-                    ['folder' => 'carnets', 'resource_type' => 'raw']
+                    ['folder' => 'carnets', 'resource_type' => 'auto', 'access_mode' => 'public']
                 );
                 $personaData['foto_carnet'] = $upload['secure_url'];
             }

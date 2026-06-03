@@ -107,7 +107,12 @@ class DocenteController extends Controller
             if ($request->hasFile('curriculum')) {
                 $upload = $cloudinary->uploadApi()->upload(
                     $request->file('curriculum')->getRealPath(),
-                    ['folder' => 'curriculums', 'resource_type' => 'raw', 'public_id' => "CV_$idArchivo"]
+                    [
+                        'folder' => 'curriculums',
+                        'resource_type' => 'auto',
+                        'public_id' => "CV_$idArchivo",
+                        'access_mode' => 'public'
+                    ]
                 );
                 $data['curriculum'] = $upload['secure_url'];
             }
@@ -115,15 +120,22 @@ class DocenteController extends Controller
             if ($request->hasFile('fotocarnet')) {
                 $upload = $cloudinary->uploadApi()->upload(
                     $request->file('fotocarnet')->getRealPath(),
-                    ['folder' => 'carnets', 'resource_type' => 'raw', 'public_id' => "CARNET_$idArchivo"]
+                    [
+                        'folder' => 'carnets',
+                        'resource_type' => 'auto',
+                        'public_id' => "CARNET_$idArchivo",
+                        'access_mode' => 'public'
+                    ]
                 );
                 $data['fotocarnet'] = $upload['secure_url'];
             }
-
             if ($request->hasFile('fotografia')) {
                 $upload = $cloudinary->uploadApi()->upload(
                     $request->file('fotografia')->getRealPath(),
-                    ['folder' => 'fotografias', 'public_id' => "FOTO_$idArchivo"]
+                    [
+                        'folder' => 'fotografias',
+                        'public_id' => "FOTO_$idArchivo"
+                    ]
                 );
                 $data['fotografia'] = $upload['secure_url'];
             }
@@ -225,7 +237,7 @@ class DocenteController extends Controller
             if ($request->hasFile('curriculum')) {
                 $upload = $cloudinary->uploadApi()->upload(
                     $request->file('curriculum')->getRealPath(),
-                    ['folder' => 'curriculums', 'resource_type' => 'raw', 'public_id' => "CV_$idArchivo"]
+                    ['folder' => 'curriculums', 'resource_type' => 'auto', 'public_id' => "CV_$idArchivo"]
                 );
                 $data['curriculum'] = $upload['secure_url'];
             }
@@ -233,7 +245,7 @@ class DocenteController extends Controller
             if ($request->hasFile('fotocarnet')) {
                 $upload = $cloudinary->uploadApi()->upload(
                     $request->file('fotocarnet')->getRealPath(),
-                    ['folder' => 'carnets', 'resource_type' => 'raw', 'public_id' => "CARNET_$idArchivo"]
+                    ['folder' => 'carnets', 'resource_type' => 'auto', 'public_id' => "CARNET_$idArchivo"]
                 );
                 $data['fotocarnet'] = $upload['secure_url'];
             }
