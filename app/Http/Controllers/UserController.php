@@ -257,22 +257,37 @@ class UserController extends Controller
                 ]));
             }
 
-            if ($request->hasFile('fotografia')) {
-                $cloudinary = new Cloudinary([
-                    'cloud' => [
-                        'cloud_name' => env('CLOUDINARY_CLOUD_NAME'),
-                        'api_key' => env('CLOUDINARY_API_KEY'),
-                        'api_secret' => env('CLOUDINARY_API_SECRET'),
-                    ],
-                    'url' => ['secure' => true]
-                ]);
+            $cloudinary = new Cloudinary([
+                'cloud' => [
+                    'cloud_name' => env('CLOUDINARY_CLOUD_NAME'),
+                    'api_key' => env('CLOUDINARY_API_KEY'),
+                    'api_secret' => env('CLOUDINARY_API_SECRET'),
+                ],
+                'url' => ['secure' => true]
+            ]);
 
-                $uploadFoto = $cloudinary->uploadApi()->upload(
+            if ($request->hasFile('fotografia')) {
+                $upload = $cloudinary->uploadApi()->upload(
                     $request->file('fotografia')->getRealPath(),
                     ['folder' => 'fotografias']
                 );
+                $personaData['fotografia'] = $upload['secure_url'];
+            }
 
-                $personaData['fotografia'] = $uploadFoto['secure_url'];
+            if ($request->hasFile('curriculum')) {
+                $upload = $cloudinary->uploadApi()->upload(
+                    $request->file('curriculum')->getRealPath(),
+                    ['folder' => 'curriculums', 'resource_type' => 'raw']
+                );
+                $personaData['curriculum'] = $upload['secure_url'];
+            }
+
+            if ($request->hasFile('foto_carnet')) {
+                $upload = $cloudinary->uploadApi()->upload(
+                    $request->file('foto_carnet')->getRealPath(),
+                    ['folder' => 'carnets', 'resource_type' => 'raw']
+                );
+                $personaData['foto_carnet'] = $upload['secure_url'];
             }
 
             $persona->update($personaData);

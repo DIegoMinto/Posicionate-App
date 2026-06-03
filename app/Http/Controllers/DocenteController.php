@@ -11,6 +11,7 @@ use App\Models\InstitucionEgreso;
 use App\Models\InstitucionBancaria;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Hash;
+use Cloudinary\Cloudinary;
 
 class DocenteController extends Controller
 {
@@ -92,16 +93,39 @@ class DocenteController extends Controller
             $data['emite_factura'] = ($request->emite_factura == '1') ? 'SI' : 'NO';
 
             $idArchivo = $request->ci . '_' . $extensionFinal;
+            $cloudinary = new Cloudinary([
+                'cloud' => [
+                    'cloud_name' => env('CLOUDINARY_CLOUD_NAME'),
+                    'api_key' => env('CLOUDINARY_API_KEY'),
+                    'api_secret' => env('CLOUDINARY_API_SECRET'),
+                ],
+                'url' => ['secure' => true]
+            ]);
+
+            $idArchivo = $request->ci . '_' . $extensionFinal;
+
             if ($request->hasFile('curriculum')) {
-                $data['curriculum'] = $request->file('curriculum')->storeAs('uploads/cvs', "CV_$idArchivo." . $request->file('curriculum')->extension(), 'public');
+                $upload = $cloudinary->uploadApi()->upload(
+                    $request->file('curriculum')->getRealPath(),
+                    ['folder' => 'curriculums', 'resource_type' => 'raw', 'public_id' => "CV_$idArchivo"]
+                );
+                $data['curriculum'] = $upload['secure_url'];
             }
 
             if ($request->hasFile('fotocarnet')) {
-                $data['fotocarnet'] = $request->file('fotocarnet')->storeAs('uploads/carnets', "CI_$idArchivo." . $request->file('fotocarnet')->extension(), 'public');
+                $upload = $cloudinary->uploadApi()->upload(
+                    $request->file('fotocarnet')->getRealPath(),
+                    ['folder' => 'carnets', 'resource_type' => 'raw', 'public_id' => "CARNET_$idArchivo"]
+                );
+                $data['fotocarnet'] = $upload['secure_url'];
             }
 
             if ($request->hasFile('fotografia')) {
-                $data['fotografia'] = $request->file('fotografia')->storeAs('uploads/fotos', "FOTO_$idArchivo." . $request->file('fotografia')->extension(), 'public');
+                $upload = $cloudinary->uploadApi()->upload(
+                    $request->file('fotografia')->getRealPath(),
+                    ['folder' => 'fotografias', 'public_id' => "FOTO_$idArchivo"]
+                );
+                $data['fotografia'] = $upload['secure_url'];
             }
 
             Docente::create($data);
@@ -187,16 +211,39 @@ class DocenteController extends Controller
 
             $idArchivo = $request->ci . '_' . $extensionFinal;
 
+            $cloudinary = new Cloudinary([
+                'cloud' => [
+                    'cloud_name' => env('CLOUDINARY_CLOUD_NAME'),
+                    'api_key' => env('CLOUDINARY_API_KEY'),
+                    'api_secret' => env('CLOUDINARY_API_SECRET'),
+                ],
+                'url' => ['secure' => true]
+            ]);
+
+            $idArchivo = $request->ci . '_' . $extensionFinal;
+
             if ($request->hasFile('curriculum')) {
-                $data['curriculum'] = $request->file('curriculum')->storeAs('uploads/cvs', "CV_$idArchivo." . $request->file('curriculum')->extension(), 'public');
+                $upload = $cloudinary->uploadApi()->upload(
+                    $request->file('curriculum')->getRealPath(),
+                    ['folder' => 'curriculums', 'resource_type' => 'raw', 'public_id' => "CV_$idArchivo"]
+                );
+                $data['curriculum'] = $upload['secure_url'];
             }
 
             if ($request->hasFile('fotocarnet')) {
-                $data['fotocarnet'] = $request->file('fotocarnet')->storeAs('uploads/carnets', "CI_$idArchivo." . $request->file('fotocarnet')->extension(), 'public');
+                $upload = $cloudinary->uploadApi()->upload(
+                    $request->file('fotocarnet')->getRealPath(),
+                    ['folder' => 'carnets', 'resource_type' => 'raw', 'public_id' => "CARNET_$idArchivo"]
+                );
+                $data['fotocarnet'] = $upload['secure_url'];
             }
 
             if ($request->hasFile('fotografia')) {
-                $data['fotografia'] = $request->file('fotografia')->storeAs('uploads/fotos', "FOTO_$idArchivo." . $request->file('fotografia')->extension(), 'public');
+                $upload = $cloudinary->uploadApi()->upload(
+                    $request->file('fotografia')->getRealPath(),
+                    ['folder' => 'fotografias', 'public_id' => "FOTO_$idArchivo"]
+                );
+                $data['fotografia'] = $upload['secure_url'];
             }
 
             $docente->update($data);
