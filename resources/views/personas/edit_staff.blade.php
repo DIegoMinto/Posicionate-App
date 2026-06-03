@@ -345,6 +345,31 @@
             
         </div>
     </x-layout-dashboard>
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
+<script>
+    $(document).ready(function () {
+        $('select[name="id_profesion"]').select2({
+            placeholder: "Seleccione Profesión",
+            allowClear: true,
+            width: '100%'
+        });
+
+        $('select[name="id_grado_academico"]').select2({
+            placeholder: "Seleccione Grado",
+            allowClear: true,
+            width: '100%'
+        });
+
+        $('select[name="id_institucion_egreso"]').select2({
+            placeholder: "Seleccione Institución",
+            allowClear: true,
+            width: '100%'
+        });
+    });
+</script>
 </body>
 
 </html>
