@@ -12,11 +12,11 @@
 </head>
 
 <body class="bg-brand-green font-sans overflow-hidden">
-    <div id="slider" class="w-[200vw] h-screen flex transition-transform duration-700 ease-in-out">
+    <div id="slider" class="w-[200vw] h-[100dvh] flex transition-transform duration-700 ease-in-out">
         <section
-            class="w-screen h-screen flex-shrink-0 bg-brand-green relative overflow-hidden flex items-center justify-center px-4 py-8">
+            class="w-screen h-[100dvh] flex-shrink-0 bg-brand-green relative overflow-hidden flex items-center justify-center px-4 py-4">
 
-            <div class="relative z-10 w-full max-w-[380px]">
+            <div class="relative z-10 w-full max-w-[340px]">
 
                 <div class="hero-card">
 
@@ -25,27 +25,24 @@
                             alt="Imagen del curso">
                     </div>
 
-                    <div class="p-6 text-center">
+                    <div class="p-4 text-center">
 
-                        <h1 class="text-2xl md:text-3xl font-bold text-brand-green mt-3 leading-tight uppercase">
+                        <h1 class="text-xl md:text-2xl font-bold text-brand-green mt-2 leading-tight uppercase">
                             {{ $curso->nombre }}
                         </h1>
 
-
                         <button type="button" onclick="abrirFormulario()"
-                            class="mt-7 w-14 h-14 md:w-16 md:h-16 rounded-full bg-brand-gold flex items-center justify-center mx-auto hover:scale-110 active:scale-95 transition-all duration-300 shadow-xl cursor-pointer">
+                            class="mt-5 w-12 h-12 md:w-14 md:h-14 rounded-full bg-brand-gold flex items-center justify-center mx-auto hover:scale-110 active:scale-95 transition-all duration-300 shadow-xl cursor-pointer">
 
-                            <svg xmlns="http://www.w3.org/2000/svg" class="w-7 h-7 text-black" fill="none"
+                            <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 text-black" fill="none"
                                 viewBox="0 0 24 24" stroke="currentColor">
-
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                     d="M9 5l7 7-7 7" />
-
                             </svg>
 
                         </button>
 
-                        <p class="text-xs text-gray-400 mt-4">
+                        <p class="text-xs text-gray-400 mt-3">
                             Toca para continuar
                         </p>
 
@@ -54,7 +51,7 @@
             </div>
         </section>
 
-        <section id="formulario" class="w-screen h-screen flex-shrink-0 overflow-y-auto bg-[#f7f7f5] px-4 py-10">
+        <section id="formulario" class="w-screen h-[100dvh] flex-shrink-0 overflow-y-auto bg-[#f7f7f5] px-4 py-10">
 
             <div class="max-w-5xl mx-auto">
                 <button type="button" onclick="cerrarFormulario()"
@@ -110,8 +107,8 @@
                     </script>
 
                     <div id="success-alert" class="mb-8 opacity-0 translate-y-5 transition-all duration-700
-                               p-5 rounded-[2rem]
-                               bg-emerald-50 border border-emerald-200 shadow-sm">
+                                                           p-5 rounded-[2rem]
+                                                           bg-emerald-50 border border-emerald-200 shadow-sm">
 
                         <div class="flex items-start gap-4">
 

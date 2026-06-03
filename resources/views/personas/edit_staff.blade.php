@@ -123,6 +123,44 @@
                                 <input type="text" name="direccion" value="{{ old('direccion', $persona->direccion ?? $persona->domicilio) }}"
                                     class="form-input-pill border-2 border-brand-gold">
                             </div>
+                            <div>
+    <label class="form-label-bold !text-brand-green">Profesión</label>
+    <select name="id_profesion" class="form-select-pill border-2 border-brand-gold">
+        <option value="">Seleccione</option>
+        @foreach($profesiones as $prof)
+            <option value="{{ $prof->id_profesion }}"
+                {{ old('id_profesion', $persona->id_profesion) == $prof->id_profesion ? 'selected' : '' }}>
+                {{ $prof->nombre }}
+            </option>
+        @endforeach
+    </select>
+</div>
+
+<div>
+    <label class="form-label-bold !text-brand-green">Grado Académico</label>
+    <select name="id_grado_academico" class="form-select-pill border-2 border-brand-gold">
+        <option value="">Seleccione</option>
+        @foreach($grados as $grado)
+            <option value="{{ $grado->id_grado_academico }}"
+                {{ old('id_grado_academico', $persona->id_grado_academico) == $grado->id_grado_academico ? 'selected' : '' }}>
+                {{ $grado->nombre }}
+            </option>
+        @endforeach
+    </select>
+</div>
+
+<div>
+    <label class="form-label-bold !text-brand-green">Institución de Egreso</label>
+    <select name="id_institucion_egreso" class="form-select-pill border-2 border-brand-gold">
+        <option value="">Seleccione</option>
+        @foreach($instituciones as $inst)
+            <option value="{{ $inst->id_institucion_egreso }}"
+                {{ old('id_institucion_egreso', $persona->id_institucion_egreso) == $inst->id_institucion_egreso ? 'selected' : '' }}>
+                {{ $inst->nombre }}
+            </option>
+        @endforeach
+    </select>
+</div>
                         </div>
 
                         <div class="space-y-4">
