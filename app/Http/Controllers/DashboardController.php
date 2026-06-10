@@ -446,4 +446,35 @@ class DashboardController extends Controller
         return redirect()->route('programs.index')
             ->with('success', 'Programa eliminado correctamente');
     }
+
+    public function programsShow($id)
+    {
+        $usuario = auth()->user()->load('persona');
+
+        $curso = Curso::with([
+            'institucion',
+            'sede',
+            'modulos',
+            'clases',
+            'planes',
+            'docente',
+            'docentesAdicionales.docente'
+        ])->findOrFail($id);
+
+        return view('programs.show', compact('usuario', 'curso'));
+    }
+
+    public function updateStatus(Request $request, $id)
+    {
+        $request->validate([
+            'estado' => 'required|string|in:activo,en proceso,finalizado'
+        ]);
+
+        $curso = Curso::findOrFail($id);
+
+        $curso->estado = $request->input('estado');
+        $curso->save();
+
+        return redirect()->back()->with('success', 'El estado del programa se ha actualizado correctamente.');
+    }
 }
