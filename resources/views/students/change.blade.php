@@ -64,12 +64,26 @@
                                 </select>
                             </div>
 
+                            <div class="flex items-center justify-between gap-4">
+                                <label class="text-sm font-medium text-black">Seleccionar el Tipo de Descuento</label>
+                                <select id="select-descuento" name="id_descuento"
+                                    class="bg-brand-green text-white text-xs font-bold px-4 py-2 rounded-sm outline-none cursor-pointer text-left">
+                                    <option value="0" data-porcentaje="0">Ninguno</option>
+                                    @foreach($descuentos as $desc)
+                                        <option value="{{ $desc->id }}" data-porcentaje="{{ $desc->porcentaje }}">
+                                            {{ $desc->nombre }} ({{ $desc->porcentaje }}%)
+                                        </option>
+                                    @endforeach
+                                </select>
+                            </div>
+
                         </div>
                     </div>
 
                 </div>
             </div>
 
+            <!-- 🔥 CUOTAS AHORA DENTRO DEL FORM -->
             <div class="mt-8 border border-brand-green rounded-lg p-8 bg-white">
                 <h2 class="text-brand-green font-bold font-sans text-xl mb-6">Plan de Pagos del Estudiante</h2>
 
@@ -89,6 +103,7 @@
                         {{ $curso->nombre }} ({{ $curso->codigo_curso }})
                     </h3>
 
+                    <!-- ❌ quitamos form="form-inscripcion" -->
                     <button type="submit" class="btn-gold">
                         Registrar
                     </button>
@@ -98,6 +113,7 @@
         </form>
     </x-layout-dashboard>
 
+    <!-- JS ORIGINAL SIN CAMBIOS -->
     <script>
         document.addEventListener('DOMContentLoaded', function () {
             const selectPlan = document.getElementById('select-plan');
