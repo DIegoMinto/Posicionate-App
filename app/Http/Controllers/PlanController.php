@@ -107,6 +107,7 @@ class PlanController extends Controller
         $plan->update([
             'nombre' => $request->nombre,
             'precio_base' => $request->precio_base,
+            'tipo_plan' => $request->tipo_plan,
             'incluye_matricula' => $request->has('incluye_matricula'),
         ]);
 
@@ -123,7 +124,6 @@ class PlanController extends Controller
                     'id_planes_pago' => $plan->id_planes_pago,
                     'nro_cuota' => $cuota['nro_cuota'],
                     'monto_cuota' => $cuota['monto'],
-                    'fecha_vencimiento' => $cuota['fecha_vencimiento'] ?: null,
                     'detalle' => ($cuota['nro_cuota'] == 1)
                         ? 'PAGO INICIAL'
                         : 'CUOTA ' . $cuota['nro_cuota']

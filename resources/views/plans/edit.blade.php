@@ -80,6 +80,25 @@
                                 class="form-input-pill border-brand-gold border">
 
                         </div>
+                        <div>
+
+                            <label class="form-label-bold text-black">
+                                Tipo de Plan
+                            </label>
+
+                            <select name="tipo_plan" class="form-input-pill border-brand-gold border">
+
+                                <option value="CONTADO" {{ $plan->tipo_plan == 'CONTADO' ? 'selected' : '' }}>
+                                    Contado
+                                </option>
+
+                                <option value="CUOTAS" {{ $plan->tipo_plan == 'CUOTAS' ? 'selected' : '' }}>
+                                    Cuotas
+                                </option>
+
+                            </select>
+
+                        </div>
 
                         <div>
 
@@ -164,22 +183,20 @@
                                 <div class="flex-1">
 
                                     <label class="text-[9px] uppercase font-bold text-gray-500">
-                                        Fecha de Vencimiento
+                                        Programación
                                     </label>
 
-                                    @if($detalle->nro_cuota == 1)
+                                    @if($plan->tipo_plan === 'CONTADO')
 
-                                        <p class="text-[10px] font-bold font-sans text-brand-green mt-2 uppercase">
-                                            Día de inscripción
+                                        <p class="text-[11px] text-brand-green font-bold">
+                                            Cada 30 días desde la inscripción
                                         </p>
-
-                                        <input type="hidden" name="cuotas[{{ $loop->index }}][fecha_vencimiento]" value="">
 
                                     @else
 
-                                        <input type="date" name="cuotas[{{ $loop->index }}][fecha_vencimiento]"
-                                            value="{{ $detalle->fecha_vencimiento ? \Carbon\Carbon::parse($detalle->fecha_vencimiento)->format('Y-m-d') : '' }}"
-                                            class="w-full bg-transparent border-b border-brand-gold font-sans text-sm outline-none focus:border-brand-green">
+                                        <p class="text-[11px] text-brand-green font-bold">
+                                            Día 15 de cada mes
+                                        </p>
 
                                     @endif
 

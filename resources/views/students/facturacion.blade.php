@@ -57,83 +57,132 @@
 
                             @forelse($pagos as $index => $pago)
 
-                                                    @php
-                                                        $pagadoFila = $pago->monto_pagado;
-                                                        $saldoFila = $pago->monto_pagar - $pagadoFila;
-                                                    @endphp
+                                @php
+                                    $pagadoFila = $pago->monto_pagado;
+                                    $saldoFila = $pago->monto_pagar - $pagadoFila;
+                                @endphp
 
-                                                    <tr class="border-b border-gray-100 hover:bg-gray-50 transition-colors text-black">
+                                <tr class="border-b border-gray-100 hover:bg-gray-50 transition-colors text-black">
 
-                                                        <td class="py-3 px-4">{{ $index + 1 }}</td>
+                                    <td class="py-3 px-4">{{ $index + 1 }}</td>
 
-                                                        <td class="py-3 px-4 whitespace-nowrap">
-                                                            {{ $pago->detalle }}
-                                                        </td>
+                                    <td class="py-3 px-4 whitespace-nowrap">
+                                        {{ $pago->detalle }}
+                                    </td>
 
-                                                        <td class="py-3 px-4 whitespace-nowrap text-right">
-                                                            {{ \Carbon\Carbon::parse($pago->fecha_programada)->format('d/m/Y') }}
-                                                        </td>
+                                    <td class="py-3 px-4 whitespace-nowrap text-right">
+                                        {{ \Carbon\Carbon::parse($pago->fecha_programada)->format('d/m/Y') }}
+                                    </td>
 
-                                                        <td class="py-3 px-4 whitespace-nowrap text-right">
+                                    <td class="py-3 px-4 whitespace-nowrap text-right">
 
-                                                            @if($pago->fecha_pagada)
-                                                                {{ \Carbon\Carbon::parse($pago->fecha_pagada)->format('d/m/Y') }}
-                                                            @else
-                                                                <span class="text-yellow-600 font-bold">
-                                                                    Pendiente
-                                                                </span>
-                                                            @endif
+                                        @if($pago->fecha_pagada)
+                                            {{ \Carbon\Carbon::parse($pago->fecha_pagada)->format('d/m/Y') }}
+                                        @else
+                                            <span class="text-yellow-600 font-bold">
+                                                Pendiente
+                                            </span>
+                                        @endif
 
-                                                        </td>
-                                                        <td class="py-3 px-4 whitespace-nowrap text-right">
-                                                            {{ number_format($pago->monto_pagar, 2) }} Bs
-                                                        </td>
+                                    </td>
+                                    <td class="py-3 px-4 whitespace-nowrap text-right">
+                                        {{ number_format($pago->monto_pagar, 2) }} Bs
+                                    </td>
 
-                                                        <td class="py-3 px-4 whitespace-nowrap text-right">
-                                                            {{ number_format($pago->monto_pagado, 2) }} Bs
-                                                        </td>
+                                    <td class="py-3 px-4 whitespace-nowrap text-right">
+                                        {{ number_format($pago->monto_pagado, 2) }} Bs
+                                    </td>
 
-                                                        <td class="py-3 px-4 whitespace-nowrap text-right">
-                                                            {{ number_format($saldoFila, 2) }} Bs
-                                                        </td>
+                                    <td class="py-3 px-4 whitespace-nowrap text-right">
+                                        {{ number_format($saldoFila, 2) }} Bs
+                                    </td>
 
-                                                        <td class="py-3 px-4 text-center">
-                                                            <span class="px-2 py-0.5 rounded-full text-[9px] font-black uppercase
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            {{ $pago->estado == 'pagado'
-                                ? 'bg-green-100 text-green-700'
-                                : 'bg-red-100 text-red-700' }}">
-                                                                {{ $pago->estado == 'pagado' ? 'completo' : 'incompleto' }}
-                                                            </span>
-                                                        </td>
+                                    <td class="py-3 px-4 text-center">
 
-                                                        <td class="py-3 px-4 text-center">
-                                                            @if(
-                                                                    in_array($usuario->cargo, [
-                                                                        'contador',
-                                                                        'asistente_contable',
-                                                                    ])
-                                                                    || $usuario->rol === 'super_admin'
-                                                                )
-                                                                <a href="{{ route('pagos.edit', $pago->id_pagos_estudiante) }}"
-                                                                    class="inline-flex items-center justify-center group relative">
+                                        @php
+                                            $claseEstado = match ($pago->estado) {
+                                                'pagado' => 'bg-green-100 text-green-700',
+                                                'revision' => 'bg-yellow-100 text-yellow-700',
+                                                default => 'bg-red-100 text-red-700'
+                                            };
 
-                                                                    <svg xmlns="http://www.w3.org/2000/svg"
-                                                                        class="w-5 h-5 text-brand-green group-hover:text-brand-gold transition-colors"
-                                                                        fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                                                        <path stroke-linecap="round" stroke-linejoin="round"
-                                                                            d="M11 5h2M12 7v10m-7 4h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                                                                    </svg>
+                                            $textoEstado = match ($pago->estado) {
+                                                'pagado' => 'Completo',
+                                                'revision' => 'En revisión',
+                                                default => 'Pendiente'
+                                            };
+                                        @endphp
 
-                                                                    <span
-                                                                        class="absolute -top-8 scale-0 transition-all rounded bg-gray-800 px-2 py-1 text-[10px] text-white group-hover:scale-100 whitespace-nowrap z-30 shadow-lg">
-                                                                        Editar Plan de Pagos
-                                                                    </span>
-                                                                </a>
-                                                            @endif
-                                                        </td>
+                                        <span
+                                            class="px-2 py-0.5 rounded-full text-[9px] font-black uppercase {{ $claseEstado }}">
+                                            {{ $textoEstado }}
+                                        </span>
+
+                                    </td>
+
+                                    <td class="py-3 px-4 text-center">
+
+                                        @if(
+                                                in_array($usuario->cargo, [
+                                                    'contador',
+                                                    'asistente_contable',
+                                                ])
+                                                || $usuario->rol === 'super_admin'
+                                            )
+
+                                            <div class="flex items-center justify-center gap-3">
+
+                                                {{-- Editar pago --}}
+                                                <a href="{{ route('pagos.edit', $pago->id_pagos_estudiante) }}"
+                                                    class="inline-flex items-center justify-center group relative">
+
+                                                    <svg xmlns="http://www.w3.org/2000/svg"
+                                                        class="w-5 h-5 text-brand-green group-hover:text-brand-gold transition-colors"
+                                                        fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+
+                                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                                            d="M11 5h2M12 7v10m-7 4h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+
+                                                    </svg>
+
+                                                    <span
+                                                        class="absolute -top-8 scale-0 transition-all rounded bg-gray-800 px-2 py-1 text-[10px] text-white group-hover:scale-100 whitespace-nowrap z-30 shadow-lg">
+                                                        Editar Pago
+                                                    </span>
+
+                                                </a>
+
+                                                @if($pago->estado == 'revision')
+
+                                                    <a href="{{ route('pagos.validar', $pago->id_pagos_estudiante) }}"
+                                                        class="inline-flex items-center justify-center group relative">
+
+                                                        <svg xmlns="http://www.w3.org/2000/svg"
+                                                            class="w-5 h-5 text-brand-green hover:text-brand-gold transition-colors"
+                                                            fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+
+                                                            <path stroke-linecap="round" stroke-linejoin="round"
+                                                                d="M5 13l4 4L19 7" />
+
+                                                        </svg>
+
+                                                        <span
+                                                            class="absolute -top-8 scale-0 transition-all rounded bg-gray-800 px-2 py-1 text-[10px] text-white group-hover:scale-100 whitespace-nowrap z-30 shadow-lg">
+                                                            Validar Pago
+                                                        </span>
+
+                                                    </a>
+
+                                                @endif
+
+                                            </div>
+
+                                        @endif
+
+                                    </td>
 
 
-                                                    </tr>
+                                </tr>
 
                             @empty
                                 <tr>

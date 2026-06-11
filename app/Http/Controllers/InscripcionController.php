@@ -193,12 +193,10 @@ class InscripcionController extends Controller
                         ? $request->cuotas[$index]['fecha_pagada']
                         : null;
 
-                    if ($montoPagado == 0) {
-                        $estado = 'pendiente';
-                    } elseif ($montoPagado < $montoPlan) {
-                        $estado = 'parcial';
+                    if ($montoPagado > 0) {
+                        $estado = 'revision';
                     } else {
-                        $estado = 'pagado';
+                        $estado = 'pendiente';
                     }
                     if ($plan->tipo_plan === 'CONTADO') {
 
@@ -332,11 +330,24 @@ class InscripcionController extends Controller
 
         $pago->monto_pagado = $nuevoMonto;
         $pago->fecha_pagada = $request->fecha_pagada;
-        $pago->estado = ($nuevoMonto >= $pago->monto_pagar) ? 'pagado' : 'pendiente';
+        if ($nuevoMonto == 0) {
+
+            $estado = 'pendiente';
+
+        } elseif ($nuevoMonto < $pago->monto_pagar) {
+
+            $estado = 'revision';
+
+        } else {
+
+            $estado = 'revision';
+
+        }
+
+        $pago->estado = $estado;
 
         $pago->save();
 
-        // 🔥 ESTO FALTABA
         $inscripcion = \App\Models\CursoEstudiante::findOrFail($pago->id_curso_estudiante);
 
         return redirect()->route('students.facturacion', [
@@ -369,6 +380,20 @@ class InscripcionController extends Controller
         ]);
 
         return back()->with('success', 'Estudiante añadido correctamente');
+    }
+
+    public function validarPago($id)
+    {
+        $pago = PagoEstudiante::findOrFail($id);
+
+        $pago->estado = 'pagado';
+
+        $pago->save();
+
+        return back()->with(
+            'success',
+            'Pago validado correctamente'
+        );
     }
 
 }
