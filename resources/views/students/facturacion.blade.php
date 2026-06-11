@@ -75,9 +75,16 @@
                                                         </td>
 
                                                         <td class="py-3 px-4 whitespace-nowrap text-right">
-                                                            {{ \Carbon\Carbon::parse($pago->fecha_pagada)->format('d/m/Y') }}
-                                                        </td>
 
+                                                            @if($pago->fecha_pagada)
+                                                                {{ \Carbon\Carbon::parse($pago->fecha_pagada)->format('d/m/Y') }}
+                                                            @else
+                                                                <span class="text-yellow-600 font-bold">
+                                                                    Pendiente
+                                                                </span>
+                                                            @endif
+
+                                                        </td>
                                                         <td class="py-3 px-4 whitespace-nowrap text-right">
                                                             {{ number_format($pago->monto_pagar, 2) }} Bs
                                                         </td>
@@ -92,7 +99,7 @@
 
                                                         <td class="py-3 px-4 text-center">
                                                             <span class="px-2 py-0.5 rounded-full text-[9px] font-black uppercase
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    {{ $pago->estado == 'pagado'
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            {{ $pago->estado == 'pagado'
                                 ? 'bg-green-100 text-green-700'
                                 : 'bg-red-100 text-red-700' }}">
                                                                 {{ $pago->estado == 'pagado' ? 'completo' : 'incompleto' }}

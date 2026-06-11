@@ -60,6 +60,8 @@
                                         <label class="form-label-bold text-black">Número
                                             de
                                             Pagos</label>
+
+
                                         <select id="select_nro_cuotas" name="nro_cuotas"
                                             onchange="generarFilasDeCuotas()"
                                             class="form-select-pill border-brand-gold border">
@@ -70,6 +72,25 @@
                                             <option value="5">5 Pagos</option>
                                             <option value="6">6 Pagos</option>
                                             <option value="12">12 Pagos</option>
+                                        </select>
+                                    </div>
+
+                                    <div>
+                                        <label class="form-label-bold text-black">
+                                            Tipo de Plan
+                                        </label>
+
+                                        <select name="tipo_plan" id="tipo_plan" onchange="generarFilasDeCuotas()"
+                                            class="form-select-pill border-brand-gold border">
+
+                                            <option value="CONTADO">
+                                                Contado
+                                            </option>
+
+                                            <option value="CUOTAS">
+                                                Cuotas Mensuales
+                                            </option>
+
                                         </select>
                                     </div>
 
@@ -268,14 +289,20 @@
                 </div>
                 <div class="flex-1 text-right">
                     <span class="text-[8px] font-sans font-bold uppercase">Vencimiento</span>
-                    ${esPrimera
-                                ? `<p class="text-[10px] font-bold font-sans text-brand-green mt-1 uppercase">Día de Inscripción</p>
-                           <input type="hidden" name="cuotas[${i}][fecha_vencimiento]" value="">`
-                                : `<div class="mt-1">
-                             <input type="date" name="cuotas[${i}][fecha_vencimiento]" required 
-                                    class="text-[10px] font-bold font-sans text-brand-green mt-1 uppercase">
-                           </div>`
+                    <div class="flex-1 text-right">
+    <span class="text-[8px] font-sans font-bold uppercase">
+        Programación
+    </span>
+
+    ${esPrimera
+                                ? `<p class="text-[10px] font-bold font-sans text-brand-green mt-1 uppercase">
+                Día de inscripción
+           </p>`
+                                : `<p class="text-[10px] font-bold font-sans text-brand-green mt-1 uppercase">
+                Automático
+           </p>`
                             }
+</div>
                 </div>
                 <input type="hidden" name="cuotas[${i}][nro_cuota]" value="${i}">
             `;

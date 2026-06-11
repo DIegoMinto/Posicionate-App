@@ -14,6 +14,7 @@ class PlanController extends Controller
         $request->validate([
             'id_curso' => 'required',
             'nombre' => 'required|string|max:255',
+            'tipo_plan' => 'required|in:CONTADO,CUOTAS',
             'precio_base' => 'required|numeric|min:0',
             'cuotas' => 'required|array|min:1',
             'cuotas.*.monto' => 'required|numeric',
@@ -27,6 +28,7 @@ class PlanController extends Controller
             $plan = PlanesPago::create([
                 'id_curso' => $request->id_curso,
                 'nombre' => $request->nombre,
+                'tipo_plan' => $request->tipo_plan,
                 'precio_base' => $request->precio_base,
                 'incluye_matricula' => $request->has('incluye_matricula'),
                 'estado' => 'ACTIVO'
@@ -38,7 +40,6 @@ class PlanController extends Controller
                     'id_planes_pago' => $plan->id_planes_pago,
                     'nro_cuota' => 0,
                     'monto_cuota' => $request->monto_matricula,
-                    'fecha_vencimiento' => now(),
                     'detalle' => 'PAGO DE MATRÍCULA'
                 ]);
             }
@@ -48,8 +49,9 @@ class PlanController extends Controller
                     'id_planes_pago' => $plan->id_planes_pago,
                     'nro_cuota' => $detalle['nro_cuota'],
                     'monto_cuota' => $detalle['monto'],
-                    'fecha_vencimiento' => !empty($detalle['fecha_vencimiento']) ? $detalle['fecha_vencimiento'] : null,
-                    'detalle' => ($detalle['nro_cuota'] == 1) ? 'PAGO INICIAL' : 'CUOTA ' . $detalle['nro_cuota']
+                    'detalle' => ($detalle['nro_cuota'] == 1)
+                        ? 'PAGO INICIAL'
+                        : 'CUOTA ' . $detalle['nro_cuota']
                 ]);
             }
 

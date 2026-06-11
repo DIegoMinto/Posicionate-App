@@ -13,7 +13,8 @@ class PlanesPago extends Model
         'id_curso',
         'nombre',
         'incluye_matricula',
-        'precio_base'
+        'precio_base',
+        'tipo_plan'
     ];
 
     public $timestamps = false;

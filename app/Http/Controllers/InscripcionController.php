@@ -15,6 +15,7 @@ use App\Models\PagoEstudiante;
 use Illuminate\Http\Request;
 use App\Models\Pais;
 use Illuminate\Support\Facades\DB;
+use Carbon\Carbon;
 
 class InscripcionController extends Controller
 {
@@ -172,7 +173,9 @@ class InscripcionController extends Controller
                     'id_descuento' => $id_descuento,
                     'estado' => 'inscrito',
                 ]);
-
+                $fechaInscripcion = Carbon::parse(
+                    $inscripcion->created_at
+                );
                 foreach ($plan->detalles as $index => $detallePlan) {
 
                     $montoPlan = (float) $detallePlan->monto_cuota;
@@ -197,13 +200,33 @@ class InscripcionController extends Controller
                     } else {
                         $estado = 'pagado';
                     }
+                    if ($plan->tipo_plan === 'CONTADO') {
 
+                        $fechaProgramada = $fechaInscripcion
+                            ->copy()
+                            ->addDays($index * 30);
+
+                    } else {
+
+                        if ($index == 0) {
+
+                            $fechaProgramada = $fechaInscripcion->copy();
+
+                        } else {
+
+                            $fechaProgramada = $fechaInscripcion
+                                ->copy()
+                                ->startOfMonth()
+                                ->addMonths($index)
+                                ->day(15);
+                        }
+                    }
                     \App\Models\PagoEstudiante::create([
                         'id_curso_estudiante' => $inscripcion->id,
                         'detalle' => $detallePlan->detalle,
                         'monto_pagar' => $montoPlan,
                         'monto_pagado' => $montoPagado,
-                        'fecha_programada' => $detallePlan->fecha_vencimiento ?? now()->format('Y-m-d'),
+                        'fecha_programada' => $fechaProgramada->format('Y-m-d'),
 
                         'fecha_pagada' => $fechaPagada,
                         'estado' => $estado,
