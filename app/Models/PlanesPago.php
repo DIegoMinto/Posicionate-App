@@ -14,14 +14,20 @@ class PlanesPago extends Model
         'nombre',
         'incluye_matricula',
         'precio_base',
-        'tipo_plan'
+        'tipo_plan',
+        'tiene_titulacion',
+        'monto_titulacion'
     ];
 
     public $timestamps = false;
 
     public function detalles()
     {
-        return $this->hasMany(PlanCuotaDetalle::class, 'id_planes_pago', 'id_planes_pago');
+        return $this->hasMany(
+            PlanCuotaDetalle::class,
+            'id_planes_pago',
+            'id_planes_pago'
+        )->orderBy('nro_cuota');
     }
     public function curso()
     {

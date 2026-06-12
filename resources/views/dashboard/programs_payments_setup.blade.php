@@ -57,22 +57,17 @@
 
                                 <div class="grid grid-cols-2 gap-4">
                                     <div>
-                                        <label class="form-label-bold text-black">Número
-                                            de
-                                            Pagos</label>
+                                        <label class="form-label-bold text-black">
+                                            Número de Pagos
+                                        </label>
 
+                                        <div class="flex items-center gap-2">
 
-                                        <select id="select_nro_cuotas" name="nro_cuotas"
-                                            onchange="generarFilasDeCuotas()"
-                                            class="form-select-pill border-brand-gold border">
-                                            <option value="1">1 Pago (Contado)</option>
-                                            <option value="2">2 Pagos</option>
-                                            <option value="3">3 Pagos</option>
-                                            <option value="4">4 Pagos</option>
-                                            <option value="5">5 Pagos</option>
-                                            <option value="6">6 Pagos</option>
-                                            <option value="12">12 Pagos</option>
-                                        </select>
+                                            <input type="number" id="select_nro_cuotas" name="nro_cuotas" min="1"
+                                                max="36" value="3" onchange="generarFilasDeCuotas()"
+                                                class="form-input-pill border-brand-gold border">
+
+                                        </div>
                                     </div>
 
                                     <div>
@@ -110,6 +105,17 @@
                                         class="text-[10px] font-bold font-sans text-brand-green uppercase cursor-pointer ml-2">
                                         ¿Este plan requiere pago de matrícula aparte?
                                     </label>
+                                </div>
+
+                                <div class="flex items-center p-3">
+
+                                    <input type="checkbox" id="check_titulacion" name="tiene_titulacion" value="1"
+                                        onchange="generarFilasDeCuotas()" class="w-4 h-4 accent-brand-gold">
+
+                                    <label class="text-[10px] font-bold font-sans text-brand-green uppercase ml-2">
+                                        ¿Incluye pago de titulación?
+                                    </label>
+
                                 </div>
 
                                 <div class="space-y-2">
@@ -251,6 +257,7 @@
                     const nroCuotas = parseInt(document.getElementById('select_nro_cuotas').value);
                     const container = document.getElementById('cuotas_dinamicas_container');
                     const incluyeMat = document.getElementById('check_mat').checked;
+                    const incluyeTitulacion = document.getElementById('check_titulacion').checked;
 
                     container.innerHTML = '';
 
@@ -269,6 +276,49 @@
             </div>
         `;
                         container.appendChild(divMat);
+                    }
+
+                    if (incluyeTitulacion) {
+
+                        const divTit = document.createElement('div');
+
+                        divTit.className =
+                            "bg-brand-green/5 p-3 border-l-4 border-brand-green mb-4 rounded-r-sm";
+
+                        divTit.innerHTML = `
+        <div class="flex justify-between items-end">
+
+            <div>
+
+                <p class="text-[9px] font-sans font-bold text-brand-green uppercase">
+                    Titulación (Pago Final)
+                </p>
+
+                <input
+                    type="number"
+                    name="monto_titulacion"
+                    value="0"
+                    step="0.01"
+                    class="w-32 bg-transparent font-sans text-sm outline-none border-b-2 border-brand-green/20 focus:border-brand-green">
+
+            </div>
+
+            <div class="text-right">
+
+                <p class="text-[9px] font-bold uppercase text-brand-green">
+                    Programación
+                </p>
+
+                <p class="text-[10px] font-bold font-sans text-brand-green uppercase">
+                    +15 días de la última cuota
+                </p>
+
+            </div>
+
+        </div>
+    `;
+
+                        container.appendChild(divTit);
                     }
 
                     const montoDividido = (total / nroCuotas).toFixed(2);

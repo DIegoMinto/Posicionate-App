@@ -1,3 +1,15 @@
+@php
+
+    $matricula = $plan->detalles->firstWhere('nro_cuota', 0);
+
+    $titulacion = $plan->detalles->firstWhere('detalle', 'TITULACION');
+
+    $cuotasNormales = $plan->detalles
+        ->where('nro_cuota', '>', 0)
+        ->where('detalle', '!=', 'TITULACION')
+        ->sortBy('nro_cuota');
+
+@endphp
 <!DOCTYPE html>
 <html lang="es">
 
@@ -125,6 +137,33 @@
 
                         </div>
 
+                        <div class="flex items-center p-3">
+
+                            <input type="checkbox" id="tiene_titulacion" name="tiene_titulacion" value="1"
+                                class="w-4 h-4 accent-brand-gold" {{ $plan->tiene_titulacion ? 'checked' : '' }}>
+
+                            <label class="text-[10px] font-bold font-sans text-brand-green uppercase ml-2">
+                                ¿Incluye Titulación?
+                            </label>
+
+                        </div>
+
+                        <div id="contenedor_titulacion" class="{{ !$plan->tiene_titulacion ? 'hidden' : '' }}">
+
+                            <div class="bg-brand-gold/10 p-3 border-l-4 border-brand-gold rounded-r-sm">
+
+                                <p class="text-[10px] font-bold uppercase text-brand-gold">
+                                    Pago de Titulación
+                                </p>
+
+                                <input type="number" step="0.01" name="monto_titulacion"
+                                    value="{{ $plan->monto_titulacion }}"
+                                    class="w-40 bg-transparent border-b border-brand-gold outline-none">
+
+                            </div>
+
+                        </div>
+
                     </div>
 
                 </div>
@@ -151,7 +190,44 @@
 
                     <div class="p-6 space-y-4">
 
-                        @foreach($plan->detalles as $detalle)
+                        {{-- MATRÍCULA --}}
+
+                        @if($matricula)
+
+                            <div class="bg-brand-green/5 border-l-4 border-brand-green p-4 rounded-r-sm">
+
+                                <div class="flex justify-between items-center">
+
+                                    <div>
+
+                                        <p class="text-[10px] font-bold uppercase text-brand-green">
+                                            Matrícula
+                                        </p>
+
+                                        <p class="text-[9px] text-gray-500">
+                                            Pago inicial
+                                        </p>
+
+                                    </div>
+
+                                    <div class="w-48">
+
+                                        <input type="number" step="0.01" name="monto_matricula"
+                                            value="{{ $matricula->monto_cuota }}"
+                                            class="w-full bg-transparent border-b border-brand-green text-right font-bold outline-none">
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                        @endif
+
+
+                        {{-- CUOTAS NORMALES --}}
+
+                        @foreach($cuotasNormales as $detalle)
 
                             <div
                                 class="flex flex-col lg:flex-row lg:items-center gap-4 bg-gray-50 border-l-4 border-brand-green p-4 rounded-r-sm">
@@ -159,11 +235,7 @@
                                 <div class="w-full lg:w-32">
 
                                     <p class="text-[10px] font-bold uppercase text-brand-green">
-                                        @if($detalle->nro_cuota == 0)
-                                            Matrícula
-                                        @else
-                                            Pago {{ $detalle->nro_cuota }}
-                                        @endif
+                                        Pago {{ $detalle->nro_cuota }}
                                     </p>
 
                                 </div>
@@ -176,7 +248,7 @@
 
                                     <input type="number" step="0.01" name="cuotas[{{ $loop->index }}][monto]"
                                         value="{{ $detalle->monto_cuota }}" required data-cuota="{{ $detalle->nro_cuota }}"
-                                        class="cuota-input w-full bg-transparent border-b border-brand-gold font-sans text-sm outline-none focus:border-brand-green">
+                                        class="cuota-input w-full bg-transparent border-b border-brand-gold font-sans text-sm outline-none">
 
                                 </div>
 
@@ -189,7 +261,7 @@
                                     @if($plan->tipo_plan === 'CONTADO')
 
                                         <p class="text-[11px] text-brand-green font-bold">
-                                            Cada 30 días desde la inscripción
+                                            Cada 30 días
                                         </p>
 
                                     @else
@@ -208,6 +280,41 @@
                             </div>
 
                         @endforeach
+
+
+                        {{-- TITULACIÓN --}}
+
+                        @if($titulacion)
+
+                            <div class="bg-brand-gold/10 border-l-4 border-brand-gold p-4 rounded-r-sm">
+
+                                <div class="flex justify-between items-center">
+
+                                    <div>
+
+                                        <p class="text-[10px] font-bold uppercase text-brand-gold">
+                                            Titulación
+                                        </p>
+
+                                        <p class="text-[9px] text-gray-500">
+                                            15 días después de la última cuota
+                                        </p>
+
+                                    </div>
+
+                                    <div class="w-48">
+
+                                        <input type="number" step="0.01" name="monto_titulacion"
+                                            value="{{ $titulacion->monto_cuota }}"
+                                            class="w-full bg-transparent border-b border-brand-gold text-right font-bold outline-none">
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                        @endif
 
                     </div>
 
@@ -254,6 +361,25 @@
                 input.value = nuevoMonto;
             });
         }
+        const checkTitulacion =
+            document.getElementById('tiene_titulacion');
+
+        const contenedorTitulacion =
+            document.getElementById('contenedor_titulacion');
+
+        checkTitulacion.addEventListener('change', function () {
+
+            if (this.checked) {
+
+                contenedorTitulacion.classList.remove('hidden');
+
+            } else {
+
+                contenedorTitulacion.classList.add('hidden');
+
+            }
+
+        });
 
     </script>
 </body>

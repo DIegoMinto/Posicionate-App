@@ -176,6 +176,7 @@ class InscripcionController extends Controller
                 $fechaInscripcion = Carbon::parse(
                     $inscripcion->created_at
                 );
+                $ultimaFechaProgramada = null;
                 foreach ($plan->detalles as $index => $detallePlan) {
 
                     $montoPlan = (float) $detallePlan->monto_cuota;
@@ -198,26 +199,37 @@ class InscripcionController extends Controller
                     } else {
                         $estado = 'pendiente';
                     }
-                    if ($plan->tipo_plan === 'CONTADO') {
+                    if ($detallePlan->detalle === 'TITULACION') {
 
-                        $fechaProgramada = $fechaInscripcion
-                            ->copy()
-                            ->addDays($index * 30);
+                        $fechaProgramada = $ultimaFechaProgramada
+                            ? $ultimaFechaProgramada->copy()->addDays(15)
+                            : $fechaInscripcion->copy()->addDays(15);
 
                     } else {
 
-                        if ($index == 0) {
-
-                            $fechaProgramada = $fechaInscripcion->copy();
-
-                        } else {
+                        if ($plan->tipo_plan === 'CONTADO') {
 
                             $fechaProgramada = $fechaInscripcion
                                 ->copy()
-                                ->startOfMonth()
-                                ->addMonths($index)
-                                ->day(15);
+                                ->addDays($index * 30);
+
+                        } else {
+
+                            if ($index == 0) {
+
+                                $fechaProgramada = $fechaInscripcion->copy();
+
+                            } else {
+
+                                $fechaProgramada = $fechaInscripcion
+                                    ->copy()
+                                    ->startOfMonth()
+                                    ->addMonths($index)
+                                    ->day(15);
+                            }
                         }
+
+                        $ultimaFechaProgramada = $fechaProgramada->copy();
                     }
                     \App\Models\PagoEstudiante::create([
                         'id_curso_estudiante' => $inscripcion->id,

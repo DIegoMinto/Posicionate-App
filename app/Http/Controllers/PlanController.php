@@ -16,10 +16,15 @@ class PlanController extends Controller
             'nombre' => 'required|string|max:255',
             'tipo_plan' => 'required|in:CONTADO,CUOTAS',
             'precio_base' => 'required|numeric|min:0',
+
             'cuotas' => 'required|array|min:1',
             'cuotas.*.monto' => 'required|numeric',
             'cuotas.*.nro_cuota' => 'required',
+
             'monto_matricula' => 'nullable|numeric|min:0',
+
+            'tiene_titulacion' => 'nullable',
+            'monto_titulacion' => 'nullable|numeric|min:0',
         ]);
 
         try {
@@ -31,9 +36,23 @@ class PlanController extends Controller
                 'tipo_plan' => $request->tipo_plan,
                 'precio_base' => $request->precio_base,
                 'incluye_matricula' => $request->has('incluye_matricula'),
+                'tiene_titulacion' => $request->has('tiene_titulacion'),
+                'monto_titulacion' => $request->monto_titulacion,
                 'estado' => 'ACTIVO'
             ]);
 
+            if ($request->has('tiene_titulacion')) {
+
+                $ultimaCuota = collect($request->cuotas)
+                    ->max('nro_cuota');
+
+                $plan->detalles()->create([
+                    'id_planes_pago' => $plan->id_planes_pago,
+                    'nro_cuota' => $ultimaCuota + 1,
+                    'monto_cuota' => $request->monto_titulacion,
+                    'detalle' => 'TITULACION'
+                ]);
+            }
 
             if ($request->has('incluye_matricula') && $request->monto_matricula > 0) {
                 $plan->detalles()->create([
@@ -109,12 +128,27 @@ class PlanController extends Controller
             'precio_base' => $request->precio_base,
             'tipo_plan' => $request->tipo_plan,
             'incluye_matricula' => $request->has('incluye_matricula'),
+            'tiene_titulacion' => $request->has('tiene_titulacion'),
+            'monto_titulacion' => $request->monto_titulacion
         ]);
 
         PlanCuotaDetalle::where(
             'id_planes_pago',
             $plan->id_planes_pago
         )->delete();
+
+        if (
+            $request->has('incluye_matricula')
+            && $request->monto_matricula > 0
+        ) {
+
+            PlanCuotaDetalle::create([
+                'id_planes_pago' => $plan->id_planes_pago,
+                'nro_cuota' => 0,
+                'monto_cuota' => $request->monto_matricula,
+                'detalle' => 'PAGO DE MATRÍCULA'
+            ]);
+        }
 
         if ($request->has('cuotas')) {
 
@@ -129,6 +163,19 @@ class PlanController extends Controller
                         : 'CUOTA ' . $cuota['nro_cuota']
                 ]);
             }
+        }
+
+        if ($request->has('tiene_titulacion')) {
+
+            $ultimaCuota = collect($request->cuotas)
+                ->max('nro_cuota');
+
+            PlanCuotaDetalle::create([
+                'id_planes_pago' => $plan->id_planes_pago,
+                'nro_cuota' => $ultimaCuota + 1,
+                'monto_cuota' => $request->monto_titulacion,
+                'detalle' => 'TITULACION'
+            ]);
         }
 
         return redirect()
