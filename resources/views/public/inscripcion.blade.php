@@ -106,9 +106,8 @@
                         };
                     </script>
 
-                    <div id="success-alert" class="mb-8 opacity-0 translate-y-5 transition-all duration-700
-                                                           p-5 rounded-[2rem]
-                                                           bg-emerald-50 border border-emerald-200 shadow-sm">
+                    <div id="success-alert"
+                        class="mb-8 opacity-0 translate-y-5 transition-all duration-700 p-5 rounded-[2rem] bg-emerald-50 border border-emerald-200 shadow-sm">
 
                         <div class="flex items-start gap-4">
 
