@@ -22,7 +22,7 @@
 }
     
 .form-label-bold {
-    @apply block text-white font-sans font-bold text-sm mb-1 tracking-wide m-1;
+    @apply block text-white font-black text-xs mb-1 tracking-wide m-1 mb-2;
 }
 
 .form-select-pill {

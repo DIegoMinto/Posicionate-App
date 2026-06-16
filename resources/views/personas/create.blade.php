@@ -7,35 +7,18 @@
     <title>Registro - Posicionate</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
-    <style>
-        .select2-container--default .select2-selection--single {
-            border: 2px solid #cbd5e1 !important;
-            border-radius: 0.5rem !important;
-            height: 44px !important;
-            padding-top: 6px !important;
-            background-color: #f8fafc !important;
-        }
-
-        .select2-container--default .select2-selection--single:focus,
-        .select2-container--open .select2-selection--single {
-            border-color: #1e3f20 !important;
-            box-shadow: 0 0 0 3px rgba(30, 63, 32, 0.15) !important;
-            background-color: #ffffff !important;
-        }
-    </style>
 </head>
 
-<body class="bg-slate-100 font-sans min-h-screen flex items-center justify-center p-4 md:p-8 text-slate-800">
+<body class="bg-slate-100 font-sans min-h-screen flex items-center justify-center p-4 md:p-8">
 
     <div class="max-w-5xl w-full bg-white shadow-2xl rounded-2xl overflow-hidden border border-slate-200">
 
-        <div class="bg-brand-green p-8 md:p-12 text-center relative border-b-4 border-brand-gold">
-            <h2 class="text-white text-2xl md:text-4xl font-black tracking-widest uppercase">
+        <div class="bg-brand-green p-8 md:p-8 text-center relative border-b-4 border-brand-gold">
+            <h2 class="text-white text-xl md:text-2xl font-sans font-bold tracking-widest uppercase">
                 Formulario de Registro de Personal
             </h2>
-            <div
-                class="inline-block bg-brand-gold text-brand-green font-bold text-xs px-4 py-1.5 rounded-full mt-3 uppercase tracking-wider shadow">
-                Posicionate
+            <div class="inline-block w-50 mt-5">
+                <img src="/img/logoblanco.png" alt="" class="w-full h-full object-contain">
             </div>
         </div>
 
@@ -75,8 +58,8 @@
                 @csrf
 
                 <div class="space-y-6">
-                    <div class="flex items-center space-x-3 bg-slate-50 border border-slate-200 rounded-lg p-3">
-                        <div class="w-3 h-6 bg-brand-gold rounded"></div>
+                    <div class="flex items-center space-x-3 rounded-lg p-3">
+                        <div class="w-1 h-6 bg-brand-gold rounded"></div>
                         <h3 class="text-brand-green text-lg font-black uppercase tracking-wider">
                             1. Datos Personales
                         </h3>
@@ -84,45 +67,39 @@
 
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                         <div>
-                            <label
-                                class="block text-xs font-black text-slate-700 uppercase tracking-wider mb-2">Nombre</label>
-                            <input type="text" name="nombre"
-                                class="w-full px-4 py-2.5 rounded-lg border-2 border-slate-300 focus:border-brand-green focus:ring-4 focus:ring-brand-green/10 outline-none transition duration-200 bg-slate-50 text-slate-900 font-medium">
+                            <label class="form-label-bold text-brand-green uppercase">Nombre</label>
+                            <input type="text" name="nombre" class="form-input-pill border-brand-green border">
                         </div>
                         <div>
-                            <label class="block text-xs font-black text-slate-700 uppercase tracking-wider mb-2">Primer
+                            <label class="form-label-bold text-brand-green uppercase">Primer
                                 Apellido</label>
-                            <input type="text" name="apellido_p"
-                                class="w-full px-4 py-2.5 rounded-lg border-2 border-slate-300 focus:border-brand-green focus:ring-4 focus:ring-brand-green/10 outline-none transition duration-200 bg-slate-50 text-slate-900 font-medium">
+                            <input type="text" name="apellido_p" class="form-input-pill border-brand-green border">
                         </div>
                         <div>
-                            <label class="block text-xs font-black text-slate-700 uppercase tracking-wider mb-2">Segundo
+                            <label class="form-label-bold text-brand-green uppercase">Segundo
                                 Apellido</label>
-                            <input type="text" name="apellido_m"
-                                class="w-full px-4 py-2.5 rounded-lg border-2 border-slate-300 focus:border-brand-green focus:ring-4 focus:ring-brand-green/10 outline-none transition duration-200 bg-slate-50 text-slate-900 font-medium">
+                            <input type="text" name="apellido_m" class="form-input-pill border-brand-green border">
                         </div>
                     </div>
 
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                         <div>
-                            <label class="block text-xs font-black text-slate-700 uppercase tracking-wider mb-2">Fecha
+                            <label class="form-label-bold text-brand-green uppercase">Fecha
                                 de Nacimiento</label>
                             <input type="date" name="fecha_nacimiento"
-                                class="w-full px-4 py-2.5 rounded-lg border-2 border-slate-300 focus:border-brand-green focus:ring-4 focus:ring-brand-green/10 outline-none transition duration-200 bg-slate-50 text-slate-900 font-medium">
+                                class="form-input-pill border-brand-green border">
                         </div>
                         <div>
-                            <label class="block text-xs font-black text-slate-700 uppercase tracking-wider mb-2">Carnet
+                            <label class="form-label-bold text-brand-green uppercase">Carnet
                                 de Identidad</label>
-                            <input type="text" name="ci"
-                                class="w-full px-4 py-2.5 rounded-lg border-2 border-slate-300 focus:border-brand-green focus:ring-4 focus:ring-brand-green/10 outline-none transition duration-200 bg-slate-50 text-slate-900 font-medium">
+                            <input type="text" name="ci" class="form-input-pill border-brand-green border">
                         </div>
                         <div>
-                            <label
-                                class="block text-xs font-black text-slate-700 uppercase tracking-wider mb-2">Extensión
+                            <label class="form-label-bold text-brand-green uppercase">Extensión
                                 del Carnet</label>
                             <div class="flex flex-col gap-2">
                                 <select id="select-extension" name="extension_ci"
-                                    class="w-full px-4 py-2.5 rounded-lg border-2 border-slate-300 focus:border-brand-green focus:ring-4 focus:ring-brand-green/10 outline-none transition duration-200 bg-slate-50 cursor-pointer text-slate-900 font-medium h-[46px]">
+                                    class="form-select-pill border-brand-green border">
                                     <option value="" selected disabled>Seleccione extensión</option>
                                     <option value="LP">LP</option>
                                     <option value="SC">SC</option>
@@ -136,7 +113,7 @@
                                     <option value="OTRO">OTRO (Escribir...)</option>
                                 </select>
                                 <input type="text" id="input-extension-otro"
-                                    class="hidden w-full px-4 py-2.5 rounded-lg border-2 border-brand-green focus:ring-4 focus:ring-brand-green/10 outline-none transition duration-200 bg-white text-slate-900 font-medium"
+                                    class="hidden form-input-pill border-brand-green border"
                                     placeholder="Escriba la extensión (ej: EXT)">
                             </div>
                         </div>
@@ -144,10 +121,9 @@
 
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                         <div>
-                            <label class="block text-xs font-black text-slate-700 uppercase tracking-wider mb-2">País de
+                            <label class="form-label-bold text-brand-green uppercase">País de
                                 Residencia</label>
-                            <select name="id_pais" id="select-pais"
-                                class="w-full px-4 py-2.5 rounded-lg border-2 border-slate-300 focus:border-brand-green focus:ring-4 focus:ring-brand-green/10 outline-none transition duration-200 bg-slate-50 text-slate-900 font-medium h-[46px]">
+                            <select name="id_pais" id="select-pais" class="form-select-pill border-brand-green border">
                                 <option value="">Seleccione País</option>
                                 @foreach($paises as $pais)
                                     <option value="{{ $pais->id_pais }}">{{ $pais->nombre }}</option>
@@ -155,19 +131,18 @@
                             </select>
                         </div>
                         <div>
-                            <label
-                                class="block text-xs font-black text-slate-700 uppercase tracking-wider mb-2">Departamento
+                            <label class="form-label-bold text-brand-green uppercase">Departamento
                                 de Residencia</label>
                             <select name="id_departamento" id="select-departamento"
-                                class="w-full px-4 py-2.5 rounded-lg border-2 border-slate-300 focus:border-brand-green focus:ring-4 focus:ring-brand-green/10 outline-none transition duration-200 bg-slate-50 text-slate-900 font-medium h-[46px]">
+                                class="form-select-pill border-brand-green border">
                                 <option value="">Seleccione un país primero</option>
                             </select>
                         </div>
                         <div>
-                            <label class="block text-xs font-black text-slate-700 uppercase tracking-wider mb-2">Ciudad
+                            <label class="form-label-bold text-brand-green uppercase">Ciudad
                                 de Residencia</label>
                             <select name="id_ciudad" id="select-ciudad"
-                                class="w-full px-4 py-2.5 rounded-lg border-2 border-slate-300 focus:border-brand-green focus:ring-4 focus:ring-brand-green/10 outline-none transition duration-200 bg-slate-50 text-slate-900 font-medium h-[46px]">
+                                class="form-select-pill border-brand-green border">
                                 <option value="">Seleccione un depto primero</option>
                             </select>
                         </div>
@@ -175,18 +150,15 @@
 
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div>
-                            <label
-                                class="block text-xs font-black text-slate-700 uppercase tracking-wider mb-2">Domicilio</label>
-                            <input type="text" name="domicilio"
-                                class="w-full px-4 py-2.5 rounded-lg border-2 border-slate-300 focus:border-brand-green focus:ring-4 focus:ring-brand-green/10 outline-none transition duration-200 bg-slate-50 text-slate-900 font-medium"
+                            <label class="form-label-bold text-brand-green uppercase">Domicilio</label>
+                            <input type="text" name="domicilio" class="form-input-pill border-brand-green border"
                                 placeholder="Calle, número, zona">
                         </div>
                         <div>
-                            <label
-                                class="block text-xs font-black text-slate-700 uppercase tracking-wider mb-2">Ubicación
+                            <label class="form-label-bold text-brand-green uppercase">Ubicación
                                 (Google Maps)</label>
                             <input type="url" name="enlace_ubicacion_maps"
-                                class="w-full px-4 py-2.5 rounded-lg border-2 border-slate-300 focus:border-brand-green focus:ring-4 focus:ring-brand-green/10 outline-none transition duration-200 bg-slate-50 text-slate-900 font-medium"
+                                class="form-input-pill border-brand-green border"
                                 placeholder="http://maps.google.com/...">
                         </div>
                     </div>
@@ -195,48 +167,41 @@
 
                         <div
                             class="bg-slate-50 p-5 rounded-xl border-2 border-slate-300 hover:border-brand-green transition-all shadow-sm">
-                            <label
-                                class="block text-xs font-black text-brand-green uppercase tracking-wider mb-1">Curriculum
+                            <label class="form-label-bold text-brand-green uppercase">Curriculum
                                 Vitae</label>
                             <p class="text-[11px] font-bold text-slate-500 mb-3">Requerido: Formato PDF</p>
-                            <input type="file" name="curriculum"
-                                class="w-full text-xs text-slate-600 file:mr-3 file:py-2 file:px-3 file:rounded-md file:border-2 file:border-brand-green file:text-xs file:font-black file:bg-white file:text-brand-green hover:file:bg-brand-green hover:file:text-white cursor-pointer transition-all">
+                            <input type="file" name="curriculum" class="form-input-pill border-brand-green border">
                         </div>
 
                         <div
                             class="bg-slate-50 p-5 rounded-xl border-2 border-slate-300 hover:border-brand-green transition-all shadow-sm">
-                            <label
-                                class="block text-xs font-black text-brand-green uppercase tracking-wider mb-1">Carnet
+                            <label class="form-label-bold text-brand-green uppercase">Carnet
                                 de Identidad</label>
                             <p class="text-[11px] font-bold text-slate-500 mb-3">Requerido: Formato PDF</p>
-                            <input type="file" name="foto_carnet"
-                                class="w-full text-xs text-slate-600 file:mr-3 file:py-2 file:px-3 file:rounded-md file:border-2 file:border-brand-green file:text-xs file:font-black file:bg-white file:text-brand-green hover:file:bg-brand-green hover:file:text-white cursor-pointer transition-all">
+                            <input type="file" name="foto_carnet" class="form-input-pill border-brand-green border">
                         </div>
 
                         <div
                             class="bg-slate-50 p-5 rounded-xl border-2 border-slate-300 hover:border-brand-green transition-all shadow-sm">
-                            <label
-                                class="block text-xs font-black text-brand-green uppercase tracking-wider mb-1">Fotografía
+                            <label class="form-label-bold text-brand-green uppercase">Fotografía
                                 de Perfil</label>
                             <p class="text-[11px] font-bold text-slate-500 mb-3">Formatos: JPG o PNG</p>
-                            <input type="file" name="fotografia"
-                                class="w-full text-xs text-slate-600 file:mr-3 file:py-2 file:px-3 file:rounded-md file:border-2 file:border-brand-green file:text-xs file:font-black file:bg-white file:text-brand-green hover:file:bg-brand-green hover:file:text-white cursor-pointer transition-all">
+                            <input type="file" name="fotografia" class="form-input-pill border-brand-green border">
                         </div>
 
                     </div>
 
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-6 pt-2">
                         <div>
-                            <label
-                                class="block text-xs font-black text-slate-700 uppercase tracking-wider mb-3">Género</label>
+                            <label class="form-label-bold text-brand-green uppercase">Género</label>
                             <div class="flex gap-6 mt-1 text-slate-900">
                                 <label
-                                    class="flex items-center gap-2.5 cursor-pointer group text-sm font-bold bg-slate-50 px-4 py-2.5 rounded-lg border-2 border-slate-300 hover:border-brand-green w-1/2 justify-center transition-all">
+                                    class="flex items-center gap-2.5 cursor-pointer group text-sm font-bold bg-slate-50 px-4 py-2.5 rounded-lg border border-brand-green  w-1/2 justify-center transition-all">
                                     <input type="radio" name="genero" value="M" class="w-4 h-4 accent-brand-green">
                                     <span>Masculino</span>
                                 </label>
                                 <label
-                                    class="flex items-center gap-2.5 cursor-pointer group text-sm font-bold bg-slate-50 px-4 py-2.5 rounded-lg border-2 border-slate-300 hover:border-brand-green w-1/2 justify-center transition-all">
+                                    class="flex items-center gap-2.5 cursor-pointer group text-sm font-bold bg-slate-50 px-4 py-2.5 rounded-lg border border-brand-green  w-1/2 justify-center transition-all">
                                     <input type="radio" name="genero" value="F" class="w-4 h-4 accent-brand-green">
                                     <span>Femenino</span>
                                 </label>
@@ -244,10 +209,10 @@
                         </div>
 
                         <div>
-                            <label class="block text-xs font-black text-slate-700 uppercase tracking-wider mb-2">Entidad
+                            <label class="form-label-bold text-brand-green uppercase">Entidad
                                 Bancaria</label>
                             <select name="id_institucion_bancaria" id="select-banco"
-                                class="w-full px-4 py-2.5 rounded-lg border-2 border-slate-300 focus:border-brand-green focus:ring-4 focus:ring-brand-green/10 outline-none transition duration-200 bg-slate-50 text-slate-900 font-medium h-[46px]">
+                                class="form-select-pill border-brand-green border">
                                 <option value="">Seleccione banco</option>
                                 @foreach($bancos as $banco)
                                     <option value="{{ $banco->id_institucion_bancaria }}">
@@ -258,18 +223,17 @@
                         </div>
 
                         <div>
-                            <label class="block text-xs font-black text-slate-700 uppercase tracking-wider mb-2">Número
+                            <label class="form-label-bold text-brand-green uppercase">Número
                                 de Cuenta</label>
                             <input type="text" name="numero_cuenta_bancaria"
-                                class="w-full px-4 py-2.5 rounded-lg border-2 border-slate-300 focus:border-brand-green focus:ring-4 focus:ring-brand-green/10 outline-none transition duration-200 bg-slate-50 text-slate-900 font-medium"
-                                placeholder="1234567890">
+                                class="form-input-pill border-brand-green border" placeholder="1234567890">
                         </div>
                     </div>
                 </div>
 
                 <div class="space-y-6">
-                    <div class="flex items-center space-x-3 bg-slate-50 border border-slate-200 rounded-lg p-3">
-                        <div class="w-3 h-6 bg-brand-gold rounded"></div>
+                    <div class="flex items-center space-x-3 rounded-lg p-3">
+                        <div class="w-1 h-6 bg-brand-gold rounded"></div>
                         <h3 class="text-brand-green text-lg font-black uppercase tracking-wider">
                             2. Habilidades Profesionales
                         </h3>
@@ -277,25 +241,23 @@
 
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div>
-                            <label
-                                class="block text-xs font-black text-slate-700 uppercase tracking-wider mb-2">Habilidades
+                            <label class="form-label-bold text-brand-green uppercase">Habilidades
                                 Técnicas</label>
                             <textarea name="habilidades_tecnicas"
-                                class="w-full px-4 py-3 rounded-lg border-2 border-slate-300 focus:border-brand-green focus:ring-4 focus:ring-brand-green/10 outline-none transition duration-200 bg-slate-50 text-slate-900 font-medium h-28 resize-none"></textarea>
+                                class="w-full px-4 py-3 rounded-lg border border-brand-green focus:border-brand-green focus:ring-4 focus:ring-brand-green/10 outline-none transition duration-200 bg-slate-50 text-slate-900 font-medium h-28 resize-none"></textarea>
                         </div>
                         <div>
-                            <label
-                                class="block text-xs font-black text-slate-700 uppercase tracking-wider mb-2">Habilidades
+                            <label class="form-label-bold text-brand-green uppercase">Habilidades
                                 Blandas</label>
                             <textarea name="habilidades_blandas"
-                                class="w-full px-4 py-3 rounded-lg border-2 border-slate-300 focus:border-brand-green focus:ring-4 focus:ring-brand-green/10 outline-none transition duration-200 bg-slate-50 text-slate-900 font-medium h-28 resize-none"></textarea>
+                                class="w-full px-4 py-3 rounded-lg border border-brand-green focus:border-brand-green focus:ring-4 focus:ring-brand-green/10 outline-none transition duration-200 bg-slate-50 text-slate-900 font-medium h-28 resize-none"></textarea>
                         </div>
                     </div>
                 </div>
 
                 <div class="space-y-6">
-                    <div class="flex items-center space-x-3 bg-slate-50 border border-slate-200 rounded-lg p-3">
-                        <div class="w-3 h-6 bg-brand-gold rounded"></div>
+                    <div class="flex items-center space-x-3 rounded-lg p-3">
+                        <div class="w-1 h-6 bg-brand-gold rounded"></div>
                         <h3 class="text-brand-green text-lg font-black uppercase tracking-wider">
                             3. Formación Académica
                         </h3>
@@ -303,10 +265,10 @@
 
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                         <div>
-                            <label
-                                class="block text-xs font-black text-slate-700 uppercase tracking-wider mb-2">Profesión
+                            <label class="form-label-bold text-brand-green uppercase">Profesión
                                 / Ocupación</label>
-                            <select name="id_profesion" id="select-profesion" class="w-full">
+                            <select name="id_profesion" id="select-profesion"
+                                class="form-select-pill border-brand-green border">
                                 <option value="">Seleccione Profesión</option>
                                 @foreach($profesiones as $prof)
                                     <option value="{{ $prof->id_profesion }}">{{ $prof->nombre }}</option>
@@ -315,9 +277,10 @@
                         </div>
 
                         <div>
-                            <label class="block text-xs font-black text-slate-700 uppercase tracking-wider mb-2">Grado
+                            <label class="form-label-bold text-brand-green uppercase">Grado
                                 Académico</label>
-                            <select name="id_grado_academico" id="select-grado" class="w-full">
+                            <select name="id_grado_academico" id="select-grado"
+                                class="form-select-pill border-brand-green border">
                                 <option value="">Seleccione Grado</option>
                                 @foreach($grados as $grado)
                                     <option value="{{ $grado->id_grado_academico }}">{{ $grado->nombre }}</option>
@@ -326,10 +289,10 @@
                         </div>
 
                         <div>
-                            <label
-                                class="block text-xs font-black text-slate-700 uppercase tracking-wider mb-2">Institución
+                            <label class="form-label-bold text-brand-green uppercase">Institución
                                 de Egreso</label>
-                            <select name="id_institucion_egreso" id="select-institucion" class="w-full">
+                            <select name="id_institucion_egreso" id="select-institucion"
+                                class="form-select-pill border-brand-green border">
                                 <option value="">Seleccione Institución</option>
                                 @foreach($instituciones as $inst)
                                     <option value="{{ $inst->id_institucion_egreso }}">{{ $inst->nombre }}</option>
@@ -340,8 +303,8 @@
                 </div>
 
                 <div class="space-y-6">
-                    <div class="flex items-center space-x-3 bg-slate-50 border border-slate-200 rounded-lg p-3">
-                        <div class="w-3 h-6 bg-brand-gold rounded"></div>
+                    <div class="flex items-center space-x-3 rounded-lg p-3">
+                        <div class="w-1 h-6 bg-brand-gold rounded"></div>
                         <h3 class="text-brand-green text-lg font-black uppercase tracking-wider">
                             4. Datos de Contacto y Referencias
                         </h3>
@@ -349,12 +312,10 @@
 
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                         <div>
-                            <label
-                                class="block text-xs font-black text-slate-700 uppercase tracking-wider mb-2">Teléfono
+                            <label class="form-label-bold text-brand-green uppercase">Teléfono
                                 Móvil</label>
                             <div class="flex gap-2">
-                                <select id="select-codigo-manual"
-                                    class="w-2/5 px-2 py-2.5 rounded-lg border-2 border-slate-300 focus:border-brand-green outline-none bg-slate-50 text-sm text-center font-bold h-[46px] text-slate-900">
+                                <select id="select-codigo-manual" class="form-select-pill border-brand-green border">
                                     <option value="+591">🇧🇴 +591</option>
                                     <option value="+54">🇦🇷 +54</option>
                                     <option value="+56">🇨🇱 +56</option>
@@ -362,17 +323,15 @@
                                     <option value="+1">🇺🇸 +1</option>
                                 </select>
                                 <input type="text" id="input-numero-movil"
-                                    class="w-3/5 px-4 py-2.5 rounded-lg border-2 border-slate-300 focus:border-brand-green focus:ring-4 focus:ring-brand-green/10 outline-none transition duration-200 bg-slate-50 text-slate-900 font-medium"
-                                    placeholder="70000000">
+                                    class="form-input-pill border-brand-green border" placeholder="70000000">
                                 <input type="hidden" name="telefono_movil" id="telefono_movil_hidden">
                             </div>
                         </div>
                         <div class="md:col-span-2">
-                            <label class="block text-xs font-black text-slate-700 uppercase tracking-wider mb-2">Correo
+                            <label class="form-label-bold text-brand-green uppercase">Correo
                                 Electrónico</label>
                             <input type="email" name="correo_electronico"
-                                class="w-full px-4 py-2.5 rounded-lg border-2 border-slate-300 focus:border-brand-green focus:ring-4 focus:ring-brand-green/10 outline-none transition duration-200 bg-slate-50 text-slate-900 font-medium"
-                                placeholder="correo@ejemplo.com">
+                                class="form-input-pill border-brand-green border" placeholder="correo@ejemplo.com">
                         </div>
                     </div>
 
@@ -381,44 +340,42 @@
                         <div class="bg-slate-50 p-5 rounded-xl border-2 border-slate-200 space-y-4 shadow-sm">
                             <div
                                 class="text-xs font-black text-brand-green tracking-wide uppercase border-b-2 border-slate-300 pb-2 flex items-center">
-                                <span
-                                    class="bg-brand-green text-white rounded-full w-5 h-5 inline-flex items-center justify-center text-[10px] mr-2">1</span>
-                                Referencia Familiar 1
+                                <span class="form-label-bold text-brand-green uppercase">
+                                    Referencia Familiar 1
+                                </span>
                             </div>
                             <div>
-                                <label class="block text-[11px] font-black text-slate-500 uppercase mb-1">Nombre
+                                <label class="form-label-bold text-brand-green uppercase">Nombre
                                     Completo</label>
                                 <input type="text" name="referencia_familiar_1"
-                                    class="w-full px-3 py-2 rounded-lg border-2 border-slate-300 focus:border-brand-green bg-white text-sm text-slate-900 outline-none font-medium">
+                                    class="form-input-pill border-brand-green border">
                             </div>
                             <div>
-                                <label class="block text-[11px] font-black text-slate-500 uppercase mb-1">Teléfono
+                                <label class="form-label-bold text-brand-green uppercase">Teléfono
                                     Celular</label>
                                 <input type="text" name="celular_familiar_1"
-                                    class="w-full px-3 py-2 rounded-lg border-2 border-slate-300 focus:border-brand-green bg-white text-sm text-slate-900 outline-none font-medium"
-                                    placeholder="Ej: 70000000">
+                                    class="form-input-pill border-brand-green border" placeholder="Ej: 70000000">
                             </div>
                         </div>
 
                         <div class="bg-slate-50 p-5 rounded-xl border-2 border-slate-200 space-y-4 shadow-sm">
                             <div
                                 class="text-xs font-black text-brand-green tracking-wide uppercase border-b-2 border-slate-300 pb-2 flex items-center">
-                                <span
-                                    class="bg-brand-green text-white rounded-full w-5 h-5 inline-flex items-center justify-center text-[10px] mr-2">2</span>
-                                Referencia Familiar 2
+                                <span class="form-label-bold text-brand-green uppercase">
+                                    Referencia Familiar 2
+                                </span>
                             </div>
                             <div>
-                                <label class="block text-[11px] font-black text-slate-500 uppercase mb-1">Nombre
+                                <label class="form-label-bold text-brand-green uppercase">Nombre
                                     Completo</label>
                                 <input type="text" name="referencia_familiar_2"
-                                    class="w-full px-3 py-2 rounded-lg border-2 border-slate-300 focus:border-brand-green bg-white text-sm text-slate-900 outline-none font-medium">
+                                    class="form-input-pill border-brand-green border">
                             </div>
                             <div>
-                                <label class="block text-[11px] font-black text-slate-500 uppercase mb-1">Teléfono
+                                <label class="form-label-bold text-brand-green uppercase">Teléfono
                                     Celular</label>
                                 <input type="text" name="celular_familiar_2"
-                                    class="w-full px-3 py-2 rounded-lg border-2 border-slate-300 focus:border-brand-green bg-white text-sm text-slate-900 outline-none font-medium"
-                                    placeholder="Ej: 70000000">
+                                    class="form-input-pill border-brand-green border" placeholder="Ej: 70000000">
                             </div>
                         </div>
 
