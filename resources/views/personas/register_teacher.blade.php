@@ -9,294 +9,340 @@
     <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
 </head>
 
-<body class="bg-brand-green font-sans min-h-screen flex">
+<body class="bg-slate-100 font-sans min-h-screen flex items-center justify-center p-4 md:p-8">
 
-    <div class="hidden lg:block lg:w-1/3 h-full border-r-4 border-brand-gold overflow-hidden"
-        style="background-color: white;">
-        <img src="/img/fondo_arbol.jpeg" class="w-full h-full object-cover" alt="">
-    </div>
-    <div class="w-full lg:w-2/3 p-6 md:p-8 overflow-y-auto">
-        <h2 class="text-white text-3xl font-bold text-center mb-10 tracking-widest uppercase">
-            Formulario de Registro de Docente
-        </h2>
-        @if ($errors->any())
-            <div class="max-w-5xl mx-auto mb-6 p-4 bg-red-500/20 border border-red-500 text-white rounded-2xl">
-                <ul class="list-disc list-inside">
-                    @foreach ($errors->all() as $error)
-                        <li>{{ $error }}</li>
-                    @endforeach
-                </ul>
+    <div class="max-w-5xl w-full bg-white shadow-2xl rounded-2xl overflow-hidden border border-slate-200">
+
+        <div class="bg-brand-green p-8 md:p-8 text-center relative border-b-4 border-brand-gold">
+            <h2 class="text-white text-xl md:text-2xl font-sans font-bold tracking-widest uppercase">
+                Formulario de Registro de Docente
+            </h2>
+            <div class="inline-block w-50 mt-5">
+                <img src="/img/logoblanco.png" alt="" class="w-full h-full object-contain">
             </div>
-        @endif
-        <form action="{{ route('docentes.store') }}" method="POST" enctype="multipart/form-data"
-            class="max-w-5xl mx-auto space-y-6">
-            @csrf
+        </div>
 
-            <div class="space-y-6">
-                <h3 class="text-white text-xl font-bold border-b border-brand-gold pb-2">
-                    DATOS PERSONALES
-                </h3>
-
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <div>
-                        <label class="form-label-bold">Nombre</label>
-                        <input type="text" name="nombre" class="form-input-pill">
+        <div class="p-6 md:p-10">
+            @if ($errors->any())
+                <div class="mb-8 p-5 bg-red-100 border-l-4 border-red-600 text-slate-900 rounded-r-xl shadow-sm">
+                    <div class="flex items-center mb-2">
+                        <svg class="w-5 h-5 text-red-600 mr-2 flex-shrink-0" fill="none" stroke="currentColor"
+                            viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
+                                d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                        <strong class="font-extrabold text-red-800 uppercase tracking-wide text-sm">¡Por favor corrige los
+                            siguientes errores!</strong>
                     </div>
-                    <div>
-                        <label class="form-label-bold">Primer Apellido</label>
-                        <input type="text" name="apellido_p" class="form-input-pill">
-                    </div>
-                    <div>
-                        <label class="form-label-bold">Segundo Apellido</label>
-                        <input type="text" name="apellido_m" class="form-input-pill">
-                    </div>
+                    <ul class="list-disc list-inside text-sm text-red-700 space-y-1 pl-1 font-medium">
+                        @foreach ($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
                 </div>
+            @endif
 
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <div>
-                        <label class="form-label-bold">Fecha de Nacimiento</label>
-                        <input type="date" name="fecha_nacimiento" class="form-input-pill text-black">
+            @if (session('success'))
+                <div
+                    class="mb-8 p-5 bg-emerald-100 border-l-4 border-emerald-600 text-emerald-900 rounded-r-xl text-center font-bold text-base shadow-sm flex items-center justify-center">
+                    <svg class="w-6 h-6 text-emerald-600 mr-2 flex-shrink-0" fill="none" stroke="currentColor"
+                        viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
+                            d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                    {{ session('success') }}
+                </div>
+            @endif
+
+            <form action="{{ route('docentes.store') }}" method="POST" enctype="multipart/form-data" class="space-y-12">
+                @csrf
+
+                <div class="space-y-6">
+                    <div class="flex items-center space-x-3 rounded-lg p-3">
+                        <div class="w-1 h-6 bg-brand-gold rounded"></div>
+                        <h3 class="text-brand-green text-lg font-black uppercase tracking-wider">
+                            1. Datos Personales
+                        </h3>
                     </div>
-                    <div>
-                        <label class="form-label-bold">Carnet de Identidad</label>
-                        <input type="text" name="ci" class="form-input-pill">
+
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div>
+                            <label class="form-label-bold text-brand-green uppercase">Nombre</label>
+                            <input type="text" name="nombre" class="form-input-pill border-brand-green border">
+                        </div>
+                        <div>
+                            <label class="form-label-bold text-brand-green uppercase">Primer
+                                Apellido</label>
+                            <input type="text" name="apellido_p" class="form-input-pill border-brand-green border">
+                        </div>
+                        <div>
+                            <label class="form-label-bold text-brand-green uppercase">Segundo
+                                Apellido</label>
+                            <input type="text" name="apellido_m" class="form-input-pill border-brand-green border">
+                        </div>
                     </div>
-                    <div>
-                        <label class="form-label-bold">Extensión del Carnet</label>
-                        <div class="flex flex-col gap-2">
-                            <select id="select-extension" name="extension_select" class="form-select-pill">
-                                <option value="" selected disabled>Seleccione extensión</option>
-                                <option value="LP">LP</option>
-                                <option value="SC">SC</option>
-                                <option value="CB">CB</option>
-                                <option value="CH">CH</option>
-                                <option value="OR">OR</option>
-                                <option value="PT">PT</option>
-                                <option value="TJ">TJ</option>
-                                <option value="BE">BE</option>
-                                <option value="PD">PD</option>
-                                <option value="OTRO">OTRO (Escribir...)</option>
+
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div>
+                            <label class="form-label-bold text-brand-green uppercase">Fecha
+                                de Nacimiento</label>
+                            <input type="date" name="fecha_nacimiento"
+                                class="form-input-pill border-brand-green border">
+                        </div>
+                        <div>
+                            <label class="form-label-bold text-brand-green uppercase">Carnet
+                                de Identidad</label>
+                            <input type="text" name="ci" class="form-input-pill border-brand-green border">
+                        </div>
+                        <div>
+                            <label class="form-label-bold text-brand-green uppercase">Extensión
+                                del Carnet</label>
+                            <div class="flex flex-col gap-2">
+                                <select id="select-extension" name="extension_ci"
+                                    class="form-select-pill border-brand-green border">
+                                    <option value="" selected disabled>Seleccione extensión</option>
+                                    <option value="LP">LP</option>
+                                    <option value="SC">SC</option>
+                                    <option value="CB">CB</option>
+                                    <option value="CH">CH</option>
+                                    <option value="OR">OR</option>
+                                    <option value="PT">PT</option>
+                                    <option value="TJ">TJ</option>
+                                    <option value="BE">BE</option>
+                                    <option value="PD">PD</option>
+                                    <option value="OTRO">OTRO (Escribir...)</option>
+                                </select>
+                                <input type="text" id="input-extension-otro"
+                                    class="hidden form-input-pill border-brand-green border"
+                                    placeholder="Escriba la extensión (ej: EXT)">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div>
+                            <label class="form-label-bold text-brand-green uppercase">País de
+                                Residencia</label>
+                            <select name="id_pais" id="select-pais" class="form-select-pill border-brand-green border">
+                                <option value="">Seleccione País</option>
+                                @foreach($paises as $pais)
+                                    <option value="{{ $pais->id_pais }}">{{ $pais->nombre }}</option>
+                                @endforeach
                             </select>
-
-                            <input type="text" id="input-extension-otro" name="extension_otro"
-                                class="hidden form-input-pill border-brand-gold"
-                                placeholder="Escriba la extensión (ej: EXT)">
                         </div>
-                    </div>
-                </div>
-
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <div>
-                        <label class="form-label-bold">País de Residencia</label>
-                        <select name="id_pais" id="select-pais" class="form-select-pill">
-                            <option value="">Seleccione País</option>
-                            @foreach($paises as $pais)
-                                <option value="{{ $pais->id_pais }}">{{ $pais->nombre }}</option>
-                            @endforeach
-                        </select>
-                    </div>
-                    <div>
-                        <label class="form-label-bold">Departamento de Residencia</label>
-                        <select name="id_departamento" id="select-departamento" class="form-select-pill">
-                            <option value="">Seleccione un país primero</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label class="form-label-bold">Ciudad de Residencia</label>
-                        <select name="id_ciudad" id="select-ciudad" class="form-select-pill">
-                            <option value="">Seleccione un depto primero</option>
-                        </select>
-                    </div>
-                </div>
-
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div>
-                        <label class="form-label-bold tracking-wide">Domicilio</label>
-                        <input type="text" name="domicilio" class="form-input-pill" placeholder="Calle, número, zona">
-                    </div>
-                </div>
-
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-
-                    <div
-                        class="bg-black/20 p-4 rounded-2xl border border-white/10 hover:border-brand-gold transition duration-300 group">
-                        <label
-                            class="form-label-bold text-brand-gold group-hover:tracking-wider transition-all">Curriculum</label>
-                        <p class="text-xs text-white/70 mb-2">Archivo PDF</p>
-                        <input type="file" name="curriculum"
-                            class="w-full text-sm text-white file:bg-brand-gold file:text-black file:font-bold file:px-3 file:py-1 file:rounded-lg file:border-0 cursor-pointer">
-                    </div>
-
-                    <div
-                        class="bg-black/20 p-4 rounded-2xl border border-white/10 hover:border-brand-gold transition duration-300 group">
-                        <label class="form-label-bold text-brand-gold group-hover:tracking-wider transition-all">Carnet
-                            de Identidad</label>
-                        <p class="text-xs text-white/70 mb-2">Archivo PDF</p>
-                        <input type="file" name="fotocarnet"
-                            class="w-full text-sm text-white file:bg-brand-gold file:text-black file:font-bold file:px-3 file:py-1 file:rounded-lg file:border-0 cursor-pointer">
-                    </div>
-
-                    <div
-                        class="bg-black/20 p-4 rounded-2xl border border-white/10 hover:border-brand-gold transition duration-300 group">
-                        <label
-                            class="form-label-bold text-brand-gold group-hover:tracking-wider transition-all">Fotografía</label>
-                        <p class="text-xs text-white/70 mb-2">JPG o PNG</p>
-                        <input type="file" name="fotografia"
-                            class="w-full text-sm text-white file:bg-brand-gold file:text-black file:font-bold file:px-3 file:py-1 file:rounded-lg file:border-0 cursor-pointer">
-                    </div>
-
-                </div>
-
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-
-                    <div>
-                        <label class="form-label-bold">Género</label>
-                        <div class="flex gap-6 mt-2 text-white">
-                            <label class="flex items-center gap-2 cursor-pointer">
-                                <input type="radio" name="genero" value="M" class="w-5 h-5 accent-brand-gold"> Masculino
-                            </label>
-                            <label class="flex items-center gap-2 cursor-pointer">
-                                <input type="radio" name="genero" value="F" class="w-5 h-5 accent-brand-gold"> Femenino
-                            </label>
-                        </div>
-                    </div>
-
-                    <div>
-                        <label class="form-label-bold">Entidad Bancaria</label>
-                        <select name="id_institucion_bancaria" class="form-select-pill">
-                            <option value="">Seleccione banco</option>
-                            @foreach($bancos as $banco)
-                                <option value="{{ $banco->id_institucion_bancaria }}">
-                                    {{ $banco->nombre }}
-                                </option>
-                            @endforeach
-                        </select>
-                    </div>
-
-                    <div>
-                        <label class="form-label-bold">Número de Cuenta</label>
-                        <input type="text" name="numero_cuenta_bancaria" class="form-input-pill"
-                            placeholder="1234567890">
-                    </div>
-
-                </div>
-            </div>
-
-
-
-            <div class="space-y-6">
-                <h3 class="text-white text-xl font-bold border-b border-brand-gold pb-2 uppercase">
-                    Información Académica
-                </h3>
-
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <div>
-                        <label class="form-label-bold">Profesión / Ocupación</label>
-                        <select name="id_profesion" id="select-profesion" class="form-select-pill">
-                            <option value="">Seleccione Profesión</option>
-                            @foreach($profesiones as $prof)
-                                <option value="{{ $prof->id_profesion }}">{{ $prof->nombre }}</option>
-                            @endforeach
-                        </select>
-                    </div>
-
-                    <div>
-                        <label class="form-label-bold">Grado Académico</label>
-                        <select name="id_grado_academico" id="select-grado" class="form-select-pill">
-                            <option value="">Seleccione Grado</option>
-                            @foreach($grados as $grado)
-                                <option value="{{ $grado->id_grado_academico }}">{{ $grado->nombre }}</option>
-                            @endforeach
-                        </select>
-                    </div>
-
-                    <div>
-                        <label class="form-label-bold">Institución de Egreso</label>
-                        <select name="id_institucion_egreso" id="select-institucion" class="form-select-pill">
-                            <option value="">Seleccione Institución</option>
-                            @foreach($instituciones as $inst)
-                                <option value="{{ $inst->id_institucion_egreso }}">{{ $inst->nombre }}</option>
-                            @endforeach
-                        </select>
-                    </div>
-                </div>
-            </div>
-
-            <div class="space-y-6">
-                <h3 class="text-white text-xl font-bold border-b border-brand-gold pb-2">
-                    DATOS DE CONTACTO
-                </h3>
-
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <div>
-                        <label class="form-label-bold">Teléfono Móvil</label>
-                        <div class="flex gap-2">
-                            <select id="select-codigo-manual" class="form-select-pill w-1/2 text-center px-1">
-                                <option value="+591">🇧🇴 +591</option>
-                                <option value="+54">🇦🇷 +54</option>
-                                <option value="+56">🇨🇱 +56</option>
-                                <option value="+51">🇵🇪 +51</option>
-                                <option value="+57">🇨🇴 +57</option>
-                                <option value="+1">🇺🇸 +1</option>
-                                <option value="+34">🇪🇸 +34</option>
+                        <div>
+                            <label class="form-label-bold text-brand-green uppercase">Departamento
+                                de Residencia</label>
+                            <select name="id_departamento" id="select-departamento"
+                                class="form-select-pill border-brand-green border">
+                                <option value="">Seleccione un país primero</option>
                             </select>
-
-                            <input type="text" id="input-numero-movil" class="form-input-pill w-2/3">
-
-                            <input type="hidden" name="telefono_movil" id="telefono_movil_hidden">
+                        </div>
+                        <div>
+                            <label class="form-label-bold text-brand-green uppercase">Ciudad
+                                de Residencia</label>
+                            <select name="id_ciudad" id="select-ciudad"
+                                class="form-select-pill border-brand-green border">
+                                <option value="">Seleccione un depto primero</option>
+                            </select>
                         </div>
                     </div>
 
-                    <div>
-                        <label class="form-label-bold">Correo Electrónico</label>
-                        <input type="email" name="correo_electronico" class="form-input-pill">
-                    </div>
-                </div>
-
-
-            </div>
-
-            <div class="space-y-4">
-                <h3 class="text-white text-xl font-bold border-b border-brand-gold pb-2 uppercase">
-                    Adicionales
-                </h3>
-
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div>
-                        <label class="form-label-bold">Programas adicionales que le gustaría impartir o impartió</label>
-                        <textarea name="programas_dar" class="form-input-pill rounded-2xl h-28 py-3"
-                            placeholder="Mencione los programas"></textarea>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label class="form-label-bold text-brand-green uppercase">Domicilio</label>
+                            <input type="text" name="domicilio" class="form-input-pill border-brand-green border"
+                                placeholder="Calle, número, zona">
+                        </div>
                     </div>
 
-                    <div class="flex flex-col justify-center">
-                        <label class="form-label-bold mb-3">¿Emite Factura?</label>
-                        <div class="flex gap-4">
-                            <label
-                                class="flex-1 flex items-center justify-center gap-3 p-3 rounded-pill bg-black/20 border border-white/10 cursor-pointer hover:border-brand-gold transition group">
-                                <input type="radio" name="emite_factura" value="1" class="w-5 h-5 accent-brand-gold">
-                                <span class="text-white font-bold group-hover:text-brand-gold">SÍ</span>
-                            </label>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 pt-2">
 
-                            <label
-                                class="flex-1 flex items-center justify-center gap-3 p-3 rounded-pill bg-black/20 border border-white/10 cursor-pointer hover:border-brand-gold transition group">
-                                <input type="radio" name="emite_factura" value="0" class="w-5 h-5 accent-brand-gold"
-                                    checked>
-                                <span class="text-white font-bold group-hover:text-brand-gold">NO</span>
-                            </label>
+                        <div
+                            class="bg-slate-50 p-5 rounded-xl border-2 border-slate-300 hover:border-brand-green transition-all shadow-sm">
+                            <label class="form-label-bold text-brand-green uppercase">Curriculum
+                                Vitae</label>
+                            <p class="text-[11px] font-bold text-slate-500 mb-3">Requerido: Formato PDF</p>
+                            <input type="file" name="curriculum" class="form-input-pill border-brand-green border">
+                        </div>
+
+                        <div
+                            class="bg-slate-50 p-5 rounded-xl border-2 border-slate-300 hover:border-brand-green transition-all shadow-sm">
+                            <label class="form-label-bold text-brand-green uppercase">Carnet
+                                de Identidad</label>
+                            <p class="text-[11px] font-bold text-slate-500 mb-3">Requerido: Formato PDF</p>
+                            <input type="file" name="fotocarnet" class="form-input-pill border-brand-green border">
+                        </div>
+
+                        <div
+                            class="bg-slate-50 p-5 rounded-xl border-2 border-slate-300 hover:border-brand-green transition-all shadow-sm">
+                            <label class="form-label-bold text-brand-green uppercase">Fotografía
+                                de Perfil</label>
+                            <p class="text-[11px] font-bold text-slate-500 mb-3">Formatos: JPG o PNG</p>
+                            <input type="file" name="fotografia" class="form-input-pill border-brand-green border">
+                        </div>
+
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 pt-2">
+                        <div>
+                            <label class="form-label-bold text-brand-green uppercase">Género</label>
+                            <div class="flex gap-6 mt-1 text-slate-900">
+                                <label
+                                    class="flex items-center gap-2.5 cursor-pointer group text-sm font-bold bg-slate-50 px-4 py-2.5 rounded-lg border border-brand-green w-1/2 justify-center transition-all">
+                                    <input type="radio" name="genero" value="M" class="w-4 h-4 accent-brand-green">
+                                    <span>Masculino</span>
+                                </label>
+                                <label
+                                    class="flex items-center gap-2.5 cursor-pointer group text-sm font-bold bg-slate-50 px-4 py-2.5 rounded-lg border border-brand-green w-1/2 justify-center transition-all">
+                                    <input type="radio" name="genero" value="F" class="w-4 h-4 accent-brand-green">
+                                    <span>Femenino</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="form-label-bold text-brand-green uppercase">Entidad
+                                Bancaria</label>
+                            <select name="id_institucion_bancaria" id="select-banco"
+                                class="form-select-pill border-brand-green border">
+                                <option value="">Seleccione banco</option>
+                                @foreach($bancos as $banco)
+                                    <option value="{{ $banco->id_institucion_bancaria }}">
+                                        {{ $banco->nombre }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
+
+                        <div>
+                            <label class="form-label-bold text-brand-green uppercase">Número
+                                de Cuenta</label>
+                            <input type="text" name="numero_cuenta_bancaria"
+                                class="form-input-pill border-brand-green border" placeholder="1234567890">
                         </div>
                     </div>
                 </div>
-            </div>
 
-            <div class="flex justify-center pt-6 pb-12">
-                <button type="submit" class="btn-gold w-40">
-                    Registrar
-                </button>
-            </div>
+                <div class="space-y-6">
+                    <div class="flex items-center space-x-3 rounded-lg p-3">
+                        <div class="w-1 h-6 bg-brand-gold rounded"></div>
+                        <h3 class="text-brand-green text-lg font-black uppercase tracking-wider">
+                            2. Formación Académica
+                        </h3>
+                    </div>
 
-        </form>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div>
+                            <label class="form-label-bold text-brand-green uppercase">Profesión
+                                / Ocupación</label>
+                            <select name="id_profesion" id="select-profesion"
+                                class="form-select-pill border-brand-green border">
+                                <option value="">Seleccione Profesión</option>
+                                @foreach($profesiones as $prof)
+                                    <option value="{{ $prof->id_profesion }}">{{ $prof->nombre }}</option>
+                                @endforeach
+                            </select>
+                        </div>
 
+                        <div>
+                            <label class="form-label-bold text-brand-green uppercase">Grado
+                                Académico</label>
+                            <select name="id_grado_academico" id="select-grado"
+                                class="form-select-pill border-brand-green border">
+                                <option value="">Seleccione Grado</option>
+                                @foreach($grados as $grado)
+                                    <option value="{{ $grado->id_grado_academico }}">{{ $grado->nombre }}</option>
+                                @endforeach
+                            </select>
+                        </div>
 
+                        <div>
+                            <label class="form-label-bold text-brand-green uppercase">Institución
+                                de Egreso</label>
+                            <select name="id_institucion_egreso" id="select-institucion"
+                                class="form-select-pill border-brand-green border">
+                                <option value="">Seleccione Institución</option>
+                                @foreach($instituciones as $inst)
+                                    <option value="{{ $inst->id_institucion_egreso }}">{{ $inst->nombre }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="space-y-6">
+                    <div class="flex items-center space-x-3 rounded-lg p-3">
+                        <div class="w-1 h-6 bg-brand-gold rounded"></div>
+                        <h3 class="text-brand-green text-lg font-black uppercase tracking-wider">
+                            3. Datos de Contacto y Adicionales
+                        </h3>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div>
+                            <label class="form-label-bold text-brand-green uppercase">Teléfono
+                                Móvil</label>
+                            <div class="flex gap-2">
+                                <select id="select-codigo-manual"
+                                    class="form-select-pill border-brand-green border w-1/2 text-center px-1">
+                                    <option value="+591">🇧🇴 +591</option>
+                                    <option value="+54">🇦🇷 +54</option>
+                                    <option value="+56">🇨🇱 +56</option>
+                                    <option value="+51">🇵🇪 +51</option>
+                                    <option value="+57">🇨🇴 +57</option>
+                                    <option value="+1">🇺🇸 +1</option>
+                                    <option value="+34">🇪🇸 +34</option>
+                                </select>
+                                <input type="text" id="input-numero-movil"
+                                    class="form-input-pill border-brand-green border w-2/3" placeholder="70000000">
+                                <input type="hidden" name="telefono_movil" id="telefono_movil_hidden">
+                            </div>
+                        </div>
+                        <div>
+                            <label class="form-label-bold text-brand-green uppercase">Correo
+                                Electrónico</label>
+                            <input type="email" name="correo_electronico"
+                                class="form-input-pill border-brand-green border" placeholder="correo@ejemplo.com">
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 pt-2">
+                        <div>
+                            <label class="form-label-bold text-brand-green uppercase">Programas adicionales que le
+                                gustaría impartir o impartió</label>
+                            <textarea name="programas_dar"
+                                class="w-full px-4 py-3 rounded-lg border border-brand-green focus:border-brand-green focus:ring-4 focus:ring-brand-green/10 outline-none transition duration-200 bg-slate-50 text-slate-900 font-medium h-28 resize-none"
+                                placeholder="Mencione los programas"></textarea>
+                        </div>
+                        <div class="flex flex-col justify-center">
+                            <label class="form-label-bold text-brand-green uppercase mb-3">¿Emite Factura?</label>
+                            <div class="flex gap-4">
+                                <label
+                                    class="flex-1 flex items-center justify-center gap-3 p-3 rounded-lg border border-brand-green bg-slate-50 cursor-pointer">
+                                    <input type="radio" name="emite_factura" value="1"
+                                        class="w-5 h-5 accent-brand-green">
+                                    <span class="text-brand-green font-bold">SÍ</span>
+                                </label>
+                                <label
+                                    class="flex-1 flex items-center justify-center gap-3 p-3 rounded-lg border border-brand-green bg-slate-50 cursor-pointer">
+                                    <input type="radio" name="emite_factura" value="0"
+                                        class="w-5 h-5 accent-brand-green" checked>
+                                    <span class="text-brand-green font-bold">NO</span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex justify-center pt-6 pb-4">
+                    <button type="submit" class="btn-gold">
+                        Registrar Docente
+                    </button>
+                </div>
+
+            </form>
+        </div>
     </div>
 
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
@@ -328,93 +374,115 @@
             extensionSelect.addEventListener('change', function () {
                 if (this.value === 'OTRO') {
                     extensionOtroInput.classList.remove('hidden');
+                    extensionOtroInput.name = "extension_ci";
+                    this.removeAttribute('name');
                     extensionOtroInput.focus();
                 } else {
                     extensionOtroInput.classList.add('hidden');
                     extensionOtroInput.value = '';
+                    extensionOtroInput.removeAttribute('name');
+                    this.name = "extension_ci";
                 }
             });
 
-            const departamentosBolivia = [
-                { id: 1, nombre: 'Chuquisaca', ext: 'CH' },
-                { id: 2, nombre: 'La Paz', ext: 'LP' },
-                { id: 3, nombre: 'Santa Cruz', ext: 'SC' },
-                { id: 4, nombre: 'Cochabamba', ext: 'CB' },
-                { id: 5, nombre: 'Oruro', ext: 'OR' },
-                { id: 6, nombre: 'Potosí', ext: 'PT' },
-                { id: 7, nombre: 'Tarija', ext: 'TJ' },
-                { id: 8, nombre: 'Beni', ext: 'BE' },
-                { id: 9, nombre: 'Pando', ext: 'PD' }
-            ];
-
-            paisSelect.addEventListener('change', (e) => {
+            // Evento para cargar departamentos cuando se selecciona un país
+            paisSelect.addEventListener('change', async (e) => {
                 const paisId = e.target.value;
 
+                // Limpiar selects dependientes
                 deptoSelect.innerHTML = '<option value="">Seleccione Departamento</option>';
-                ciudadSelect.innerHTML = '<option value="">Seleccione depto primero</option>';
+                ciudadSelect.innerHTML = '<option value="">Seleccione un depto primero</option>';
 
-                if (!paisId) return;
+                if (!paisId) {
+                    deptoSelect.innerHTML = '<option value="">Seleccione un país primero</option>';
+                    return;
+                }
 
-                if (paisId == "3") {
-                    departamentosBolivia.forEach(d => {
-                        deptoSelect.innerHTML += `<option value="${d.id}" data-ext="${d.ext}">${d.nombre}</option>`;
-                    });
-                } else {
-                    deptoSelect.innerHTML = '<option value="">Solo disponible Bolivia</option>';
+                deptoSelect.innerHTML = '<option value="">Cargando departamentos...</option>';
+
+                try {
+                    // Obtener departamentos desde la API
+                    const response = await fetch(`/api/paises/${paisId}/departamentos`);
+                    const departamentos = await response.json();
+
+                    deptoSelect.innerHTML = '<option value="">Seleccione Departamento</option>';
+
+                    if (departamentos.length === 0) {
+                        deptoSelect.innerHTML = '<option value="">No hay departamentos disponibles</option>';
+                    } else {
+                        departamentos.forEach(d => {
+                            deptoSelect.innerHTML += `<option value="${d.id_departamento}">${d.nombre}</option>`;
+                        });
+                    }
+                } catch (error) {
+                    console.error("Error cargando departamentos:", error);
+                    deptoSelect.innerHTML = '<option value="">Error al cargar departamentos</option>';
                 }
             });
 
+            // Evento para cargar ciudades cuando se selecciona un departamento
             deptoSelect.addEventListener('change', async (e) => {
                 const deptoId = e.target.value;
-                const selectedOption = e.target.options[e.target.selectedIndex];
 
-                if (selectedOption.dataset.ext) {
-                    extensionSelect.value = selectedOption.dataset.ext;
-                    extensionSelect.dispatchEvent(new Event('change'));
+                ciudadSelect.innerHTML = '<option value="">Seleccione Ciudad</option>';
+
+                if (!deptoId) {
+                    ciudadSelect.innerHTML = '<option value="">Seleccione un depto primero</option>';
+                    return;
                 }
 
-                if (!deptoId) return;
-
                 ciudadSelect.innerHTML = '<option value="">Cargando ciudades...</option>';
+
                 try {
+                    // Obtener ciudades desde la API
                     const response = await fetch(`/api/departamentos/${deptoId}/ciudades`);
                     const ciudades = await response.json();
 
                     ciudadSelect.innerHTML = '<option value="">Seleccione Ciudad</option>';
-                    ciudades.forEach(c => {
-                        ciudadSelect.innerHTML += `<option value="${c.id_ciudad}">${c.nombre}</option>`;
-                    });
+
+                    if (ciudades.length === 0) {
+                        ciudadSelect.innerHTML = '<option value="">No hay ciudades disponibles</option>';
+                    } else {
+                        ciudades.forEach(c => {
+                            ciudadSelect.innerHTML += `<option value="${c.id_ciudad}">${c.nombre}</option>`;
+                        });
+                    }
                 } catch (error) {
                     console.error("Error cargando ciudades:", error);
-                    ciudadSelect.innerHTML = '<option value="">Error al cargar</option>';
+                    ciudadSelect.innerHTML = '<option value="">Error al cargar ciudades</option>';
                 }
             });
+
             actualizarTelefonoCompleto();
         });
-        $('#select-profesion').select2({
-            placeholder: "Seleccione Profesión",
-            allowClear: true,
-            width: '100%'
-        });
 
-        $('#select-grado').select2({
-            placeholder: "Seleccione Grado",
-            allowClear: true,
-            width: '100%'
-        });
+        // Inicializar Select2
+        $(document).ready(function () {
+            $('#select-profesion').select2({
+                placeholder: "Seleccione Profesión",
+                allowClear: true,
+                width: '100%'
+            });
 
-        $('#select-institucion').select2({
-            placeholder: "Seleccione Institución",
-            allowClear: true,
-            width: '100%'
-        });
+            $('#select-grado').select2({
+                placeholder: "Seleccione Grado",
+                allowClear: true,
+                width: '100%'
+            });
 
-        $('#select-banco').select2({
-            placeholder: "Seleccione banco",
-            allowClear: true,
-            width: '100%'
+            $('#select-institucion').select2({
+                placeholder: "Seleccione Institución",
+                allowClear: true,
+                width: '100%'
+            });
+
+            $('#select-banco').select2({
+                placeholder: "Seleccione banco",
+                allowClear: true,
+                width: '100%'
+            });
         });
     </script>
 </body>
 
-</html>h
+</html>
