@@ -7,326 +7,437 @@
     <title>Registro - Posicionate</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <style>
+        .select2-container--default .select2-selection--single {
+            border: 2px solid #cbd5e1 !important;
+            border-radius: 0.5rem !important;
+            height: 44px !important;
+            padding-top: 6px !important;
+            background-color: #f8fafc !important;
+        }
+
+        .select2-container--default .select2-selection--single:focus,
+        .select2-container--open .select2-selection--single {
+            border-color: #1e3f20 !important;
+            box-shadow: 0 0 0 3px rgba(30, 63, 32, 0.15) !important;
+            background-color: #ffffff !important;
+        }
+    </style>
 </head>
 
-<body class="bg-brand-green font-sans min-h-screen flex">
+<body class="bg-slate-100 font-sans min-h-screen flex items-center justify-center p-4 md:p-8 text-slate-800">
 
-    <div class="hidden lg:block lg:w-1/3 h-screen border-r-4 border-brand-gold overflow-hidden"
-        style="background-color: white;">
-        PONER IMAGENES AQUÍ
-    </div>
-    <div class="w-full lg:w-2/3 p-6 md:p-8 overflow-y-auto">
-        <h2 class="text-white text-3xl font-bold text-center mb-10 tracking-widest uppercase">
-            Formulario de Registro de Personal
-        </h2>
-        @if ($errors->any())
-            <div class="max-w-5xl mx-auto mb-6 p-4 bg-red-500/20 border-2 border-red-500 text-white rounded-2xl">
-                <strong class="block font-bold mb-2 text-red-400 uppercase tracking-wide">¡Ups! Algo salió mal:</strong>
-                <ul class="list-disc list-inside text-sm space-y-1">
-                    @foreach ($errors->all() as $error)
-                        <li>{{ $error }}</li>
-                    @endforeach
-                </ul>
-            </div>
-        @endif
+    <div class="max-w-5xl w-full bg-white shadow-2xl rounded-2xl overflow-hidden border border-slate-200">
 
-        @if (session('success'))
+        <div class="bg-brand-green p-8 md:p-12 text-center relative border-b-4 border-brand-gold">
+            <h2 class="text-white text-2xl md:text-4xl font-black tracking-widest uppercase">
+                Formulario de Registro de Personal
+            </h2>
             <div
-                class="max-w-5xl mx-auto mb-6 p-4 bg-green-500/20 border-2 border-green-500 text-white rounded-2xl text-center font-bold">
-                {{ session('success') }}
+                class="inline-block bg-brand-gold text-brand-green font-bold text-xs px-4 py-1.5 rounded-full mt-3 uppercase tracking-wider shadow">
+                Posicionate
             </div>
-        @endif
+        </div>
 
-        <form action="{{ route('personas.store') }}" method="POST" enctype="multipart/form-data"
-            class="max-w-5xl mx-auto space-y-6">
-            @csrf
-
-            <div class="space-y-6">
-                <h3 class="text-white text-xl font-bold border-b border-brand-gold pb-2">
-                    DATOS PERSONALES
-                </h3>
-
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <div>
-                        <label class="form-label-bold">Nombre</label>
-                        <input type="text" name="nombre" class="form-input-pill">
+        <div class="p-6 md:p-10">
+            @if ($errors->any())
+                <div class="mb-8 p-5 bg-red-100 border-l-4 border-red-600 text-slate-900 rounded-r-xl shadow-sm">
+                    <div class="flex items-center mb-2">
+                        <svg class="w-5 h-5 text-red-600 mr-2 flex-shrink-0" fill="none" stroke="currentColor"
+                            viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
+                                d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                        <strong class="font-extrabold text-red-800 uppercase tracking-wide text-sm">¡Por favor corrige los
+                            siguientes errores!</strong>
                     </div>
-                    <div>
-                        <label class="form-label-bold">Primer Apellido</label>
-                        <input type="text" name="apellido_p" class="form-input-pill">
-                    </div>
-                    <div>
-                        <label class="form-label-bold">Segundo Apellido</label>
-                        <input type="text" name="apellido_m" class="form-input-pill">
-                    </div>
+                    <ul class="list-disc list-inside text-sm text-red-700 space-y-1 pl-1 font-medium">
+                        @foreach ($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
                 </div>
+            @endif
 
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <div>
-                        <label class="form-label-bold">Fecha de Nacimiento</label>
-                        <input type="date" name="fecha_nacimiento" class="form-input-pill text-black">
+            @if (session('success'))
+                <div
+                    class="mb-8 p-5 bg-emerald-100 border-l-4 border-emerald-600 text-emerald-900 rounded-r-xl text-center font-bold text-base shadow-sm flex items-center justify-center">
+                    <svg class="w-6 h-6 text-emerald-600 mr-2 flex-shrink-0" fill="none" stroke="currentColor"
+                        viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
+                            d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                    {{ session('success') }}
+                </div>
+            @endif
+
+            <form action="{{ route('personas.store') }}" method="POST" enctype="multipart/form-data" class="space-y-12">
+                @csrf
+
+                <div class="space-y-6">
+                    <div class="flex items-center space-x-3 bg-slate-50 border border-slate-200 rounded-lg p-3">
+                        <div class="w-3 h-6 bg-brand-gold rounded"></div>
+                        <h3 class="text-brand-green text-lg font-black uppercase tracking-wider">
+                            1. Datos Personales
+                        </h3>
                     </div>
-                    <div>
-                        <label class="form-label-bold">Carnet de Identidad</label>
-                        <input type="text" name="ci" class="form-input-pill">
+
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div>
+                            <label
+                                class="block text-xs font-black text-slate-700 uppercase tracking-wider mb-2">Nombre</label>
+                            <input type="text" name="nombre"
+                                class="w-full px-4 py-2.5 rounded-lg border-2 border-slate-300 focus:border-brand-green focus:ring-4 focus:ring-brand-green/10 outline-none transition duration-200 bg-slate-50 text-slate-900 font-medium">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-black text-slate-700 uppercase tracking-wider mb-2">Primer
+                                Apellido</label>
+                            <input type="text" name="apellido_p"
+                                class="w-full px-4 py-2.5 rounded-lg border-2 border-slate-300 focus:border-brand-green focus:ring-4 focus:ring-brand-green/10 outline-none transition duration-200 bg-slate-50 text-slate-900 font-medium">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-black text-slate-700 uppercase tracking-wider mb-2">Segundo
+                                Apellido</label>
+                            <input type="text" name="apellido_m"
+                                class="w-full px-4 py-2.5 rounded-lg border-2 border-slate-300 focus:border-brand-green focus:ring-4 focus:ring-brand-green/10 outline-none transition duration-200 bg-slate-50 text-slate-900 font-medium">
+                        </div>
                     </div>
-                    <div>
-                        <label class="form-label-bold">Extensión del Carnet</label>
-                        <div class="flex flex-col gap-2">
-                            <select id="select-extension" name="extension_ci" class="form-select-pill">
-                                <option value="" selected disabled>Seleccione extensión</option>
-                                <option value="LP">LP</option>
-                                <option value="SC">SC</option>
-                                <option value="CB">CB</option>
-                                <option value="CH">CH</option>
-                                <option value="OR">OR</option>
-                                <option value="PT">PT</option>
-                                <option value="TJ">TJ</option>
-                                <option value="BE">BE</option>
-                                <option value="PD">PD</option>
-                                <option value="OTRO">OTRO (Escribir...)</option>
+
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div>
+                            <label class="block text-xs font-black text-slate-700 uppercase tracking-wider mb-2">Fecha
+                                de Nacimiento</label>
+                            <input type="date" name="fecha_nacimiento"
+                                class="w-full px-4 py-2.5 rounded-lg border-2 border-slate-300 focus:border-brand-green focus:ring-4 focus:ring-brand-green/10 outline-none transition duration-200 bg-slate-50 text-slate-900 font-medium">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-black text-slate-700 uppercase tracking-wider mb-2">Carnet
+                                de Identidad</label>
+                            <input type="text" name="ci"
+                                class="w-full px-4 py-2.5 rounded-lg border-2 border-slate-300 focus:border-brand-green focus:ring-4 focus:ring-brand-green/10 outline-none transition duration-200 bg-slate-50 text-slate-900 font-medium">
+                        </div>
+                        <div>
+                            <label
+                                class="block text-xs font-black text-slate-700 uppercase tracking-wider mb-2">Extensión
+                                del Carnet</label>
+                            <div class="flex flex-col gap-2">
+                                <select id="select-extension" name="extension_ci"
+                                    class="w-full px-4 py-2.5 rounded-lg border-2 border-slate-300 focus:border-brand-green focus:ring-4 focus:ring-brand-green/10 outline-none transition duration-200 bg-slate-50 cursor-pointer text-slate-900 font-medium h-[46px]">
+                                    <option value="" selected disabled>Seleccione extensión</option>
+                                    <option value="LP">LP</option>
+                                    <option value="SC">SC</option>
+                                    <option value="CB">CB</option>
+                                    <option value="CH">CH</option>
+                                    <option value="OR">OR</option>
+                                    <option value="PT">PT</option>
+                                    <option value="TJ">TJ</option>
+                                    <option value="BE">BE</option>
+                                    <option value="PD">PD</option>
+                                    <option value="OTRO">OTRO (Escribir...)</option>
+                                </select>
+                                <input type="text" id="input-extension-otro"
+                                    class="hidden w-full px-4 py-2.5 rounded-lg border-2 border-brand-green focus:ring-4 focus:ring-brand-green/10 outline-none transition duration-200 bg-white text-slate-900 font-medium"
+                                    placeholder="Escriba la extensión (ej: EXT)">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div>
+                            <label class="block text-xs font-black text-slate-700 uppercase tracking-wider mb-2">País de
+                                Residencia</label>
+                            <select name="id_pais" id="select-pais"
+                                class="w-full px-4 py-2.5 rounded-lg border-2 border-slate-300 focus:border-brand-green focus:ring-4 focus:ring-brand-green/10 outline-none transition duration-200 bg-slate-50 text-slate-900 font-medium h-[46px]">
+                                <option value="">Seleccione País</option>
+                                @foreach($paises as $pais)
+                                    <option value="{{ $pais->id_pais }}">{{ $pais->nombre }}</option>
+                                @endforeach
                             </select>
-
-                            <input type="text" id="input-extension-otro"
-                                class="hidden form-input-pill border-brand-gold"
-                                placeholder="Escriba la extensión (ej: EXT)">
                         </div>
-                    </div>
-                </div>
-
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <div>
-                        <label class="form-label-bold">País de Residencia</label>
-                        <select name="id_pais" id="select-pais" class="form-select-pill">
-                            <option value="">Seleccione País</option>
-                            @foreach($paises as $pais)
-                                <option value="{{ $pais->id_pais }}">{{ $pais->nombre }}</option>
-                            @endforeach
-                        </select>
-                    </div>
-                    <div>
-                        <label class="form-label-bold">Departamento de Residencia</label>
-                        <select name="id_departamento" id="select-departamento" class="form-select-pill">
-                            <option value="">Seleccione un país primero</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label class="form-label-bold">Ciudad de Residencia</label>
-                        <select name="id_ciudad" id="select-ciudad" class="form-select-pill">
-                            <option value="">Seleccione un depto primero</option>
-                        </select>
-                    </div>
-                </div>
-
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div>
-                        <label class="form-label-bold tracking-wide">Domicilio</label>
-                        <input type="text" name="domicilio" class="form-input-pill" placeholder="Calle, número, zona">
-                    </div>
-
-                    <div>
-                        <label class="form-label-bold tracking-wide">Ubicación (Google Maps)</label>
-                        <input type="url" name="enlace_ubicacion_maps" class="form-input-pill"
-                            placeholder="https://maps.google.com/...">
-                    </div>
-                </div>
-
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-
-                    <div
-                        class="bg-black/20 p-4 rounded-2xl border border-white/10 hover:border-brand-gold transition duration-300 group">
-                        <label
-                            class="form-label-bold text-brand-gold group-hover:tracking-wider transition-all">Curriculum</label>
-                        <p class="text-xs text-white/70 mb-2">Archivo PDF</p>
-                        <input type="file" name="curriculum"
-                            class="w-full text-sm text-white file:bg-brand-gold file:text-black file:font-bold file:px-3 file:py-1 file:rounded-lg file:border-0 cursor-pointer">
-                    </div>
-
-                    <div
-                        class="bg-black/20 p-4 rounded-2xl border border-white/10 hover:border-brand-gold transition duration-300 group">
-                        <label class="form-label-bold text-brand-gold group-hover:tracking-wider transition-all">Carnet
-                            de Identidad</label>
-                        <p class="text-xs text-white/70 mb-2">Archivo PDF</p>
-                        <input type="file" name="foto_carnet"
-                            class="w-full text-sm text-white file:bg-brand-gold file:text-black file:font-bold file:px-3 file:py-1 file:rounded-lg file:border-0 cursor-pointer">
-                    </div>
-
-                    <div
-                        class="bg-black/20 p-4 rounded-2xl border border-white/10 hover:border-brand-gold transition duration-300 group">
-                        <label
-                            class="form-label-bold text-brand-gold group-hover:tracking-wider transition-all">Fotografía</label>
-                        <p class="text-xs text-white/70 mb-2">JPG o PNG</p>
-                        <input type="file" name="fotografia"
-                            class="w-full text-sm text-white file:bg-brand-gold file:text-black file:font-bold file:px-3 file:py-1 file:rounded-lg file:border-0 cursor-pointer">
-                    </div>
-
-                </div>
-
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-
-                    <div>
-                        <label class="form-label-bold">Género</label>
-                        <div class="flex gap-6 mt-2 text-white">
-                            <label class="flex items-center gap-2 cursor-pointer">
-                                <input type="radio" name="genero" value="M" class="w-5 h-5 accent-brand-gold"> Masculino
-                            </label>
-                            <label class="flex items-center gap-2 cursor-pointer">
-                                <input type="radio" name="genero" value="F" class="w-5 h-5 accent-brand-gold"> Femenino
-                            </label>
-                        </div>
-                    </div>
-
-                    <div>
-                        <label class="form-label-bold">Entidad Bancaria</label>
-                        <select name="id_institucion_bancaria" class="form-select-pill">
-                            <option value="">Seleccione banco</option>
-                            @foreach($bancos as $banco)
-                                <option value="{{ $banco->id_institucion_bancaria }}">
-                                    {{ $banco->nombre }}
-                                </option>
-                            @endforeach
-                        </select>
-                    </div>
-
-                    <div>
-                        <label class="form-label-bold">Número de Cuenta</label>
-                        <input type="text" name="numero_cuenta_bancaria" class="form-input-pill"
-                            placeholder="1234567890">
-                    </div>
-
-                </div>
-            </div>
-
-            <div class="space-y-4">
-                <h3 class="text-white text-xl font-bold border-b border-brand-gold pb-2">
-                    HABILIDADES
-                </h3>
-
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-
-                    <div>
-                        <label class="form-label-bold">Habilidades Técnicas</label>
-                        <textarea name="habilidades_tecnicas" class="form-input-pill rounded-2xl h-28 py-3"></textarea>
-                    </div>
-
-                    <div>
-                        <label class="form-label-bold">Habilidades Blandas</label>
-                        <textarea name="habilidades_blandas" class="form-input-pill rounded-2xl h-28 py-3"></textarea>
-                    </div>
-
-                </div>
-            </div>
-
-            <div class="space-y-6">
-                <h3 class="text-white text-xl font-bold border-b border-brand-gold pb-2 uppercase">
-                    Información Académica
-                </h3>
-
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <div>
-                        <label class="form-label-bold">Profesión / Ocupación</label>
-                        <select name="id_profesion" id="select-profesion" class="form-select-pill">
-                            <option value="">Seleccione Profesión</option>
-                            @foreach($profesiones as $prof)
-                                <option value="{{ $prof->id_profesion }}">{{ $prof->nombre }}</option>
-                            @endforeach
-                        </select>
-                    </div>
-
-                    <div>
-                        <label class="form-label-bold">Grado Académico</label>
-                        <select name="id_grado_academico" id="select-grado" class="form-select-pill">
-                            <option value="">Seleccione Grado</option>
-                            @foreach($grados as $grado)
-                                <option value="{{ $grado->id_grado_academico }}">{{ $grado->nombre }}</option>
-                            @endforeach
-                        </select>
-                    </div>
-
-                    <div>
-                        <label class="form-label-bold">Institución de Egreso</label>
-                        <select name="id_institucion_egreso" id="select-institucion" class="form-select-pill">
-                            <option value="">Seleccione Institución</option>
-                            @foreach($instituciones as $inst)
-                                <option value="{{ $inst->id_institucion_egreso }}">{{ $inst->nombre }}</option>
-                            @endforeach
-                        </select>
-                    </div>
-                </div>
-            </div>
-
-            <div class="space-y-6">
-                <h3 class="text-white text-xl font-bold border-b border-brand-gold pb-2">
-                    DATOS DE CONTACTO
-                </h3>
-
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <div>
-                        <label class="form-label-bold">Teléfono Móvil</label>
-                        <div class="flex gap-2">
-                            <select id="select-codigo-manual" class="form-select-pill w-1/2 text-center px-1">
-                                <option value="+591">🇧🇴 +591</option>
-                                <option value="+54">🇦🇷 +54</option>
-                                <option value="+56">🇨🇱 +56</option>
-                                <option value="+51">🇵🇪 +51</option>
-                                <option value="+1">🇺🇸 +1</option>
+                        <div>
+                            <label
+                                class="block text-xs font-black text-slate-700 uppercase tracking-wider mb-2">Departamento
+                                de Residencia</label>
+                            <select name="id_departamento" id="select-departamento"
+                                class="w-full px-4 py-2.5 rounded-lg border-2 border-slate-300 focus:border-brand-green focus:ring-4 focus:ring-brand-green/10 outline-none transition duration-200 bg-slate-50 text-slate-900 font-medium h-[46px]">
+                                <option value="">Seleccione un país primero</option>
                             </select>
-
-                            <input type="text" id="input-numero-movil" class="form-input-pill w-2/3"
-                                placeholder="70000000">
-
-                            <input type="hidden" name="telefono_movil" id="telefono_movil_hidden">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-black text-slate-700 uppercase tracking-wider mb-2">Ciudad
+                                de Residencia</label>
+                            <select name="id_ciudad" id="select-ciudad"
+                                class="w-full px-4 py-2.5 rounded-lg border-2 border-slate-300 focus:border-brand-green focus:ring-4 focus:ring-brand-green/10 outline-none transition duration-200 bg-slate-50 text-slate-900 font-medium h-[46px]">
+                                <option value="">Seleccione un depto primero</option>
+                            </select>
                         </div>
                     </div>
-                    <div>
-                        <label class="form-label-bold">Correo Electrónico</label>
-                        <input type="email" name="correo_electronico" class="form-input-pill">
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label
+                                class="block text-xs font-black text-slate-700 uppercase tracking-wider mb-2">Domicilio</label>
+                            <input type="text" name="domicilio"
+                                class="w-full px-4 py-2.5 rounded-lg border-2 border-slate-300 focus:border-brand-green focus:ring-4 focus:ring-brand-green/10 outline-none transition duration-200 bg-slate-50 text-slate-900 font-medium"
+                                placeholder="Calle, número, zona">
+                        </div>
+                        <div>
+                            <label
+                                class="block text-xs font-black text-slate-700 uppercase tracking-wider mb-2">Ubicación
+                                (Google Maps)</label>
+                            <input type="url" name="enlace_ubicacion_maps"
+                                class="w-full px-4 py-2.5 rounded-lg border-2 border-slate-300 focus:border-brand-green focus:ring-4 focus:ring-brand-green/10 outline-none transition duration-200 bg-slate-50 text-slate-900 font-medium"
+                                placeholder="http://maps.google.com/...">
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 pt-2">
+
+                        <div
+                            class="bg-slate-50 p-5 rounded-xl border-2 border-slate-300 hover:border-brand-green transition-all shadow-sm">
+                            <label
+                                class="block text-xs font-black text-brand-green uppercase tracking-wider mb-1">Curriculum
+                                Vitae</label>
+                            <p class="text-[11px] font-bold text-slate-500 mb-3">Requerido: Formato PDF</p>
+                            <input type="file" name="curriculum"
+                                class="w-full text-xs text-slate-600 file:mr-3 file:py-2 file:px-3 file:rounded-md file:border-2 file:border-brand-green file:text-xs file:font-black file:bg-white file:text-brand-green hover:file:bg-brand-green hover:file:text-white cursor-pointer transition-all">
+                        </div>
+
+                        <div
+                            class="bg-slate-50 p-5 rounded-xl border-2 border-slate-300 hover:border-brand-green transition-all shadow-sm">
+                            <label
+                                class="block text-xs font-black text-brand-green uppercase tracking-wider mb-1">Carnet
+                                de Identidad</label>
+                            <p class="text-[11px] font-bold text-slate-500 mb-3">Requerido: Formato PDF</p>
+                            <input type="file" name="foto_carnet"
+                                class="w-full text-xs text-slate-600 file:mr-3 file:py-2 file:px-3 file:rounded-md file:border-2 file:border-brand-green file:text-xs file:font-black file:bg-white file:text-brand-green hover:file:bg-brand-green hover:file:text-white cursor-pointer transition-all">
+                        </div>
+
+                        <div
+                            class="bg-slate-50 p-5 rounded-xl border-2 border-slate-300 hover:border-brand-green transition-all shadow-sm">
+                            <label
+                                class="block text-xs font-black text-brand-green uppercase tracking-wider mb-1">Fotografía
+                                de Perfil</label>
+                            <p class="text-[11px] font-bold text-slate-500 mb-3">Formatos: JPG o PNG</p>
+                            <input type="file" name="fotografia"
+                                class="w-full text-xs text-slate-600 file:mr-3 file:py-2 file:px-3 file:rounded-md file:border-2 file:border-brand-green file:text-xs file:font-black file:bg-white file:text-brand-green hover:file:bg-brand-green hover:file:text-white cursor-pointer transition-all">
+                        </div>
+
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 pt-2">
+                        <div>
+                            <label
+                                class="block text-xs font-black text-slate-700 uppercase tracking-wider mb-3">Género</label>
+                            <div class="flex gap-6 mt-1 text-slate-900">
+                                <label
+                                    class="flex items-center gap-2.5 cursor-pointer group text-sm font-bold bg-slate-50 px-4 py-2.5 rounded-lg border-2 border-slate-300 hover:border-brand-green w-1/2 justify-center transition-all">
+                                    <input type="radio" name="genero" value="M" class="w-4 h-4 accent-brand-green">
+                                    <span>Masculino</span>
+                                </label>
+                                <label
+                                    class="flex items-center gap-2.5 cursor-pointer group text-sm font-bold bg-slate-50 px-4 py-2.5 rounded-lg border-2 border-slate-300 hover:border-brand-green w-1/2 justify-center transition-all">
+                                    <input type="radio" name="genero" value="F" class="w-4 h-4 accent-brand-green">
+                                    <span>Femenino</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-black text-slate-700 uppercase tracking-wider mb-2">Entidad
+                                Bancaria</label>
+                            <select name="id_institucion_bancaria" id="select-banco"
+                                class="w-full px-4 py-2.5 rounded-lg border-2 border-slate-300 focus:border-brand-green focus:ring-4 focus:ring-brand-green/10 outline-none transition duration-200 bg-slate-50 text-slate-900 font-medium h-[46px]">
+                                <option value="">Seleccione banco</option>
+                                @foreach($bancos as $banco)
+                                    <option value="{{ $banco->id_institucion_bancaria }}">
+                                        {{ $banco->nombre }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-black text-slate-700 uppercase tracking-wider mb-2">Número
+                                de Cuenta</label>
+                            <input type="text" name="numero_cuenta_bancaria"
+                                class="w-full px-4 py-2.5 rounded-lg border-2 border-slate-300 focus:border-brand-green focus:ring-4 focus:ring-brand-green/10 outline-none transition duration-200 bg-slate-50 text-slate-900 font-medium"
+                                placeholder="1234567890">
+                        </div>
                     </div>
                 </div>
 
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-
-                    <div
-                        class="bg-black/20 p-5 rounded-2xl border border-white/10 space-y-3 hover:border-brand-gold transition">
-                        <label class="form-label-bold text-white">Referencia Familiar 1</label>
-                        <input type="text" name="referencia_familiar_1" class="form-input-pill"
-                            placeholder="Nombre completo">
-                    </div>
-                    <div
-                        class="bg-black/20 p-5 rounded-2xl border border-white/10 space-y-3 hover:border-brand-gold transition">
-                        <label class="form-label-bold text-white">Celular Referencia Familiar 1</label>
-                        <input type="text" name="celular_familiar_1" class="form-input-pill" placeholder="Teléfono">
+                <div class="space-y-6">
+                    <div class="flex items-center space-x-3 bg-slate-50 border border-slate-200 rounded-lg p-3">
+                        <div class="w-3 h-6 bg-brand-gold rounded"></div>
+                        <h3 class="text-brand-green text-lg font-black uppercase tracking-wider">
+                            2. Habilidades Profesionales
+                        </h3>
                     </div>
 
-                    <div
-                        class="bg-black/20 p-5 rounded-2xl border border-white/10 space-y-3 hover:border-brand-gold transition">
-                        <label class="form-label-bold text-white">Referencia Familiar 2</label>
-                        <input type="text" name="referencia_familiar_2" class="form-input-pill"
-                            placeholder="Nombre completo">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label
+                                class="block text-xs font-black text-slate-700 uppercase tracking-wider mb-2">Habilidades
+                                Técnicas</label>
+                            <textarea name="habilidades_tecnicas"
+                                class="w-full px-4 py-3 rounded-lg border-2 border-slate-300 focus:border-brand-green focus:ring-4 focus:ring-brand-green/10 outline-none transition duration-200 bg-slate-50 text-slate-900 font-medium h-28 resize-none"></textarea>
+                        </div>
+                        <div>
+                            <label
+                                class="block text-xs font-black text-slate-700 uppercase tracking-wider mb-2">Habilidades
+                                Blandas</label>
+                            <textarea name="habilidades_blandas"
+                                class="w-full px-4 py-3 rounded-lg border-2 border-slate-300 focus:border-brand-green focus:ring-4 focus:ring-brand-green/10 outline-none transition duration-200 bg-slate-50 text-slate-900 font-medium h-28 resize-none"></textarea>
+                        </div>
                     </div>
-                    <div
-                        class="bg-black/20 p-5 rounded-2xl border border-white/10 space-y-3 hover:border-brand-gold transition">
-                        <label class="form-label-bold text-white">Celular Referencia Familiar 2</label>
-                        <input type="text" name="celular_familiar_2" class="form-input-pill" placeholder="Teléfono">
-                    </div>
-
                 </div>
-            </div>
 
-            <div class="flex justify-center pt-6 pb-12">
-                <button type="submit" class="btn-gold w-40">
-                    Registrar
-                </button>
-            </div>
+                <div class="space-y-6">
+                    <div class="flex items-center space-x-3 bg-slate-50 border border-slate-200 rounded-lg p-3">
+                        <div class="w-3 h-6 bg-brand-gold rounded"></div>
+                        <h3 class="text-brand-green text-lg font-black uppercase tracking-wider">
+                            3. Formación Académica
+                        </h3>
+                    </div>
 
-        </form>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div>
+                            <label
+                                class="block text-xs font-black text-slate-700 uppercase tracking-wider mb-2">Profesión
+                                / Ocupación</label>
+                            <select name="id_profesion" id="select-profesion" class="w-full">
+                                <option value="">Seleccione Profesión</option>
+                                @foreach($profesiones as $prof)
+                                    <option value="{{ $prof->id_profesion }}">{{ $prof->nombre }}</option>
+                                @endforeach
+                            </select>
+                        </div>
 
+                        <div>
+                            <label class="block text-xs font-black text-slate-700 uppercase tracking-wider mb-2">Grado
+                                Académico</label>
+                            <select name="id_grado_academico" id="select-grado" class="w-full">
+                                <option value="">Seleccione Grado</option>
+                                @foreach($grados as $grado)
+                                    <option value="{{ $grado->id_grado_academico }}">{{ $grado->nombre }}</option>
+                                @endforeach
+                            </select>
+                        </div>
 
+                        <div>
+                            <label
+                                class="block text-xs font-black text-slate-700 uppercase tracking-wider mb-2">Institución
+                                de Egreso</label>
+                            <select name="id_institucion_egreso" id="select-institucion" class="w-full">
+                                <option value="">Seleccione Institución</option>
+                                @foreach($instituciones as $inst)
+                                    <option value="{{ $inst->id_institucion_egreso }}">{{ $inst->nombre }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="space-y-6">
+                    <div class="flex items-center space-x-3 bg-slate-50 border border-slate-200 rounded-lg p-3">
+                        <div class="w-3 h-6 bg-brand-gold rounded"></div>
+                        <h3 class="text-brand-green text-lg font-black uppercase tracking-wider">
+                            4. Datos de Contacto y Referencias
+                        </h3>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div>
+                            <label
+                                class="block text-xs font-black text-slate-700 uppercase tracking-wider mb-2">Teléfono
+                                Móvil</label>
+                            <div class="flex gap-2">
+                                <select id="select-codigo-manual"
+                                    class="w-2/5 px-2 py-2.5 rounded-lg border-2 border-slate-300 focus:border-brand-green outline-none bg-slate-50 text-sm text-center font-bold h-[46px] text-slate-900">
+                                    <option value="+591">🇧🇴 +591</option>
+                                    <option value="+54">🇦🇷 +54</option>
+                                    <option value="+56">🇨🇱 +56</option>
+                                    <option value="+51">🇵🇪 +51</option>
+                                    <option value="+1">🇺🇸 +1</option>
+                                </select>
+                                <input type="text" id="input-numero-movil"
+                                    class="w-3/5 px-4 py-2.5 rounded-lg border-2 border-slate-300 focus:border-brand-green focus:ring-4 focus:ring-brand-green/10 outline-none transition duration-200 bg-slate-50 text-slate-900 font-medium"
+                                    placeholder="70000000">
+                                <input type="hidden" name="telefono_movil" id="telefono_movil_hidden">
+                            </div>
+                        </div>
+                        <div class="md:col-span-2">
+                            <label class="block text-xs font-black text-slate-700 uppercase tracking-wider mb-2">Correo
+                                Electrónico</label>
+                            <input type="email" name="correo_electronico"
+                                class="w-full px-4 py-2.5 rounded-lg border-2 border-slate-300 focus:border-brand-green focus:ring-4 focus:ring-brand-green/10 outline-none transition duration-200 bg-slate-50 text-slate-900 font-medium"
+                                placeholder="correo@ejemplo.com">
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 pt-2">
+
+                        <div class="bg-slate-50 p-5 rounded-xl border-2 border-slate-200 space-y-4 shadow-sm">
+                            <div
+                                class="text-xs font-black text-brand-green tracking-wide uppercase border-b-2 border-slate-300 pb-2 flex items-center">
+                                <span
+                                    class="bg-brand-green text-white rounded-full w-5 h-5 inline-flex items-center justify-center text-[10px] mr-2">1</span>
+                                Referencia Familiar 1
+                            </div>
+                            <div>
+                                <label class="block text-[11px] font-black text-slate-500 uppercase mb-1">Nombre
+                                    Completo</label>
+                                <input type="text" name="referencia_familiar_1"
+                                    class="w-full px-3 py-2 rounded-lg border-2 border-slate-300 focus:border-brand-green bg-white text-sm text-slate-900 outline-none font-medium">
+                            </div>
+                            <div>
+                                <label class="block text-[11px] font-black text-slate-500 uppercase mb-1">Teléfono
+                                    Celular</label>
+                                <input type="text" name="celular_familiar_1"
+                                    class="w-full px-3 py-2 rounded-lg border-2 border-slate-300 focus:border-brand-green bg-white text-sm text-slate-900 outline-none font-medium"
+                                    placeholder="Ej: 70000000">
+                            </div>
+                        </div>
+
+                        <div class="bg-slate-50 p-5 rounded-xl border-2 border-slate-200 space-y-4 shadow-sm">
+                            <div
+                                class="text-xs font-black text-brand-green tracking-wide uppercase border-b-2 border-slate-300 pb-2 flex items-center">
+                                <span
+                                    class="bg-brand-green text-white rounded-full w-5 h-5 inline-flex items-center justify-center text-[10px] mr-2">2</span>
+                                Referencia Familiar 2
+                            </div>
+                            <div>
+                                <label class="block text-[11px] font-black text-slate-500 uppercase mb-1">Nombre
+                                    Completo</label>
+                                <input type="text" name="referencia_familiar_2"
+                                    class="w-full px-3 py-2 rounded-lg border-2 border-slate-300 focus:border-brand-green bg-white text-sm text-slate-900 outline-none font-medium">
+                            </div>
+                            <div>
+                                <label class="block text-[11px] font-black text-slate-500 uppercase mb-1">Teléfono
+                                    Celular</label>
+                                <input type="text" name="celular_familiar_2"
+                                    class="w-full px-3 py-2 rounded-lg border-2 border-slate-300 focus:border-brand-green bg-white text-sm text-slate-900 outline-none font-medium"
+                                    placeholder="Ej: 70000000">
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+                <div class="flex justify-center pt-6 pb-4">
+                    <button type="submit" class="btn-gold">
+                        Registrar Personal
+                    </button>
+                </div>
+
+            </form>
+        </div>
     </div>
+
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
     <script>
-
         document.addEventListener('DOMContentLoaded', () => {
             const paisSelect = document.getElementById('select-pais');
             const deptoSelect = document.getElementById('select-departamento');
@@ -364,75 +475,102 @@
                 }
             });
 
-            const departamentosBolivia = [
-                { id: 1, nombre: 'Chuquisaca' },
-                { id: 2, nombre: 'La Paz' },
-                { id: 3, nombre: 'Santa Cruz' },
-                { id: 4, nombre: 'Cochabamba' },
-                { id: 5, nombre: 'Oruro' },
-                { id: 6, nombre: 'Potosí' },
-                { id: 7, nombre: 'Tarija' },
-                { id: 8, nombre: 'Beni' },
-                { id: 9, nombre: 'Pando' }
-            ];
-
-            paisSelect.addEventListener('change', (e) => {
+            // Evento para cargar departamentos cuando se selecciona un país
+            paisSelect.addEventListener('change', async (e) => {
                 const paisId = e.target.value;
-                deptoSelect.innerHTML = '<option value="">Seleccione Departamento</option>';
-                ciudadSelect.innerHTML = '<option value="">Seleccione depto primero</option>';
 
-                if (paisId == "3") {
-                    departamentosBolivia.forEach(d => {
-                        deptoSelect.innerHTML += `<option value="${d.id}">${d.nombre}</option>`;
-                    });
-                } else if (paisId) {
-                    deptoSelect.innerHTML = '<option value="">Solo disponible Bolivia</option>';
+                // Limpiar selects dependientes
+                deptoSelect.innerHTML = '<option value="">Seleccione Departamento</option>';
+                ciudadSelect.innerHTML = '<option value="">Seleccione un depto primero</option>';
+
+                if (!paisId) {
+                    deptoSelect.innerHTML = '<option value="">Seleccione un país primero</option>';
+                    return;
+                }
+
+                deptoSelect.innerHTML = '<option value="">Cargando departamentos...</option>';
+
+                try {
+                    // Obtener departamentos desde la API
+                    const response = await fetch(`/api/paises/${paisId}/departamentos`);
+                    const departamentos = await response.json();
+
+                    deptoSelect.innerHTML = '<option value="">Seleccione Departamento</option>';
+
+                    if (departamentos.length === 0) {
+                        deptoSelect.innerHTML = '<option value="">No hay departamentos disponibles</option>';
+                    } else {
+                        departamentos.forEach(d => {
+                            deptoSelect.innerHTML += `<option value="${d.id_departamento}">${d.nombre}</option>`;
+                        });
+                    }
+                } catch (error) {
+                    console.error("Error cargando departamentos:", error);
+                    deptoSelect.innerHTML = '<option value="">Error al cargar departamentos</option>';
                 }
             });
 
+            // Evento para cargar ciudades cuando se selecciona un departamento
             deptoSelect.addEventListener('change', async (e) => {
                 const deptoId = e.target.value;
-                if (!deptoId) return;
+
+                ciudadSelect.innerHTML = '<option value="">Seleccione Ciudad</option>';
+
+                if (!deptoId) {
+                    ciudadSelect.innerHTML = '<option value="">Seleccione un depto primero</option>';
+                    return;
+                }
 
                 ciudadSelect.innerHTML = '<option value="">Cargando ciudades...</option>';
+
                 try {
+                    // Obtener ciudades desde la API
                     const response = await fetch(`/api/departamentos/${deptoId}/ciudades`);
                     const ciudades = await response.json();
 
                     ciudadSelect.innerHTML = '<option value="">Seleccione Ciudad</option>';
-                    ciudades.forEach(c => {
-                        ciudadSelect.innerHTML += `<option value="${c.id_ciudad}">${c.nombre}</option>`;
-                    });
+
+                    if (ciudades.length === 0) {
+                        ciudadSelect.innerHTML = '<option value="">No hay ciudades disponibles</option>';
+                    } else {
+                        ciudades.forEach(c => {
+                            ciudadSelect.innerHTML += `<option value="${c.id_ciudad}">${c.nombre}</option>`;
+                        });
+                    }
                 } catch (error) {
                     console.error("Error cargando ciudades:", error);
-                    ciudadSelect.innerHTML = '<option value="">Error al cargar</option>';
+                    ciudadSelect.innerHTML = '<option value="">Error al cargar ciudades</option>';
                 }
             });
 
             actualizarTelefonoCompleto();
         });
-        $('#select-profesion').select2({
-            placeholder: "Seleccione Profesión",
-            allowClear: true,
-            width: '100%'
-        });
 
-        $('#select-grado').select2({
-            placeholder: "Seleccione Grado",
-            allowClear: true,
-            width: '100%'
-        });
+        // Inicializar Select2
+        $(document).ready(function () {
+            $('#select-profesion').select2({
+                placeholder: "Seleccione Profesión",
+                allowClear: true,
+                width: '100%'
+            });
 
-        $('#select-institucion').select2({
-            placeholder: "Seleccione Institución",
-            allowClear: true,
-            width: '100%'
-        });
+            $('#select-grado').select2({
+                placeholder: "Seleccione Grado",
+                allowClear: true,
+                width: '100%'
+            });
 
-        $('#select-banco').select2({
-            placeholder: "Seleccione banco",
-            allowClear: true,
-            width: '100%'
+            $('#select-institucion').select2({
+                placeholder: "Seleccione Institución",
+                allowClear: true,
+                width: '100%'
+            });
+
+            $('#select-banco').select2({
+                placeholder: "Seleccione banco",
+                allowClear: true,
+                width: '100%'
+            });
         });
     </script>
 </body>
