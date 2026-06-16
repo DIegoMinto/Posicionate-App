@@ -43,10 +43,22 @@
                         </div>
                         <div>
                             <p class="text-[10px] uppercase font-sans font-bold">Docente</p>
-                            <p class="font-bold italic">
+                            <p class="font-sans  italic">
                                 {{ $curso->docente ? $curso->docente->nombre . ' ' . $curso->docente->apellido_p : 'Sin asignar' }}
                             </p>
+
+                            @if($curso->docentesAdicionales->count() > 0)
+                                <div class="mt-1 space-y-1">
+                                    <p class="text-[10px] uppercase font-bold">Docentes adicionales:</p>
+                                    @foreach($curso->docentesAdicionales as $da)
+                                        <p class="font-sans italic">
+                                            {{ $da->docente->nombre }} {{ $da->docente->apellido_p }}
+                                        </p>
+                                    @endforeach
+                                </div>
+                            @endif
                         </div>
+
                         <div class="border-t pt-2">
                             <p class="text-[10px] uppercase font-bold">Inscritos</p>
                             <p class="text-2xl font-black text-brand-green">{{ $curso->inscritos }} <span

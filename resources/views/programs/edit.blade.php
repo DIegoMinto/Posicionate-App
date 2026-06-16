@@ -51,17 +51,41 @@
                                 class="form-input-pill border-2 border-brand-gold w-full">
                         </div>
                         <div>
-                            <label class="form-label-bold text-black">Asignar Docente</label>
-                            <select name="id_docente" class="form-select-pill border-2 border-brand-gold">
+                            <label class="form-label-bold text-black">Docente Responsable</label>
+                            <select name="id_docente" class="form-select-pill border-2 border-brand-gold mb-2">
                                 <option value="" {{ is_null($curso->id_docente) ? 'selected' : '' }}>
                                     -- Sin Docente Asignado --
                                 </option>
                                 @foreach($docentes as $docente)
                                     <option value="{{ $docente->id_docente }}" {{ $curso->id_docente == $docente->id_docente ? 'selected' : '' }}>
-                                        {{ $docente->nombre }} {{ $docente->apellido }}
+                                        {{ $docente->nombre }} {{ $docente->apellido_p }}
                                     </option>
                                 @endforeach
                             </select>
+
+                            {{-- Docentes adicionales ya guardados --}}
+                            <div id="docentes-adicionales-container" class="space-y-2">
+                                @foreach($curso->docentesAdicionales as $da)
+                                    <div class="flex gap-2 items-center">
+                                        <select name="docentes_adicionales[]"
+                                            class="form-select-pill border-2 border-brand-gold flex-1 mt-2">
+                                            <option value="">Seleccionar docente adicional...</option>
+                                            @foreach($docentes as $doc)
+                                                <option value="{{ $doc->id_docente }}" {{ $da->id_docente == $doc->id_docente ? 'selected' : '' }}>
+                                                    {{ $doc->nombre }} {{ $doc->apellido_p }}
+                                                </option>
+                                            @endforeach
+                                        </select>
+                                        <button type="button" onclick="this.parentElement.remove()"
+                                            class="text-red-400 font-bold px-2 mt-2">✕</button>
+                                    </div>
+                                @endforeach
+                            </div>
+
+                            <button type="button" onclick="agregarDocente()"
+                                class="text-[10px] font-bold text-black uppercase hover:text-brand-gold transition-colors cursor-pointer mt-2">
+                                + Agregar Docente Adicional
+                            </button>
                         </div>
                         <div>
                             <label class="form-label-bold text-black">Sede</label>
@@ -215,6 +239,27 @@
             </form>
         </div>
     </x-layout-dashboard>
+    <script>
+        function agregarDocente() {
+            const container = document.getElementById('docentes-adicionales-container');
+            const div = document.createElement('div');
+            div.className = 'flex gap-2 items-center';
+            div.innerHTML = `
+            <select name="docentes_adicionales[]"
+                class="form-select-pill border-2 border-brand-gold flex-1 mt-2">
+                <option value="">Seleccionar docente adicional...</option>
+                @foreach($docentes as $doc)
+                    <option value="{{ $doc->id_docente }}">
+                        {{ $doc->nombre }} {{ $doc->apellido_p }}
+                    </option>
+                @endforeach
+            </select>
+            <button type="button" onclick="this.parentElement.remove()"
+                class="text-red-400 font-bold px-2 mt-2">✕</button>
+        `;
+            container.appendChild(div);
+        }
+    </script>
 </body>
 
 </html>

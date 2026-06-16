@@ -230,22 +230,13 @@ class DashboardController extends Controller
             abort(403, 'No autorizado');
         }
 
-        $curso = Curso::with(['institucion', 'modulos', 'docente', 'sede'])
-            ->findOrFail($id);
+        $usuario = auth()->user()->load('persona');
+        $curso = Curso::with(['modulos', 'institucion', 'docentesAdicionales'])->findOrFail($id);
+        $docentes = \App\Models\Docente::all();
+        $instituciones = \App\Models\Institucion::all();
+        $sedes = \App\Models\Sede::all();
 
-        $usuario = auth()->user();
-
-        $docentes = Docente::all();
-        $sedes = Sede::all();
-        $instituciones = Institucion::all();
-
-        return view('programs.edit', compact(
-            'curso',
-            'usuario',
-            'docentes',
-            'sedes',
-            'instituciones'
-        ));
+        return view('programs.edit', compact('usuario', 'curso', 'docentes', 'instituciones', 'sedes'));
     }
 
     public function programsCreate()
@@ -379,6 +370,8 @@ class DashboardController extends Controller
             'id_institucion' => 'nullable|exists:institucion,id_institucion',
             'id_sede' => 'nullable|exists:sede,id_sede',
             'id_docente' => 'nullable|exists:docente,id_docente',
+            'docentes_adicionales' => 'nullable|array',
+            'docentes_adicionales.*' => 'exists:docente,id_docente',
         ]);
 
         $dataCurso = $request->only([
@@ -415,16 +408,13 @@ class DashboardController extends Controller
             }
         }
 
-        $curso->update($dataCurso);
+        $curso->docentesAdicionales()->delete();
 
-        if ($request->has('modulos')) {
-            foreach ($request->modulos as $id_modulo => $data) {
-                $modulo = Modulo::find($id_modulo);
-                if ($modulo) {
-                    $modulo->update([
-                        'nombre' => $data['nombre'],
-                        'fecha_inicio' => !empty($data['fecha_inicio']) ? $data['fecha_inicio'] : null,
-                        'fecha_fin' => !empty($data['fecha_fin']) ? $data['fecha_fin'] : null,
+        if ($request->has('docentes_adicionales')) {
+            foreach ($request->docentes_adicionales as $doc_id) {
+                if ($doc_id) {
+                    $curso->docentesAdicionales()->create([
+                        'id_docente' => $doc_id
                     ]);
                 }
             }
