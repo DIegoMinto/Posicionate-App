@@ -141,7 +141,6 @@
                                 class="btn-sidebar-text leading-tight uppercase whitespace-nowrap">CONTEO</span>
                         </a>
                     @endif
-
                 </nav>
             </div>
         </div>

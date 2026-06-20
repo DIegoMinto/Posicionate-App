@@ -15,6 +15,8 @@ use App\Http\Controllers\StatiticController;
 use App\Http\Controllers\PlanController;
 use App\Http\Controllers\ModuloController;
 use App\Http\Controllers\EstudianteController;
+use App\Http\Controllers\ContrasenaController;
+use App\Http\Controllers\AreaController;
 
 use App\Models\PlanesPago;
 
@@ -169,4 +171,19 @@ Route::middleware(['auth', 'vigente'])->group(function () {
     Route::get('/plans/{id}/edit', [PlanController::class, 'edit'])->name('plans.edit');
 
     Route::put('/plans/{id}', [PlanController::class, 'update'])->name('plans.update');
+
+    // RUTAS CONTRASEÑAS
+    Route::controller(ContrasenaController::class)->group(function () {
+        Route::get('/contrasenas', 'index')->name('contrasenas.index');
+        Route::get('/contrasenas/crear', 'create')->name('contrasenas.create');
+        Route::post('/contrasenas', 'store')->name('contrasenas.store');
+        Route::delete('/contrasenas/{id}', 'destroy')->name('contrasenas.destroy');
+    });
+
+    //RUTAS AREAS
+    Route::controller(AreaController::class)->group(function () {
+        Route::get('/areas', 'index')->name('areas.index');
+        Route::get('/areas/crear', 'create')->name('areas.create');
+        Route::post('/areas', 'store')->name('areas.store');
+    });
 });
