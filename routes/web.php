@@ -165,7 +165,7 @@ Route::middleware(['auth', 'vigente'])->group(function () {
     Route::get('/students/{id}/info', [DashboardController::class, 'show_student'])->name('people.show');
     Route::post('/curso/agregar-estudiante', [InscripcionController::class, 'agregarEstudiante'])
         ->name('curso.agregar.estudiante');
-    Route::get('/pagos/{id}/validar', [InscripcionController::class, 'validarPago'])->name('pagos.validar');
+    Route::post('/pagos/{id}/validar', [InscripcionController::class, 'validarPago'])->name('pagos.validar');
 
     // RUTAS PLANES
     Route::get('/plans/{id}/edit', [PlanController::class, 'edit'])->name('plans.edit');

@@ -120,65 +120,81 @@
 
                                     </td>
 
-                                    <td class="py-3 px-4 text-center">
-
+                                    <td class="py-3 px-4 text-center" x-data="{ openVerify: false }">
                                         @if(
-                                                in_array($usuario->cargo, [
-                                                    'contador',
-                                                    'asistente_contable',
-                                                ])
+                                                in_array($usuario->cargo, ['contador', 'asistente_contable'])
                                                 || $usuario->rol === 'super_admin'
                                             )
-
                                             <div class="flex items-center justify-center gap-3">
 
                                                 {{-- Editar pago --}}
                                                 <a href="{{ route('pagos.edit', $pago->id_pagos_estudiante) }}"
                                                     class="inline-flex items-center justify-center group relative">
-
                                                     <svg xmlns="http://www.w3.org/2000/svg"
                                                         class="w-5 h-5 text-brand-green group-hover:text-brand-gold transition-colors"
                                                         fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-
                                                         <path stroke-linecap="round" stroke-linejoin="round"
                                                             d="M11 5h2M12 7v10m-7 4h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-
                                                     </svg>
-
                                                     <span
                                                         class="absolute -top-8 scale-0 transition-all rounded bg-gray-800 px-2 py-1 text-[10px] text-white group-hover:scale-100 whitespace-nowrap z-30 shadow-lg">
                                                         Editar Pago
                                                     </span>
-
                                                 </a>
 
                                                 @if($pago->estado == 'revision')
-
-                                                    <a href="{{ route('pagos.validar', $pago->id_pagos_estudiante) }}"
-                                                        class="inline-flex items-center justify-center group relative">
-
+                                                    <button @click="openVerify = true" type="button"
+                                                        class="inline-flex items-center justify-center group relative cursor-pointer">
                                                         <svg xmlns="http://www.w3.org/2000/svg"
                                                             class="w-5 h-5 text-brand-green hover:text-brand-gold transition-colors"
                                                             fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-
                                                             <path stroke-linecap="round" stroke-linejoin="round"
                                                                 d="M5 13l4 4L19 7" />
-
                                                         </svg>
-
                                                         <span
                                                             class="absolute -top-8 scale-0 transition-all rounded bg-gray-800 px-2 py-1 text-[10px] text-white group-hover:scale-100 whitespace-nowrap z-30 shadow-lg">
                                                             Validar Pago
                                                         </span>
+                                                    </button>
 
-                                                    </a>
+                                                    <div x-show="openVerify"
+                                                        class="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 backdrop-blur-sm"
+                                                        x-cloak x-transition>
 
+                                                        <div class="bg-white p-6 rounded-sm shadow-2xl w-85 text-left border-t-4 border-brand-green"
+                                                            @click.away="openVerify = false">
+                                                            <h3 class="text-[11px] font-black text-brand-green uppercase mb-2">
+                                                                Validación de Finanzas</h3>
+                                                            <p class="text-[10px] mb-4 text-gray-600">
+                                                                Para pasar a estado <strong>COMPLETO</strong> el pago de <span
+                                                                    class="font-bold text-black">{{ number_format($pago->monto_pagar, 2) }}
+                                                                    Bs</span>, digite la clave maestra de Contabilidad.
+                                                            </p>
+
+                                                            <form action="{{ route('pagos.validar', $pago->id_pagos_estudiante) }}"
+                                                                method="POST">
+                                                                @csrf
+                                                                <input type="password" name="password_contabilidad" required
+                                                                    class="w-full border-2 border-brand-gold p-2 text-xs mb-4 focus:outline-none bg-gray-50 uppercase tracking-widest placeholder:normal-case placeholder:tracking-normal"
+                                                                    placeholder="Contraseña de Contabilidad">
+
+                                                                <div class="flex justify-end gap-3">
+                                                                    <button type="button" @click="openVerify = false"
+                                                                        class="text-[9px] font-bold text-gray-400 uppercase cursor-pointer">
+                                                                        Cancelar
+                                                                    </button>
+                                                                    <button type="submit"
+                                                                        class="bg-brand-green text-white px-4 py-2 rounded-sm text-[9px] font-black uppercase cursor-pointer hover:bg-opacity-90">
+                                                                        Aprobar Pago
+                                                                    </button>
+                                                                </div>
+                                                            </form>
+                                                        </div>
+                                                    </div>
                                                 @endif
 
                                             </div>
-
                                         @endif
-
                                     </td>
 
 

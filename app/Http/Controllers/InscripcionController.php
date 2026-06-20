@@ -394,18 +394,42 @@ class InscripcionController extends Controller
         return back()->with('success', 'Estudiante añadido correctamente');
     }
 
-    public function validarPago($id)
+    public function validarPago(Request $request, $id)
     {
+        $request->validate([
+            'password_contabilidad' => 'required|string',
+        ]);
+
+        $configuracionArea = \App\Models\ContrasenaArea::whereHas('area', function ($query) {
+            $query->where('nombre', 'ILIKE', '%contabilidad%');
+        })
+            ->latest()
+            ->first();
+
+        if (!$configuracionArea) {
+            return redirect()->back()->with('error', 'No se encontró la configuración de seguridad para el área de Contabilidad.');
+        }
+        try {
+            $passwordDecodificada = \Illuminate\Support\Facades\Crypt::decryptString($configuracionArea->contrasena_encriptada);
+
+            if ($request->password_contabilidad !== $passwordDecodificada) {
+                return redirect()->back()->with('error', 'La contraseña de validación para el área de Contabilidad es incorrecta.');
+            }
+        } catch (\Illuminate\Contracts\Encryption\DecryptException $e) {
+            if (!\Hash::check($request->password_contabilidad, $configuracionArea->contrasena_encriptada)) {
+                return redirect()->back()->with('error', 'La contraseña de validación para el área de Contabilidad es incorrecta.');
+            }
+        }
+
         $pago = PagoEstudiante::findOrFail($id);
 
-        $pago->estado = 'pagado';
+        $pago->update([
+            'estado' => 'pagado',
+            'monto_pagado' => $pago->monto_pagar,
+            'fecha_pagada' => Carbon::now()->toDateString()
+        ]);
 
-        $pago->save();
-
-        return back()->with(
-            'success',
-            'Pago validado correctamente'
-        );
+        return redirect()->back()->with('success', 'El pago ha sido validado y completado con éxito por el área de Contabilidad.');
     }
 
 }
