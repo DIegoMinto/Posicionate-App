@@ -33,7 +33,7 @@
                                     <label class="form-label-bold text-black">Nombre del Área</label>
                                     <input type="text" name="nombre" value="{{ old('nombre') }}" required
                                         placeholder="EJ: RECURSOS HUMANOS, DIRECCIÓN"
-                                        class="form-input-pill border-2 border-brand-gold">
+                                        class="form-input-pill border-2 border-brand-gold uppercase">
                                     @error('nombre')
                                         <span
                                             class="text-red-500 text-[10px] mt-1 block font-medium uppercase">{{ $message }}</span>

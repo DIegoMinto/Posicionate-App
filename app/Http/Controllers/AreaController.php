@@ -21,7 +21,7 @@ class AreaController extends Controller
 
         $areas = \App\Models\Area::orderBy('nombre', 'asc')->get();
 
-        return view('contrasenas.create', compact('usuario', 'areas'));
+        return view('areas.create', compact('usuario', 'areas'));
     }
 
     public function store(Request $request)

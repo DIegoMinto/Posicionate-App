@@ -11,8 +11,8 @@
 <body>
     <x-layout-dashboard :usuario="$usuario">
         <x-page-header titulo="Áreas Organizacionales">
-            <a href="/variables" class="btn-back">
-                ← Volver a Variables
+            <a href="{{ route('creations.index') }}" class="btn-back">
+                ← Volver
             </a>
         </x-page-header>
 
