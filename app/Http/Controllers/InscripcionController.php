@@ -120,8 +120,7 @@ class InscripcionController extends Controller
 
         $estudiantes = $query
             ->orderBy('curso_estudiante.created_at', 'desc')
-            ->paginate(10)
-            ->withQueryString();
+            ->get();
 
         $personales = Personal::with('persona')->get();
 
