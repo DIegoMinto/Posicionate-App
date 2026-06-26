@@ -57,18 +57,22 @@
 
                             <div>
                                 <label class="block text-sm font-bold text-brand-green mb-1">
-                                    Monto a pagar ahora
+                                    Monto pagado (total corregido)
                                 </label>
-                                <input type="number" step="0.01" name="monto_pagado" max="{{ $saldo }}" required
+                                <input type="number" step="0.01" name="monto_pagado" min="0"
+                                    max="{{ $pago->monto_pagar }}" value="{{ $pago->monto_pagado }}" required
                                     class="w-full border border-gray-300 rounded p-2 text-center focus:ring-1 focus:ring-brand-green outline-none">
+                                <p class="text-xs text-gray-500 mt-1">Ingresa el total pagado real (0 para reiniciar)
+                                </p>
                             </div>
 
                             <div>
                                 <label class="block text-sm font-bold text-brand-green mb-1">
                                     Fecha de pago
                                 </label>
-                                <input type="date" name="fecha_pagada" value="{{ now()->format('Y-m-d') }}" required
-                                    class="w-full border border-gray-300 rounded p-2 text-center focus:ring-1 focus:ring-brand-green outline-none">
+                                <input type="date" name="fecha_pagada"
+                                    value="{{ $pago->fecha_pagada ? \Carbon\Carbon::parse($pago->fecha_pagada)->format('Y-m-d') : now()->format('Y-m-d') }}"
+                                    ...>
                             </div>
 
                         </div>

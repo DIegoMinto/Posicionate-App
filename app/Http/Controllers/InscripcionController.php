@@ -331,31 +331,22 @@ class InscripcionController extends Controller
 
         $pago = \App\Models\PagoEstudiante::findOrFail($id);
 
-        $nuevoMonto = $pago->monto_pagado + $request->monto_pagado;
-
-        if ($nuevoMonto > $pago->monto_pagar) {
+        if ($request->monto_pagado > $pago->monto_pagar) {
             return back()->withErrors([
-                'monto_pagado' => 'No puedes pagar más del saldo pendiente'
+                'monto_pagado' => 'El monto pagado no puede superar el monto total (' . $pago->monto_pagar . ' Bs)'
             ]);
         }
 
-        $pago->monto_pagado = $nuevoMonto;
+        $pago->monto_pagado = $request->monto_pagado;
         $pago->fecha_pagada = $request->fecha_pagada;
-        if ($nuevoMonto == 0) {
 
-            $estado = 'pendiente';
-
-        } elseif ($nuevoMonto < $pago->monto_pagar) {
-
-            $estado = 'revision';
-
+        if ($request->monto_pagado == 0) {
+            $pago->estado = 'pendiente';
+        } elseif ($request->monto_pagado < $pago->monto_pagar) {
+            $pago->estado = 'revision';
         } else {
-
-            $estado = 'revision';
-
+            $pago->estado = 'revision';
         }
-
-        $pago->estado = $estado;
 
         $pago->save();
 
