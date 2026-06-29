@@ -43,7 +43,6 @@ class WhatsappController extends Controller
 
             $instance = $user->instance_name;
 
-            // 🔍 Verificar si existe en Evolution
             $check = Http::withHeaders($this->headers())
                 ->get("{$this->baseUrl}/instance/connectionState/{$instance}");
 
@@ -53,10 +52,15 @@ class WhatsappController extends Controller
                     ->post("{$this->baseUrl}/instance/create", [
                         "instanceName" => $instance,
                         "integration" => "WHATSAPP-BAILEYS",
-                        "qrcode" => true
+                        "qrcode" => true,
+                        "tokenStoreType" => "DATABASE"
                     ]);
 
-                dd($create->status(), $create->body());
+                if ($create->failed()) {
+                    return response()->json([
+                        'error' => 'Error al crear en Render: ' . $create->body()
+                    ], 500);
+                }
                 sleep(2);
             }
 
