@@ -176,7 +176,10 @@ class InscripcionController extends Controller
                     $inscripcion->created_at
                 );
                 $ultimaFechaProgramada = null;
-                foreach ($plan->detalles as $index => $detallePlan) {
+                $posicion = 0;
+                foreach ($plan->detalles as $detallePlan) {
+
+                    $nro = $detallePlan->nro_cuota; // <-- clave real para buscar en el request
 
                     $montoPlan = (float) $detallePlan->monto_cuota;
 
@@ -185,61 +188,42 @@ class InscripcionController extends Controller
                         $montoPlan -= ($montoPlan * ($descuento->porcentaje / 100));
                     }
 
-                    $montoPagado = isset($request->cuotas[$index]['monto_pagado'])
-                        ? (float) $request->cuotas[$index]['monto_pagado']
+                    $montoPagado = isset($request->cuotas[$nro]['monto_pagado'])
+                        ? (float) $request->cuotas[$nro]['monto_pagado']
                         : 0;
 
-                    $fechaPagada = isset($request->cuotas[$index]['fecha_pagada'])
-                        ? $request->cuotas[$index]['fecha_pagada']
+                    $fechaPagada = isset($request->cuotas[$nro]['fecha_pagada']) && $request->cuotas[$nro]['fecha_pagada'] !== ''
+                        ? $request->cuotas[$nro]['fecha_pagada']
                         : null;
 
-                    if ($montoPagado > 0) {
-                        $estado = 'revision';
-                    } else {
-                        $estado = 'pendiente';
-                    }
-                    if ($detallePlan->detalle === 'TITULACION') {
+                    $estado = $montoPagado > 0 ? 'revision' : 'pendiente';
 
+                    if ($detallePlan->detalle === 'TITULACION') {
                         $fechaProgramada = $ultimaFechaProgramada
                             ? $ultimaFechaProgramada->copy()->addDays(15)
                             : $fechaInscripcion->copy()->addDays(15);
-
                     } else {
-
                         if ($plan->tipo_plan === 'CONTADO') {
-
-                            $fechaProgramada = $fechaInscripcion
-                                ->copy()
-                                ->addDays($index * 30);
-
+                            $fechaProgramada = $fechaInscripcion->copy()->addDays($posicion * 30);
                         } else {
-
-                            if ($index == 0) {
-
-                                $fechaProgramada = $fechaInscripcion->copy();
-
-                            } else {
-
-                                $fechaProgramada = $fechaInscripcion
-                                    ->copy()
-                                    ->startOfMonth()
-                                    ->addMonths($index)
-                                    ->day(15);
-                            }
+                            $fechaProgramada = $posicion == 0
+                                ? $fechaInscripcion->copy()
+                                : $fechaInscripcion->copy()->startOfMonth()->addMonths($posicion)->day(15);
                         }
-
                         $ultimaFechaProgramada = $fechaProgramada->copy();
                     }
+
                     \App\Models\PagoEstudiante::create([
                         'id_curso_estudiante' => $inscripcion->id,
                         'detalle' => $detallePlan->detalle,
                         'monto_pagar' => $montoPlan,
                         'monto_pagado' => $montoPagado,
                         'fecha_programada' => $fechaProgramada->format('Y-m-d'),
-
                         'fecha_pagada' => $fechaPagada,
                         'estado' => $estado,
                     ]);
+
+                    $posicion++;
                 }
 
                 return redirect()->route('curso.estudiantes', $request->id_curso)
@@ -326,7 +310,7 @@ class InscripcionController extends Controller
     {
         $request->validate([
             'monto_pagado' => 'required|numeric|min:0',
-            'fecha_pagada' => 'required|date',
+            'fecha_pagada' => 'nullable|date',
         ]);
 
         $pago = \App\Models\PagoEstudiante::findOrFail($id);
@@ -338,13 +322,13 @@ class InscripcionController extends Controller
         }
 
         $pago->monto_pagado = $request->monto_pagado;
-        $pago->fecha_pagada = $request->fecha_pagada;
 
         if ($request->monto_pagado == 0) {
+            // reinicio: sin fecha, vuelve a pendiente
+            $pago->fecha_pagada = null;
             $pago->estado = 'pendiente';
-        } elseif ($request->monto_pagado < $pago->monto_pagar) {
-            $pago->estado = 'revision';
         } else {
+            $pago->fecha_pagada = $request->fecha_pagada;
             $pago->estado = 'revision';
         }
 

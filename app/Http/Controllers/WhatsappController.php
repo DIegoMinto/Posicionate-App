@@ -73,9 +73,11 @@ class WhatsappController extends Controller
             ]);
 
         } catch (\Exception $e) {
-            return response()->json([
-                'error' => $e->getMessage()
-            ], 500);
+            dd([
+                'mensaje' => $e->getMessage(),
+                'archivo' => $e->getFile(),
+                'linea' => $e->getLine()
+            ]);
         }
     }
 

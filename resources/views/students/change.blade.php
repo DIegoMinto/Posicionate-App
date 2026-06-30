@@ -83,7 +83,6 @@
                 </div>
             </div>
 
-            <!-- 🔥 CUOTAS AHORA DENTRO DEL FORM -->
             <div class="mt-8 border border-brand-green rounded-lg p-8 bg-white">
                 <h2 class="text-brand-green font-bold font-sans text-xl mb-6">Plan de Pagos del Estudiante</h2>
 
@@ -103,7 +102,6 @@
                         {{ $curso->nombre }} ({{ $curso->codigo_curso }})
                     </h3>
 
-                    <!-- ❌ quitamos form="form-inscripcion" -->
                     <button type="submit" class="btn-gold">
                         Registrar
                     </button>
@@ -113,7 +111,6 @@
         </form>
     </x-layout-dashboard>
 
-    <!-- JS ORIGINAL SIN CAMBIOS -->
     <script>
         document.addEventListener('DOMContentLoaded', function () {
             const selectPlan = document.getElementById('select-plan');
@@ -165,35 +162,30 @@
                     sumaTotal += montoConDescuento;
 
                     const html = `
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 items-end border-b border-gray-100 pb-4">
-                <div>
-                    <label class="block font-sans font-bold text-brand-green mb-1">${cuota.nro_cuota == 0 ? 'MATRÍCULA' : cuota.detalle}</label>
-                    <div class="bg-gray-100 p-2 rounded text-sm text-gray-700 border border-gray-200">
-                        ${montoConDescuento.toFixed(2)} Bs (Sugerido)
-                    </div>
-                    
-
-                </div>
-                <div>
-                    <label class="block font-sans font-bold text-brand-green mb-1 text-center uppercase">Monto a pagar</label>
-                    <input type="number"
-                        name="cuotas[${index}][monto_pagado]"
-                        step="0.01"
-                        value="0.00"
-                        class="w-full border border-gray-300 rounded p-2 text-center focus:ring-1 focus:ring-brand-green outline-none font-sans">
-                </div>
-
-                <div>
-                    <label class="block font-sans font-bold text-brand-green mb-1 uppercase text-center">Fecha Programada</label>
-                    <input type="date"
-                        name="cuotas[${index}][fecha_pagada]"
-                        value="${cuota.fecha_vencimiento || ''}"
-                        class="w-full border border-gray-300 rounded p-2 text-center focus:ring-1 focus:ring-brand-green outline-none">
-
-                    <input type="hidden" name="cuotas[${index}][detalle]" value="${cuota.nro_cuota == 0 ? 'MATRÍCULA' : cuota.detalle}">
-                </div>
-
-            </div>`;
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 items-end border-b border-gray-100 pb-4">
+        <div>
+            <label class="block font-sans font-bold text-brand-green mb-1">${cuota.nro_cuota == 0 ? 'MATRÍCULA' : cuota.detalle}</label>
+            <div class="bg-gray-100 p-2 rounded text-sm text-gray-700 border border-gray-200">
+                ${montoConDescuento.toFixed(2)} Bs (Sugerido)
+            </div>
+        </div>
+        <div>
+            <label class="block font-sans font-bold text-brand-green mb-1 text-center uppercase">Monto a pagar</label>
+            <input type="number"
+                name="cuotas[${cuota.nro_cuota}][monto_pagado]"
+                step="0.01"
+                value="0.00"
+                class="w-full border border-gray-300 rounded p-2 text-center focus:ring-1 focus:ring-brand-green outline-none font-sans">
+        </div>
+        <div>
+            <label class="block font-sans font-bold text-brand-green mb-1 uppercase text-center">Fecha Programada</label>
+            <input type="date"
+                name="cuotas[${cuota.nro_cuota}][fecha_pagada]"
+                value="${cuota.fecha_vencimiento || ''}"
+                class="w-full border border-gray-300 rounded p-2 text-center focus:ring-1 focus:ring-brand-green outline-none">
+            <input type="hidden" name="cuotas[${cuota.nro_cuota}][detalle]" value="${cuota.nro_cuota == 0 ? 'MATRÍCULA' : cuota.detalle}">
+        </div>
+    </div>`;
                     contenedorCuotas.insertAdjacentHTML('beforeend', html);
                 });
 
