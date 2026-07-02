@@ -172,14 +172,17 @@ class InscripcionController extends Controller
                     'id_descuento' => $id_descuento,
                     'estado' => 'inscrito',
                 ]);
-                $fechaInscripcion = Carbon::parse(
-                    $inscripcion->created_at
-                );
+
+                $curso = Curso::findOrFail($request->id_curso);
+                $fechaInscripcion = $curso->fecha_inicio
+                    ? Carbon::parse($curso->fecha_inicio)
+                    : Carbon::parse($inscripcion->created_at);
+
                 $ultimaFechaProgramada = null;
                 $posicion = 0;
                 foreach ($plan->detalles as $detallePlan) {
 
-                    $nro = $detallePlan->nro_cuota; // <-- clave real para buscar en el request
+                    $nro = $detallePlan->nro_cuota;
 
                     $montoPlan = (float) $detallePlan->monto_cuota;
 
