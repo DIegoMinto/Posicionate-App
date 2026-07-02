@@ -370,8 +370,14 @@ class DashboardController extends Controller
             'id_institucion' => 'nullable|exists:institucion,id_institucion',
             'id_sede' => 'nullable|exists:sede,id_sede',
             'id_docente' => 'nullable|exists:docente,id_docente',
+            'fecha_inicio' => 'nullable|date',
+            'fecha_fin' => 'nullable|date|after_or_equal:fecha_inicio',
             'docentes_adicionales' => 'nullable|array',
             'docentes_adicionales.*' => 'exists:docente,id_docente',
+            'modulos' => 'nullable|array',
+            'modulos.*.nombre' => 'nullable|string|max:255',
+            'modulos.*.fecha_inicio' => 'nullable|date',
+            'modulos.*.fecha_fin' => 'nullable|date',
         ]);
 
         $dataCurso = $request->only([
@@ -408,6 +414,8 @@ class DashboardController extends Controller
             }
         }
 
+        $curso->update($dataCurso);
+
         $curso->docentesAdicionales()->delete();
 
         if ($request->has('docentes_adicionales')) {
@@ -415,6 +423,19 @@ class DashboardController extends Controller
                 if ($doc_id) {
                     $curso->docentesAdicionales()->create([
                         'id_docente' => $doc_id
+                    ]);
+                }
+            }
+        }
+
+        if ($request->has('modulos')) {
+            foreach ($request->modulos as $id_modulo => $datosModulo) {
+                $modulo = $curso->modulos()->find($id_modulo);
+                if ($modulo) {
+                    $modulo->update([
+                        'nombre' => $datosModulo['nombre'] ?? $modulo->nombre,
+                        'fecha_inicio' => $datosModulo['fecha_inicio'] ?? null,
+                        'fecha_fin' => $datosModulo['fecha_fin'] ?? null,
                     ]);
                 }
             }

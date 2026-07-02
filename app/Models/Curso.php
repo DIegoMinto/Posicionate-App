@@ -26,7 +26,6 @@ class Curso extends Model
         'costo_matricula'
     ];
 
-    // Relaciones para que Laravel haga la magia
     public function docente(): BelongsTo
     {
         return $this->belongsTo(Docente::class, 'id_docente', 'id_docente');
