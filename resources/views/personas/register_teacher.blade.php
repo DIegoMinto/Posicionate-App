@@ -161,7 +161,7 @@
                         <div
                             class="bg-slate-50 p-5 rounded-xl border-2 border-slate-300 hover:border-brand-green transition-all shadow-sm">
                             <label class="form-label-bold text-brand-green uppercase">Curriculum
-                                Vitae</label>
+                                Vitae (Documentado)</label>
                             <p class="text-[11px] font-bold text-slate-500 mb-3">Requerido: Formato PDF</p>
                             <input type="file" name="curriculum" class="form-input-pill border-brand-green border">
                         </div>
