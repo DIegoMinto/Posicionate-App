@@ -34,6 +34,7 @@ class StatiticController extends Controller
             'id_curso',
             DB::raw('COUNT(*) as total')
         )
+            ->where('estado', 'inscrito')
             ->when($mes, fn($q) => $q->whereMonth('created_at', $mes))
             ->when($anio, fn($q) => $q->whereYear('created_at', $anio))
             ->groupBy('id_personal', 'id_curso')
