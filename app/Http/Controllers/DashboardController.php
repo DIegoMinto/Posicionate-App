@@ -24,14 +24,20 @@ class DashboardController extends Controller
         $usuario = auth()->user()->load('persona');
 
         $rankingGeneral = Personal::with('persona')
-            ->withCount('cursoEstudiantes')
+            ->withCount([
+                'cursoEstudiantes' => function ($q) {
+                    $q->where('estado', 'inscrito');
+                }
+            ])
             ->orderByDesc('curso_estudiantes_count')
             ->take(3)
             ->get();
+
         $rankingMensual = Personal::with('persona')
             ->withCount([
                 'cursoEstudiantes as inscritos_mes_count' => function ($q) {
-                    $q->whereMonth('created_at', now()->month)
+                    $q->where('estado', 'inscrito')
+                        ->whereMonth('created_at', now()->month)
                         ->whereYear('created_at', now()->year);
                 }
             ])
