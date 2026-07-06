@@ -25,7 +25,8 @@
 
             <section class="bg-white rounded-2xl p-6 md:p-10 shadow-sm border border-gray-100">
                 <div class="flex flex-col items-center mb-8">
-                    <h2 class="text-2xl md:text-3xl font-black text-brand-green text-center">Ranking General</h2>
+                    <h2 class="text-2xl md:text-3xl font-black text-brand-green text-center uppercase">Ranking General
+                    </h2>
                     <div class="h-1 w-24 bg-[#CCB463] mt-3 rounded-full"></div>
                 </div>
 
