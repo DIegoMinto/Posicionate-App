@@ -147,7 +147,6 @@ class DocenteController extends Controller
         } catch (\Illuminate\Validation\ValidationException $e) {
             return back()->withErrors($e->validator)->withInput();
         } catch (\Exception $e) {
-            // Ahora $data siempre estará definida, aunque esté vacía si falló la validación
             dd([
                 'Mensaje' => $e->getMessage(),
                 'Linea' => $e->getLine(),

@@ -11,10 +11,11 @@
 <body>
     <x-layout-dashboard :usuario="$usuario">
 
-        <x-page-header titulo="Perfil de Docente: {{ $docente->nombre }} {{ $docente->apellido_p }}"><a
-                href="{{ route('teachers.index') }}" class="btn-back">
+        <x-page-header titulo="Perfil de Docente: {{ $docente->nombre }} {{ $docente->apellido_p }}">
+            <a href="{{ route('teachers.index') }}" class="btn-back">
                 ← Volver
-            </a></x-page-header>
+            </a>
+        </x-page-header>
 
         <div class="m-6 border-2 border-brand-green rounded-xl p-7">
 
@@ -22,7 +23,7 @@
 
                 <div class="flex">
                     <div class="pt-4">
-                        <img src="{{ $docente->fotografia ? asset('storage/' . $docente->fotografia) : asset('img/default-avatar.png') }}"
+                        <img src="{{ $docente->fotografia ? $docente->fotografia : asset('img/default-avatar.png') }}"
                             class="w-25 h-25 rounded-xs object-cover border">
                     </div>
 
@@ -101,26 +102,27 @@
                 </div>
 
             </div>
+
             <div class="bg-gray-50 rounded-lg border col-span-1 md:col-span-2 lg:col-span-2 p-4 mt-6">
                 <h3 class="font-bold text-brand-green mb-3">Documentación Adjunta</h3>
                 <div class="flex flex-wrap gap-4">
 
                     @if($docente->curriculum)
-                        <a href="{{ asset('storage/' . $docente->curriculum) }}" target="_blank"
+                        <a href="{{ $docente->curriculum }}" target="_blank"
                             class="bg-brand-green text-white px-4 py-2 rounded text-xs font-bold hover:scale-105 transition uppercase">
                             Ver Curriculum
                         </a>
                     @endif
 
                     @if($docente->fotocarnet)
-                        <a href="{{ asset('storage/' . $docente->fotocarnet) }}" target="_blank"
+                        <a href="{{ $docente->fotocarnet }}" target="_blank"
                             class="bg-brand-gold text-black px-4 py-2 rounded text-xs font-bold hover:scale-105 transition uppercase">
                             Ver Foto Carnet
                         </a>
                     @endif
 
                     @if($docente->fotografia)
-                        <a href="{{ asset('storage/' . $docente->fotografia) }}" target="_blank"
+                        <a href="{{ $docente->fotografia }}" target="_blank"
                             class="bg-blue-600 text-white px-4 py-2 rounded text-xs font-bold hover:scale-105 transition uppercase">
                             Ver Fotografía
                         </a>
