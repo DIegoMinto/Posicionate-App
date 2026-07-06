@@ -23,27 +23,79 @@ class DashboardController extends Controller
     {
         $usuario = auth()->user()->load('persona');
 
-        $rankingGeneral = Personal::with('persona')
-            ->withCount([
-                'cursoEstudiantes' => function ($q) {
-                    $q->where('estado', 'inscrito');
-                }
-            ])
-            ->orderByDesc('curso_estudiantes_count')
-            ->take(3)
-            ->get();
+        $personales = Personal::with([
+            'persona',
+            'cursoEstudiantes' => function ($q) {
+                $q->where('estado', 'inscrito')->with('curso');
+            }
+        ])->get();
 
-        $rankingMensual = Personal::with('persona')
-            ->withCount([
-                'cursoEstudiantes as inscritos_mes_count' => function ($q) {
-                    $q->where('estado', 'inscrito')
-                        ->whereMonth('created_at', now()->month)
-                        ->whereYear('created_at', now()->year);
+        $rankingGeneral = $personales->map(function ($personal) {
+            $inscritosDiplomados = 0;
+            $inscritosCursosRegulares = 0;
+
+            foreach ($personal->cursoEstudiantes as $inscripcion) {
+                if ($inscripcion->curso) {
+                    $tipo = strtolower($inscripcion->curso->tipo);
+                    if ($tipo === 'diplomado') {
+                        $inscritosDiplomados++;
+                    } elseif ($tipo === 'curso') {
+                        $inscritosCursosRegulares++;
+                    }
                 }
-            ])
-            ->orderByDesc('inscritos_mes_count')
+            }
+
+            $puntosPorCursos = intdiv($inscritosCursosRegulares, 3);
+            $residuoCursos = $inscritosCursosRegulares % 3;
+
+            $personal->total_puntaje = $inscritosDiplomados + $puntosPorCursos;
+            $personal->exponente_cursos = $residuoCursos;
+
+            return $personal;
+        })
+            ->sort(function ($a, $b) {
+                if ($b->total_puntaje === $a->total_puntaje) {
+                    return $b->exponente_cursos <=> $a->exponente_cursos;
+                }
+                return $b->total_puntaje <=> $a->total_puntaje;
+            })
             ->take(3)
-            ->get();
+            ->values();
+
+        $rankingMensual = $personales->map(function ($personal) {
+            $inscritosDiplomadosMes = 0;
+            $inscritosCursosRegularesMes = 0;
+
+            foreach ($personal->cursoEstudiantes as $inscripcion) {
+                if ($inscripcion->created_at && $inscripcion->created_at->month == now()->month && $inscripcion->created_at->year == now()->year) {
+                    if ($inscripcion->curso) {
+                        $tipo = strtolower($inscripcion->curso->tipo);
+                        if ($tipo === 'diplomado') {
+                            $inscritosDiplomadosMes++;
+                        } elseif ($tipo === 'curso') {
+                            $inscritosCursosRegularesMes++;
+                        }
+                    }
+                }
+            }
+
+            $puntosPorCursosMes = intdiv($inscritosCursosRegularesMes, 3);
+            $residuoCursosMes = $inscritosCursosRegularesMes % 3;
+
+            $personal->total_puntaje_mes = $inscritosDiplomadosMes + $puntosPorCursosMes;
+            $personal->exponente_cursos_mes = $residuoCursosMes;
+
+            return $personal;
+        })
+            ->sort(function ($a, $b) {
+                if ($b->total_puntaje_mes === $a->total_puntaje_mes) {
+                    return $b->exponente_cursos_mes <=> $a->exponente_cursos_mes;
+                }
+                return $b->total_puntaje_mes <=> $a->total_puntaje_mes;
+            })
+            ->take(3)
+            ->values();
+
 
         return view(
             'dashboard.index',

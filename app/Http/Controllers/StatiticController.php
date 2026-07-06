@@ -19,15 +19,12 @@ class StatiticController extends Controller
         $id_personal = $request->id_personal;
         $orden = $request->orden ?? 'desc';
 
-
         $cursos = Curso::when($mes, fn($q) => $q->whereMonth('fecha_inicio', $mes))
             ->when($anio, fn($q) => $q->whereYear('fecha_inicio', $anio))
             ->orderBy('nombre')
             ->get();
 
-
         $personales = Personal::with('persona')->get();
-
 
         $inscripciones = CursoEstudiante::select(
             'id_personal',
@@ -55,8 +52,12 @@ class StatiticController extends Controller
             $fila = [
                 'personal' => $p,
                 'total' => 0,
+                'puntaje' => 0,
                 'cursos' => []
             ];
+
+            $inscritosDiplomados = 0;
+            $inscritosCursosRegulares = 0;
 
             foreach ($cursos as $curso) {
 
@@ -70,22 +71,28 @@ class StatiticController extends Controller
 
                 $fila['cursos'][$curso->id_curso] = $count;
                 $fila['total'] += $count;
-
-
                 $totalesCursos[$curso->id_curso] += $count;
+
+                if (strtolower($curso->tipo) === 'diplomado') {
+                    $inscritosDiplomados += $count;
+                } elseif (strtolower($curso->tipo) === 'curso') {
+                    $inscritosCursosRegulares += $count;
+                }
             }
+
+            $fila['puntaje'] = $inscritosDiplomados + intdiv($inscritosCursosRegulares, 3);
 
             $data[] = $fila;
         }
 
-
         usort($data, function ($a, $b) use ($orden) {
             return $orden === 'asc'
-                ? $a['total'] <=> $b['total']
-                : $b['total'] <=> $a['total'];
+                ? $a['puntaje'] <=> $b['puntaje']
+                : $b['puntaje'] <=> $a['puntaje'];
         });
 
         $totalGeneral = array_sum(array_column($data, 'total'));
+        $totalPuntajeGeneral = array_sum(array_column($data, 'puntaje'));
 
         return view('statitics.index', compact(
             'usuario',
@@ -94,6 +101,7 @@ class StatiticController extends Controller
             'personales',
             'totalesCursos',
             'totalGeneral',
+            'totalPuntajeGeneral',
             'orden'
         ));
     }

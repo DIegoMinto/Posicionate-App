@@ -12,7 +12,6 @@
 <body class="bg-gray-50 text-gray-800 antialiased">
     <x-layout-dashboard :usuario="$usuario">
 
-        <!-- Se añade pointer-events-none aquí para que no bloquee el mouse ni el scroll -->
         <div
             class="absolute inset-0 opacity-10 bg-[radial-gradient(#CCB463_1px,transparent_1px)] [background-size:16px_16px] pointer-events-none">
         </div>
@@ -51,7 +50,9 @@
                                     {{ $segundo->persona->nombre ?? 'Usuario' }}
                                 </h4>
                                 <p class="text-3xl font-black text-brand-green mt-1">
-                                    {{ $segundo->curso_estudiantes_count }}
+                                    {{ $segundo->total_puntaje }}@if($segundo->exponente_cursos > 0)<sup
+                                    class="text-sm text-brand-green font-bold">{{ $segundo->exponente_cursos }}</sup>@endif
+                                    <span class="text-xs font-semibold text-gray-400">pts</span>
                                 </p>
                             </div>
                         </div>
@@ -75,7 +76,9 @@
                                     {{ $primero->persona->nombre ?? 'Líder Actual' }}
                                 </h3>
                                 <p class="text-4xl font-black text-[#CCB463] mt-1">
-                                    {{ $primero->curso_estudiantes_count }}
+                                    {{ $primero->total_puntaje }}@if($primero->exponente_cursos > 0)<sup
+                                    class="text-sm text-brand-gold font-bold">{{ $primero->exponente_cursos }}</sup>@endif
+                                    <span class="text-sm font-semibold text-gray-400">pts</span>
                                 </p>
                             </div>
                         </div>
@@ -98,7 +101,9 @@
                                     {{ $tercero->persona->nombre ?? 'Usuario' }}
                                 </h4>
                                 <p class="text-3xl font-black text-brand-green mt-1">
-                                    {{ $tercero->curso_estudiantes_count }}
+                                    {{ $tercero->total_puntaje }}@if($tercero->exponente_cursos > 0)<sup
+                                    class="text-sm text-brand-green font-bold">{{ $tercero->exponente_cursos }}</sup>@endif
+                                    <span class="text-xs font-semibold text-gray-400">pts</span>
                                 </p>
                             </div>
                         </div>
@@ -137,10 +142,8 @@
                             En POSICIONATE creemos en el aprendizaje constante como motor de crecimiento personal y
                             profesional.
                             Somos un centro de formación continua enfocado a desarrollar habilidades prácticas.
-
                         </p>
                     </div>
-
                 </div>
 
                 <div class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 flex flex-col justify-between">
@@ -172,7 +175,6 @@
                             </div>
                         </div>
                     </div>
-
                 </div>
 
             </section>

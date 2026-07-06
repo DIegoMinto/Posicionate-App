@@ -75,6 +75,9 @@
                                 <th class="py-3 px-4 text-center whitespace-nowrap min-w-[160px]">Código</th>
                                 <th class="py-3 px-4 text-center whitespace-nowrap min-w-[160px]">Asesor</th>
                                 <th class="py-3 px-4 text-center whitespace-nowrap min-w-[160px]">Total</th>
+                                <th
+                                    class="py-3 px-4 text-center whitespace-nowrap min-w-[160px] text-white border-l border-brand-gold">
+                                    Puntaje</th>
 
                                 @foreach($cursos as $curso)
                                     <th class="py-3 px-4 text-center min-w-[220px] max-w-[220px]">
@@ -112,6 +115,11 @@
                                         </span>
                                     </td>
 
+                                    <td
+                                        class="py-3 px-4 text-center whitespace-nowrap min-w-[160px] bg-amber-50 font-black text-amber-800 border-l border-amber-200">
+                                        {{ $row['puntaje'] }} pts
+                                    </td>
+
                                     @foreach($cursos as $curso)
                                         <td class="py-3 px-4 text-center whitespace-nowrap min-w-[160px]">
                                             {{ $row['cursos'][$curso->id_curso] ?? 0 }}
@@ -121,7 +129,7 @@
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="{{ 4 + count($cursos) }}" class="py-12 text-center text-gray-400 italic">
+                                    <td colspan="{{ 5 + count($cursos) }}" class="py-12 text-center text-gray-400 italic">
                                         No hay datos disponibles.
                                     </td>
                                 </tr>
@@ -134,6 +142,10 @@
 
                                 <td class="py-3 px-4 text-center text-white">
                                     {{ $totalGeneral }}
+                                </td>
+
+                                <td class="py-3 px-4 text-center text-white font-black border-l border-brand-gold">
+                                    {{ $totalPuntajeGeneral }} pts
                                 </td>
 
                                 @foreach($cursos as $curso)
