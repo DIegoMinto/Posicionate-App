@@ -12,8 +12,9 @@
 <body class="bg-gray-50 text-gray-800 antialiased">
     <x-layout-dashboard :usuario="$usuario">
 
+        <!-- Se añade pointer-events-none aquí para que no bloquee el mouse ni el scroll -->
         <div
-            class="absolute inset-0 opacity-10 bg-[radial-gradient(#CCB463_1px,transparent_1px)] [background-size:16px_16px]">
+            class="absolute inset-0 opacity-10 bg-[radial-gradient(#CCB463_1px,transparent_1px)] [background-size:16px_16px] pointer-events-none">
         </div>
         <div class="relative z-10">
             <x-page-header titulo="Bienvenido a Posicionate App" class="text-white">
