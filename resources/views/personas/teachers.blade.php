@@ -136,8 +136,7 @@
                                     <td class="py-3 px-4 whitespace-nowrap">
                                         <div class="flex gap-2">
                                             @if($d->curriculum)
-                                                <a href="{{ asset('storage/' . $d->curriculum) }}" target="_blank"
-                                                    title="Ver CV">
+                                                <a href="{{ $d->curriculum }}" target="_blank" title="Ver CV">
                                                     <svg class="w-4 h-4 text-red-500" fill="currentColor" viewBox="0 0 20 20">
                                                         <path
                                                             d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4z" />
@@ -145,12 +144,20 @@
                                                 </a>
                                             @endif
                                             @if($d->fotografia)
-                                                <a href="{{ asset('storage/' . $d->fotografia) }}" target="_blank"
-                                                    title="Ver Foto">
+                                                <a href="{{ $d->fotografia }}" target="_blank" title="Ver Foto">
                                                     <svg class="w-4 h-4 text-blue-500" fill="currentColor" viewBox="0 0 20 20">
                                                         <path fill-rule="evenodd"
                                                             d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z"
                                                             clip-rule="evenodd" />
+                                                    </svg>
+                                                </a>
+                                            @endif
+                                            @if($d->fotocarnet)
+                                                <a href="{{ $d->fotocarnet }}" target="_blank" title="Ver Carnet">
+                                                    <svg class="w-4 h-4 text-yellow-600" fill="currentColor"
+                                                        viewBox="0 0 20 20">
+                                                        <path
+                                                            d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4z" />
                                                     </svg>
                                                 </a>
                                             @endif
