@@ -82,12 +82,12 @@ class DocenteController extends Controller
                 'emite_factura' => 'required',
             ]);
 
-            $extensionFinal = $request->extension_select === 'OTRO'
-                ? strtoupper(trim($request->extension_otro))
-                : $request->extension_select;
+            // El campo extension_ci ya viene con el valor final desde el formulario
+            // (el JS alterna el "name" entre el <select> y el <input> de "OTRO",
+            // pero ambos usan siempre extension_ci).
+            $extensionFinal = strtoupper(trim($request->extension_ci));
 
-
-            $data = $request->except(['_token', 'extension_select', 'extension_otro', 'id_pais', 'id_departamento']);
+            $data = $request->except(['_token', 'id_pais', 'id_departamento']);
 
             $data['extension_ci'] = $extensionFinal;
             $data['emite_factura'] = ($request->emite_factura == '1') ? 'SI' : 'NO';
@@ -101,8 +101,6 @@ class DocenteController extends Controller
                 ],
                 'url' => ['secure' => true]
             ]);
-
-            $idArchivo = $request->ci . '_' . $extensionFinal;
 
             if ($request->hasFile('curriculum')) {
                 $upload = $cloudinary->uploadApi()->upload(
@@ -201,7 +199,7 @@ class DocenteController extends Controller
                 'nombre' => 'required|string|max:100',
                 'apellido_p' => 'required|string|max:100',
                 'ci' => 'required|numeric|unique:docente,ci,' . $docente->id_docente . ',id_docente',
-                'extension_select' => 'required',
+                'extension_ci' => 'required|string|max:10',
                 'correo_electronico' => 'required|email|unique:docente,correo_electronico,' . $docente->id_docente . ',id_docente',
                 'id_ciudad' => 'required',
                 'id_institucion_egreso' => 'required',
@@ -211,11 +209,9 @@ class DocenteController extends Controller
                 'emite_factura' => 'required',
             ]);
 
-            $extensionFinal = $request->extension_select === 'OTRO'
-                ? strtoupper(trim($request->extension_otro))
-                : $request->extension_select;
+            $extensionFinal = strtoupper(trim($request->extension_ci));
 
-            $data = $request->except(['_token', '_method', 'extension_select', 'extension_otro', 'id_pais', 'id_departamento']);
+            $data = $request->except(['_token', '_method', 'id_pais', 'id_departamento']);
 
             $data['extension_ci'] = $extensionFinal;
             $data['emite_factura'] = ($request->emite_factura == '1') ? 'SI' : 'NO';
@@ -230,8 +226,6 @@ class DocenteController extends Controller
                 ],
                 'url' => ['secure' => true]
             ]);
-
-            $idArchivo = $request->ci . '_' . $extensionFinal;
 
             if ($request->hasFile('curriculum')) {
                 $upload = $cloudinary->uploadApi()->upload(
