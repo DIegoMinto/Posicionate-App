@@ -18,9 +18,22 @@ class StatiticController extends Controller
         $anio = $request->anio;
         $id_personal = $request->id_personal;
         $orden = $request->orden ?? 'desc';
+        $fecha_inicio = $request->fecha_inicio;
+        $fecha_fin = $request->fecha_fin;
 
-        $cursos = Curso::when($mes, fn($q) => $q->whereMonth('fecha_inicio', $mes))
-            ->when($anio, fn($q) => $q->whereYear('fecha_inicio', $anio))
+        $usarRango = $fecha_inicio || $fecha_fin;
+
+        $cursos = Curso::when($usarRango, function ($q) use ($fecha_inicio, $fecha_fin) {
+            if ($fecha_inicio && $fecha_fin) {
+                $q->whereBetween('fecha_inicio', [$fecha_inicio, $fecha_fin]);
+            } elseif ($fecha_inicio) {
+                $q->where('fecha_inicio', '>=', $fecha_inicio);
+            } elseif ($fecha_fin) {
+                $q->where('fecha_inicio', '<=', $fecha_fin);
+            }
+        })
+            ->when(!$usarRango && $mes, fn($q) => $q->whereMonth('fecha_inicio', $mes))
+            ->when(!$usarRango && $anio, fn($q) => $q->whereYear('fecha_inicio', $anio))
             ->orderBy('nombre')
             ->get();
 
@@ -32,8 +45,17 @@ class StatiticController extends Controller
             DB::raw('COUNT(*) as total')
         )
             ->where('estado', 'inscrito')
-            ->when($mes, fn($q) => $q->whereMonth('created_at', $mes))
-            ->when($anio, fn($q) => $q->whereYear('created_at', $anio))
+            ->when($usarRango, function ($q) use ($fecha_inicio, $fecha_fin) {
+                if ($fecha_inicio && $fecha_fin) {
+                    $q->whereBetween('created_at', [$fecha_inicio, $fecha_fin]);
+                } elseif ($fecha_inicio) {
+                    $q->where('created_at', '>=', $fecha_inicio);
+                } elseif ($fecha_fin) {
+                    $q->where('created_at', '<=', $fecha_fin);
+                }
+            })
+            ->when(!$usarRango && $mes, fn($q) => $q->whereMonth('created_at', $mes))
+            ->when(!$usarRango && $anio, fn($q) => $q->whereYear('created_at', $anio))
             ->groupBy('id_personal', 'id_curso')
             ->get();
 
@@ -51,7 +73,9 @@ class StatiticController extends Controller
 
             $fila = [
                 'personal' => $p,
-                'total' => 0,
+                'total_inscritos' => 0,
+                'puntaje_diplomados' => 0,
+                'puntaje_cursos' => 0,
                 'puntaje' => 0,
                 'cursos' => []
             ];
@@ -70,7 +94,7 @@ class StatiticController extends Controller
                 $count = $match ? $match->total : 0;
 
                 $fila['cursos'][$curso->id_curso] = $count;
-                $fila['total'] += $count;
+                $fila['total_inscritos'] += $count;
                 $totalesCursos[$curso->id_curso] += $count;
 
                 if (strtolower($curso->tipo) === 'diplomado') {
@@ -80,7 +104,9 @@ class StatiticController extends Controller
                 }
             }
 
-            $fila['puntaje'] = $inscritosDiplomados + intdiv($inscritosCursosRegulares, 3);
+            $fila['puntaje_diplomados'] = $inscritosDiplomados;
+            $fila['puntaje_cursos'] = intdiv($inscritosCursosRegulares, 3);
+            $fila['puntaje'] = $fila['puntaje_diplomados'] + $fila['puntaje_cursos'];
 
             $data[] = $fila;
         }
@@ -91,7 +117,9 @@ class StatiticController extends Controller
                 : $b['puntaje'] <=> $a['puntaje'];
         });
 
-        $totalGeneral = array_sum(array_column($data, 'total'));
+        $totalInscritosGeneral = array_sum(array_column($data, 'total_inscritos'));
+        $totalPuntajeDiplomadosGeneral = array_sum(array_column($data, 'puntaje_diplomados'));
+        $totalPuntajeCursosGeneral = array_sum(array_column($data, 'puntaje_cursos'));
         $totalPuntajeGeneral = array_sum(array_column($data, 'puntaje'));
 
         return view('statitics.index', compact(
@@ -100,7 +128,9 @@ class StatiticController extends Controller
             'cursos',
             'personales',
             'totalesCursos',
-            'totalGeneral',
+            'totalInscritosGeneral',
+            'totalPuntajeDiplomadosGeneral',
+            'totalPuntajeCursosGeneral',
             'totalPuntajeGeneral',
             'orden'
         ));

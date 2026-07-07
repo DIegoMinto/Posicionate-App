@@ -24,7 +24,8 @@
 
             <section class="bg-white rounded-2xl p-6 md:p-10 shadow-sm border border-gray-100">
                 <div class="flex flex-col items-center mb-8">
-                    <h2 class="text-2xl md:text-3xl font-black text-brand-green text-center uppercase">Ranking General
+                    <h2 class="text-2xl md:text-3xl font-black text-brand-green text-center uppercase">
+                        Ranking Mensual - {{ strtoupper(\Carbon\Carbon::now()->locale('es')->monthName) }}
                     </h2>
                     <div class="h-1 w-24 bg-[#CCB463] mt-3 rounded-full"></div>
                 </div>
@@ -32,8 +33,8 @@
                 <div
                     class="flex flex-col md:flex-row items-center md:items-end justify-center gap-8 md:gap-4 lg:gap-8 min-h-[380px]">
 
-                    @if(isset($rankingGeneral[1]))
-                        @php $segundo = $rankingGeneral[1]; @endphp
+                    @if(isset($rankingMensual[1]))
+                        @php $segundo = $rankingMensual[1]; @endphp
                         <div
                             class="flex flex-col items-center order-2 md:order-1 transition-all duration-300 hover:-translate-y-2">
                             <div class="relative w-[190px] lg:w-[210px]">
@@ -46,20 +47,20 @@
                                     class="absolute -top-3 -right-3 w-16 filter drop-shadow-md" alt="2do Lugar">
                             </div>
                             <div class="mt-4 text-center">
-                                <h4 class="text-lg font-bold text-gray-700 leading-tight">
+                                <h4 class="text-lg font-bold text-brand-green leading-tight">
                                     {{ $segundo->persona->nombre ?? 'Usuario' }}
                                 </h4>
                                 <p class="text-3xl font-black text-brand-green mt-1">
                                     {{ $segundo->total_puntaje }}@if($segundo->exponente_cursos > 0)<sup
                                     class="text-sm text-brand-green font-bold">{{ $segundo->exponente_cursos }}</sup>@endif
-                                    <span class="text-xs font-semibold text-gray-400">pts</span>
+                                    <span class="text-xs font-semibold text-brand-green">pts</span>
                                 </p>
                             </div>
                         </div>
                     @endif
 
-                    @if(isset($rankingGeneral[0]))
-                        @php $primero = $rankingGeneral[0]; @endphp
+                    @if(isset($rankingMensual[0]))
+                        @php $primero = $rankingMensual[0]; @endphp
                         <div
                             class="flex flex-col items-center order-1 md:order-2 transform scale-105 md:scale-110 z-10 transition-all duration-300 hover:-translate-y-2">
                             <div class="relative w-[220px] lg:w-[240px] mb-4 md:mb-6">
@@ -75,17 +76,17 @@
                                 <h3 class="text-xl font-black text-brand-green leading-tight">
                                     {{ $primero->persona->nombre ?? 'Líder Actual' }}
                                 </h3>
-                                <p class="text-4xl font-black text-[#CCB463] mt-1">
+                                <p class="text-4xl font-black text-brand-green mt-1">
                                     {{ $primero->total_puntaje }}@if($primero->exponente_cursos > 0)<sup
-                                    class="text-sm text-brand-gold font-bold">{{ $primero->exponente_cursos }}</sup>@endif
-                                    <span class="text-sm font-semibold text-gray-400">pts</span>
+                                    class="text-sm text-brand-green font-bold">{{ $primero->exponente_cursos }}</sup>@endif
+                                    <span class="text-sm font-semibold text-brand-green">pts</span>
                                 </p>
                             </div>
                         </div>
                     @endif
 
-                    @if(isset($rankingGeneral[2]))
-                        @php $tercero = $rankingGeneral[2]; @endphp
+                    @if(isset($rankingMensual[2]))
+                        @php $tercero = $rankingMensual[2]; @endphp
                         <div class="flex flex-col items-center order-3 transition-all duration-300 hover:-translate-y-2">
                             <div class="relative w-[190px] lg:w-[210px]">
                                 <div
@@ -97,13 +98,13 @@
                                     class="absolute -top-3 -right-3 w-16 filter drop-shadow-md" alt="3er Lugar">
                             </div>
                             <div class="mt-4 text-center">
-                                <h4 class="text-lg font-bold text-gray-700 leading-tight">
+                                <h4 class="text-lg font-bold text-brand-green leading-tight">
                                     {{ $tercero->persona->nombre ?? 'Usuario' }}
                                 </h4>
                                 <p class="text-3xl font-black text-brand-green mt-1">
                                     {{ $tercero->total_puntaje }}@if($tercero->exponente_cursos > 0)<sup
                                     class="text-sm text-brand-green font-bold">{{ $tercero->exponente_cursos }}</sup>@endif
-                                    <span class="text-xs font-semibold text-gray-400">pts</span>
+                                    <span class="text-xs font-semibold text-brand-green">pts</span>
                                 </p>
                             </div>
                         </div>
@@ -137,7 +138,7 @@
                             </div>
                             <h3 class="text-xl font-bold font-sans tracking-tight uppercase">Sobre Posicionate</h3>
                         </div>
-                        <p class="text-white text-sm md:text-base leading-relaxed mb-6" font-sans>
+                        <p class="text-white text-sm md:text-base leading-relaxed mb-6">
                             POSICIONATE LA PLATA | Centro de Formación Continua
                             En POSICIONATE creemos en el aprendizaje constante como motor de crecimiento personal y
                             profesional.
@@ -163,15 +164,15 @@
 
                         <div class="space-y-4 text-sm text-gray-600">
                             <div class="text-black">
-                                <p class="font-semibold ">Dirección Física:</p>
-                                <p class="mt-0.5 ">Calle René Calvo Arana #87</p>
-                                <p class="text-xs ">Sucre, Bolivia</p>
+                                <p class="font-semibold">Dirección Física:</p>
+                                <p class="mt-0.5">Calle René Calvo Arana #87</p>
+                                <p class="text-xs">Sucre, Bolivia</p>
                             </div>
                             <hr class="border-gray-100">
                             <div class="text-black">
-                                <p class="font-semibold 0">Canales de Atención:</p>
+                                <p class="font-semibold">Canales de Atención:</p>
                                 <p class="mt-0.5">academicoposicionate@gmail.com</p>
-                                <p>+591 60300960</p>
+                                <p class="+591 60300960">+591 60300960</p>
                             </div>
                         </div>
                     </div>

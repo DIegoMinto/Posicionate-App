@@ -51,6 +51,18 @@
                     <option value="asc" {{ $orden == 'asc' ? 'selected' : '' }}>MENOR A MAYOR</option>
                 </select>
 
+                <div>
+                    <div class="font-sans text-[12px] text-white">Fecha inicio</div>
+                    <input type="date" name="fecha_inicio" value="{{ request('fecha_inicio') }}"
+                        onchange="this.form.submit()" class="bg-white text-[10px] px-2 py-1.5 rounded-md uppercase">
+                </div>
+
+                <div>
+                    <div class="font-sans text-[12px] text-white">Fecha fin</div>
+                    <input type="date" name="fecha_fin" value="{{ request('fecha_fin') }}" onchange="this.form.submit()"
+                        class="bg-white text-[10px] px-2 py-1.5 rounded-md uppercase">
+                </div>
+
             </form>
 
         </x-page-header>
@@ -71,13 +83,18 @@
                         <thead>
                             <tr
                                 class="border-b-2 border-brand-gold uppercase text-[10px] font-black bg-brand-green text-white">
-                                <th class="py-3 px-4 text-center whitespace-nowrap min-w-[160px]">N°</th>
-                                <th class="py-3 px-4 text-center whitespace-nowrap min-w-[160px]">Código</th>
+                                <th class="py-3 px-4 text-center whitespace-nowrap min-w-[80px]">N°</th>
+                                <th class="py-3 px-4 text-center whitespace-nowrap min-w-[120px]">Código</th>
                                 <th class="py-3 px-4 text-center whitespace-nowrap min-w-[160px]">Asesor</th>
-                                <th class="py-3 px-4 text-center whitespace-nowrap min-w-[160px]">Total</th>
+                                <th class="py-3 px-4 text-center whitespace-nowrap min-w-[120px]">Total Inscritos</th>
                                 <th
-                                    class="py-3 px-4 text-center whitespace-nowrap min-w-[160px] text-white border-l border-brand-gold">
-                                    Puntaje</th>
+                                    class="py-3 px-4 text-center whitespace-nowrap min-w-[120px] text-white border-l border-brand-gold/50">
+                                    Pts Cursos</th>
+                                <th class="py-3 px-4 text-center whitespace-nowrap min-w-[120px] text-white">Pts
+                                    Diplomados</th>
+                                <th
+                                    class="py-3 px-4 text-center whitespace-nowrap min-w-[140px] text-white border-brand-gold">
+                                    Total Puntos</th>
 
                                 @foreach($cursos as $curso)
                                     <th class="py-3 px-4 text-center min-w-[220px] max-w-[220px]">
@@ -94,34 +111,43 @@
                             @forelse($data as $index => $row)
                                 <tr class="border-b border-gray-100 hover:bg-gray-50 text-black">
 
-                                    <td class="py-3 px-4 text-center whitespace-nowrap min-w-[160px]">
+                                    <td class="py-3 px-4 text-center whitespace-nowrap">
                                         {{ $index + 1 }}
                                     </td>
 
-                                    <td class="py-3 px-4 text-center whitespace-nowrap min-w-[160px]">
+                                    <td class="py-3 px-4 text-center whitespace-nowrap">
                                         {{ $row['personal']->codigo_personal }}
                                     </td>
 
-                                    <td class="py-3 px-4 text-center whitespace-nowrap min-w-[160px]">
+                                    <td class="py-3 px-4 text-left whitespace-nowrap">
                                         {{ $row['personal']->persona->apellido_p }}
                                         {{ $row['personal']->persona->apellido_m }}
                                         {{ $row['personal']->persona->nombre }}
                                     </td>
 
-                                    <td class="py-3 px-4 text-center whitespace-nowrap min-w-[160px]">
+                                    <td class="py-3 px-4 text-center whitespace-nowrap">
                                         <span
                                             class="px-2 py-1 rounded-full bg-green-100 text-green-700 text-[10px] font-black">
-                                            {{ $row['total'] }}
+                                            {{ $row['total_inscritos'] }}
                                         </span>
                                     </td>
 
                                     <td
-                                        class="py-3 px-4 text-center whitespace-nowrap min-w-[160px] bg-amber-50 font-black text-amber-800 border-l border-amber-200">
+                                        class="py-3 px-4 text-center whitespace-nowrap bg-gray-50 text-gray-700 border-l border-brand-gold/20">
+                                        {{ $row['puntaje_cursos'] }} pts
+                                    </td>
+
+                                    <td class="py-3 px-4 text-center whitespace-nowrap bg-gray-50 text-gray-700">
+                                        {{ $row['puntaje_diplomados'] }} pts
+                                    </td>
+
+                                    <td
+                                        class="py-3 px-4 text-center whitespace-nowrap bg-amber-50 font-black text-amber-800">
                                         {{ $row['puntaje'] }} pts
                                     </td>
 
                                     @foreach($cursos as $curso)
-                                        <td class="py-3 px-4 text-center whitespace-nowrap min-w-[160px]">
+                                        <td class="py-3 px-4 text-center whitespace-nowrap">
                                             {{ $row['cursos'][$curso->id_curso] ?? 0 }}
                                         </td>
                                     @endforeach
@@ -129,27 +155,35 @@
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="{{ 5 + count($cursos) }}" class="py-12 text-center text-gray-400 italic">
+                                    <td colspan="{{ 7 + count($cursos) }}" class="py-12 text-center text-gray-400 italic">
                                         No hay datos disponibles.
                                     </td>
                                 </tr>
                             @endforelse
 
                             <tr class="bg-brand-green font-sans font-medium text-white">
-                                <td colspan="3" class="py-3 px-4 text-right uppercase">
+                                <td colspan="3" class="py-3 px-4 text-right uppercase font-black">
                                     TOTAL GENERAL
                                 </td>
 
-                                <td class="py-3 px-4 text-center text-white">
-                                    {{ $totalGeneral }}
+                                <td class="py-3 px-4 text-center text-white font-black">
+                                    {{ $totalInscritosGeneral }}
                                 </td>
 
-                                <td class="py-3 px-4 text-center text-white font-black border-l border-brand-gold">
+                                <td class="py-3 px-4 text-center text-white font-bold border-l border-brand-gold/30">
+                                    {{ $totalPuntajeCursosGeneral }} pts
+                                </td>
+
+                                <td class="py-3 px-4 text-center text-white font-bold">
+                                    {{ $totalPuntajeDiplomadosGeneral }} pts
+                                </td>
+
+                                <td class="py-3 px-4 text-center text-white font-black">
                                     {{ $totalPuntajeGeneral }} pts
                                 </td>
 
                                 @foreach($cursos as $curso)
-                                    <td class="py-3 px-4 text-center">
+                                    <td class="py-3 px-4 text-center font-bold">
                                         {{ $totalesCursos[$curso->id_curso] ?? 0 }}
                                     </td>
                                 @endforeach

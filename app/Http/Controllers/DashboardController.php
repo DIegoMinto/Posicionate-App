@@ -23,14 +23,16 @@ class DashboardController extends Controller
     {
         $usuario = auth()->user()->load('persona');
 
-        $personales = Personal::with([
+        $queryPersonalesBase = Personal::with([
             'persona',
             'cursoEstudiantes' => function ($q) {
                 $q->where('estado', 'inscrito')->with('curso');
             }
-        ])->get();
+        ]);
 
-        $rankingGeneral = $personales->map(function ($personal) {
+        $personalesGeneral = $queryPersonalesBase->get();
+
+        $rankingGeneral = $personalesGeneral->map(function ($personal) {
             $inscritosDiplomados = 0;
             $inscritosCursosRegulares = 0;
 
@@ -62,19 +64,30 @@ class DashboardController extends Controller
             ->take(3)
             ->values();
 
-        $rankingMensual = $personales->map(function ($personal) {
+        $queryPersonalesMensual = clone $queryPersonalesBase;
+
+        $queryPersonalesMensual->with([
+            'cursoEstudiantes' => function ($q) {
+                $q->where('estado', 'inscrito')
+                    ->whereMonth('created_at', now()->month)
+                    ->whereYear('created_at', now()->year)
+                    ->with('curso');
+            }
+        ]);
+
+        $personalesMensual = $queryPersonalesMensual->get();
+
+        $rankingMensual = $personalesMensual->map(function ($personal) {
             $inscritosDiplomadosMes = 0;
             $inscritosCursosRegularesMes = 0;
 
             foreach ($personal->cursoEstudiantes as $inscripcion) {
-                if ($inscripcion->created_at && $inscripcion->created_at->month == now()->month && $inscripcion->created_at->year == now()->year) {
-                    if ($inscripcion->curso) {
-                        $tipo = strtolower($inscripcion->curso->tipo);
-                        if ($tipo === 'diplomado') {
-                            $inscritosDiplomadosMes++;
-                        } elseif ($tipo === 'curso') {
-                            $inscritosCursosRegularesMes++;
-                        }
+                if ($inscripcion->curso) {
+                    $tipo = strtolower($inscripcion->curso->tipo);
+                    if ($tipo === 'diplomado') {
+                        $inscritosDiplomadosMes++;
+                    } elseif ($tipo === 'curso') {
+                        $inscritosCursosRegularesMes++;
                     }
                 }
             }
