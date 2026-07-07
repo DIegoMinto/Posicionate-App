@@ -80,6 +80,8 @@ class DocenteController extends Controller
                 'id_profesion' => 'required',
                 'id_institucion_bancaria' => 'required',
                 'emite_factura' => 'required',
+                'numero_movil' => 'required|string|max:20',
+                'codigo_pais_movil' => 'required|string|max:5',
             ]);
 
             // El campo extension_ci ya viene con el valor final desde el formulario
@@ -87,9 +89,10 @@ class DocenteController extends Controller
             // pero ambos usan siempre extension_ci).
             $extensionFinal = strtoupper(trim($request->extension_ci));
 
-            $data = $request->except(['_token', 'id_pais', 'id_departamento']);
+            $data = $request->except(['_token', 'id_pais', 'id_departamento', 'codigo_pais_movil', 'numero_movil']);
 
             $data['extension_ci'] = $extensionFinal;
+            $data['telefono_movil'] = trim($request->codigo_pais_movil . ' ' . $request->numero_movil);
             $data['emite_factura'] = ($request->emite_factura == '1') ? 'SI' : 'NO';
 
             $idArchivo = $request->ci . '_' . $extensionFinal;
@@ -207,13 +210,16 @@ class DocenteController extends Controller
                 'id_profesion' => 'required',
                 'id_institucion_bancaria' => 'required',
                 'emite_factura' => 'required',
+                'numero_movil' => 'required|string|max:20',
+                'codigo_pais_movil' => 'required|string|max:5',
             ]);
 
             $extensionFinal = strtoupper(trim($request->extension_ci));
 
-            $data = $request->except(['_token', '_method', 'id_pais', 'id_departamento']);
+            $data = $request->except(['_token', '_method', 'id_pais', 'id_departamento', 'codigo_pais_movil', 'numero_movil']);
 
             $data['extension_ci'] = $extensionFinal;
+            $data['telefono_movil'] = trim($request->codigo_pais_movil . ' ' . $request->numero_movil);
             $data['emite_factura'] = ($request->emite_factura == '1') ? 'SI' : 'NO';
 
             $idArchivo = $request->ci . '_' . $extensionFinal;

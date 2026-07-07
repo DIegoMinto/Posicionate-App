@@ -284,7 +284,7 @@
                             <label class="form-label-bold text-brand-green uppercase">Teléfono
                                 Móvil</label>
                             <div class="flex gap-2">
-                                <select id="select-codigo-manual"
+                                <select id="select-codigo-manual" name="codigo_pais_movil"
                                     class="form-select-pill border-brand-green border w-1/2 text-center px-1">
                                     <option value="+591">🇧🇴 +591</option>
                                     <option value="+54">🇦🇷 +54</option>
@@ -294,9 +294,8 @@
                                     <option value="+1">🇺🇸 +1</option>
                                     <option value="+34">🇪🇸 +34</option>
                                 </select>
-                                <input type="text" id="input-numero-movil"
+                                <input type="text" id="input-numero-movil" name="numero_movil"
                                     class="form-input-pill border-brand-green border w-2/3" placeholder="70000000">
-                                <input type="hidden" name="telefono_movil" id="telefono_movil_hidden">
                             </div>
                         </div>
                         <div>
