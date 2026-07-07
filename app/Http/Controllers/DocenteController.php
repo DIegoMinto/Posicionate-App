@@ -72,7 +72,15 @@ class DocenteController extends Controller
                 'nombre' => 'required|string|max:100',
                 'apellido_p' => 'required|string|max:100',
                 'ci' => 'required|numeric|unique:docente,ci',
-                'extension_select' => 'required',
+                'extension_ci' => 'required|string|max:10'
+
+
+
+
+
+
+                ,
+            ,
                 'correo_electronico' => 'required|email|unique:docente,correo_electronico',
                 'id_ciudad' => 'required',
                 'id_institucion_egreso' => 'required',

@@ -193,6 +193,91 @@ class WhatsappController extends Controller
 
     }
 
+    public function getGroups()
+    {
+        try {
+            $instance = auth()->user()->instance_name ?? auth()->user()->codigo_personal;
 
+            if (!$instance) {
+                return response()->json(['error' => 'No se encontró el nombre de la instancia.'], 400);
+            }
+
+            $response = Http::withHeaders($this->headers())
+                ->timeout(60)
+                ->get("{$this->baseUrl}/group/fetchAllGroups/{$instance}?getParticipants=false");
+
+            if ($response->failed()) {
+                return response()->json([
+                    'error' => 'Evolution API devolvió un error.',
+                    'status' => $response->status()
+                ], $response->status());
+            }
+
+            $groups = $response->json();
+            return response()->json(is_array($groups) ? $groups : []);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'error' => 'Excepción interna en Laravel.',
+                'message' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    public function extractGroupContacts(Request $request)
+    {
+        $request->validate(['groupJid' => 'required|string']);
+
+        try {
+            $user = auth()->user();
+            $instance = $user->instance_name ?? $user->codigo_personal;
+
+            $response = Http::withHeaders($this->headers())
+                ->timeout(60)
+                ->get("{$this->baseUrl}/group/participants/{$instance}", [
+                    'groupJid' => $request->groupJid,
+                ]);
+
+            if ($response->failed()) {
+                return response()->json([
+                    'ok' => false,
+                    'error' => 'Error al obtener participantes del grupo.',
+                    'details' => $response->body()
+                ], 500);
+            }
+
+            $participants = $response->json('participants') ?? [];
+            $saved = 0;
+
+            foreach ($participants as $p) {
+                $isLid = str_ends_with($p['id'], '@lid');
+
+                \App\Models\ExtractedContact::updateOrCreate(
+                    [
+                        'user_id' => $user->id,
+                        'instance' => $instance,
+                        'wa_id' => $p['id'],
+                        'source_type' => 'group',
+                        'source_ref' => $request->groupJid,
+                    ],
+                    [
+                        'phone' => $isLid ? ($p['phoneNumber'] ?? null) : explode('@', $p['id'])[0],
+                        'is_lid' => $isLid,
+                        'name' => !empty($p['name']) ? $p['name'] : null,
+                    ]
+                );
+                $saved++;
+            }
+
+            return response()->json(['ok' => true, 'saved' => $saved]);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'ok' => false,
+                'error' => 'Excepción interna al extraer contactos.',
+                'message' => $e->getMessage()
+            ], 500);
+        }
+    }
 
 }
