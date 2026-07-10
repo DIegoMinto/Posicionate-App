@@ -4,6 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>WP Sender - Posicionate</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <script defer src="https://cdn.jsdelivr.net/npm/@alpinejs/collapse@3.x.x/dist/cdn.min.js"></script>
@@ -105,17 +106,26 @@
                             class="mb-4 p-3 rounded border text-sm" x-text="extractionMessage">
                         </div>
 
-                        <div class="mb-4">
-                            <label class="block text-gray-700 text-sm font-bold mb-2 uppercase tracking-tight">
-                                Identificador (JID) del Grupo:
-                            </label>
-                            <input type="text" x-model="targetGroupJid" placeholder="Ej: 120363399372945033@g.us"
-                                class="w-full px-3 py-2 border rounded-md text-gray-800 focus:outline-none focus:border-brand-gold border-gray-300">
-                            <p class="text-xs text-gray-500 mt-1">
-                                Ingresá el ID de WhatsApp del grupo para extraer todos sus participantes directamente
-                                sin demoras.
-                            </p>
+                        <div x-show="loadingGroups" class="text-center text-gray-500 py-4">
+                            Cargando grupos...
                         </div>
+
+                        <div x-show="!loadingGroups && groups.length === 0" class="text-center text-gray-500 py-4">
+                            No se encontraron grupos para esta instancia.
+                        </div>
+
+                        <div x-show="!loadingGroups && groups.length > 0" class="max-h-64 overflow-y-auto space-y-2">
+                            <template x-for="group in groups" :key="group.id">
+                                <label
+                                    class="flex items-center gap-2 p-2 border rounded hover:bg-gray-50 cursor-pointer">
+                                    <input type="checkbox" :value="group.id" x-model="selectedGroups">
+                                    <span class="text-sm text-gray-800" x-text="group.subject"></span>
+                                    <span class="text-xs text-gray-400 ml-auto"
+                                        x-text="'(' + group.size + ' miembros)'"></span>
+                                </label>
+                            </template>
+                        </div>
+
                     </div>
 
                     <div class="bg-gray-50 p-4 border-t border-gray-200 flex justify-end space-x-2">
@@ -123,12 +133,12 @@
                             class="px-4 py-2 bg-gray-300 text-gray-700 rounded text-xs uppercase font-bold hover:bg-gray-400">
                             Cancelar
                         </button>
-                        <button @click="processDirectExtraction()"
-                            :disabled="!targetGroupJid.trim() || processingExtraction"
-                            :class="!targetGroupJid.trim() || processingExtraction ? 'opacity-50 cursor-not-allowed' : 'hover:bg-opacity-90'"
-                            class="px-4 py-2 bg-brand-green text-white bg-green-600 rounded text-xs uppercase font-bold flex items-center">
+                        <button @click="processExcelExport()"
+                            :disabled="selectedGroups.length === 0 || processingExtraction"
+                            :class="selectedGroups.length === 0 || processingExtraction ? 'opacity-50 cursor-not-allowed' : 'hover:bg-opacity-90'"
+                            class="px-4 py-2 bg-blue-600 text-white rounded text-xs uppercase font-bold flex items-center">
                             <span x-show="processingExtraction" class="mr-2 animate-spin">⏳</span>
-                            <span x-text="processingExtraction ? 'Extrayendo...' : 'Extraer Contactos'"></span>
+                            <span x-text="processingExtraction ? 'Generando...' : 'Descargar Excel'"></span>
                         </button>
                     </div>
                 </div>
@@ -250,6 +260,49 @@
                             this.extractionMessage = `Extracción parcial: se guardaron ${totalSaved} contactos, pero fallaron ${errors} grupo(s).`;
                         } else {
                             this.extractionMessage = 'No se pudo completar la extracción de ninguno de los grupos seleccionados.';
+                        }
+                    },
+
+                    async processExcelExport() {
+                        if (this.selectedGroups.length === 0) return;
+
+                        this.processingExtraction = true;
+                        this.extractionMessage = '';
+
+                        try {
+                            const res = await fetch('/whatsapp/groups/export-excel', {
+                                method: 'POST',
+                                credentials: 'same-origin',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || ''
+                                },
+                                body: JSON.stringify({ groupJids: this.selectedGroups })
+                            });
+
+                            if (!res.ok) {
+                                const err = await res.json();
+                                throw new Error(err.error || 'Error al generar el Excel');
+                            }
+
+                            const blob = await res.blob();
+                            const url = window.URL.createObjectURL(blob);
+                            const a = document.createElement('a');
+                            a.href = url;
+                            a.download = 'contactos.xlsx';
+                            document.body.appendChild(a);
+                            a.click();
+                            a.remove();
+                            window.URL.revokeObjectURL(url);
+
+                            this.extractionSuccess = true;
+                            this.extractionMessage = '¡Excel descargado con éxito!';
+
+                        } catch (e) {
+                            this.extractionSuccess = false;
+                            this.extractionMessage = e.message;
+                        } finally {
+                            this.processingExtraction = false;
                         }
                     }
                 }

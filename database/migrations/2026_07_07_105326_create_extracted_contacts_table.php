@@ -12,7 +12,7 @@ return new class extends Migration {
     {
         Schema::create('extracted_contacts', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('user_id')->constrained(table: 'personal', column: 'id_personal')->cascadeOnDelete();
             $table->string('instance');
             $table->string('wa_id');
             $table->string('phone')->nullable();

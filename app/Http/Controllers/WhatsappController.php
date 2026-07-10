@@ -224,57 +224,85 @@ class WhatsappController extends Controller
         }
     }
 
-    public function extractGroupContacts(Request $request)
+    public function exportGroupContactsExcel(Request $request)
     {
-        $request->validate(['groupJid' => 'required|string']);
+        $request->validate([
+            'groupJids' => 'required|array',
+            'groupJids.*' => 'string',
+        ]);
 
         try {
             $user = auth()->user();
             $instance = $user->instance_name ?? $user->codigo_personal;
 
-            $response = Http::withHeaders($this->headers())
-                ->timeout(60)
-                ->get("{$this->baseUrl}/group/participants/{$instance}", [
-                    'groupJid' => $request->groupJid,
-                ]);
+            $phones = [];
 
-            if ($response->failed()) {
+            foreach ($request->groupJids as $groupJid) {
+                $response = Http::withHeaders($this->headers())
+                    ->timeout(60)
+                    ->get("{$this->baseUrl}/group/participants/{$instance}", [
+                        'groupJid' => $groupJid,
+                    ]);
+
+                if ($response->failed()) {
+                    continue;
+                }
+
+                $participants = $response->json('participants') ?? [];
+
+                foreach ($participants as $p) {
+                    $isLid = str_ends_with($p['id'], '@lid');
+                    $phone = null;
+
+                    if ($isLid) {
+                        if (!empty($p['phoneNumber'])) {
+                            $phone = explode('@', $p['phoneNumber'])[0];
+                        }
+                    } else {
+                        $phone = explode('@', $p['id'])[0];
+                    }
+
+                    if ($phone) {
+                        $phones[$phone] = true;
+                    }
+                }
+            }
+
+            $phoneList = array_keys($phones);
+
+            if (empty($phoneList)) {
                 return response()->json([
                     'ok' => false,
-                    'error' => 'Error al obtener participantes del grupo.',
-                    'details' => $response->body()
-                ], 500);
+                    'error' => 'No se encontraron números resolubles en los grupos seleccionados.'
+                ], 422);
             }
 
-            $participants = $response->json('participants') ?? [];
-            $saved = 0;
+            $spreadsheet = new \PhpOffice\PhpSpreadsheet\Spreadsheet();
+            $sheet = $spreadsheet->getActiveSheet();
+            $sheet->setCellValue('A1', 'Numero');
 
-            foreach ($participants as $p) {
-                $isLid = str_ends_with($p['id'], '@lid');
-
-                \App\Models\ExtractedContact::updateOrCreate(
-                    [
-                        'user_id' => $user->id,
-                        'instance' => $instance,
-                        'wa_id' => $p['id'],
-                        'source_type' => 'group',
-                        'source_ref' => $request->groupJid,
-                    ],
-                    [
-                        'phone' => $isLid ? ($p['phoneNumber'] ?? null) : explode('@', $p['id'])[0],
-                        'is_lid' => $isLid,
-                        'name' => !empty($p['name']) ? $p['name'] : null,
-                    ]
+            $row = 2;
+            foreach ($phoneList as $phone) {
+                $sheet->setCellValueExplicit(
+                    "A{$row}",
+                    $phone,
+                    \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_STRING
                 );
-                $saved++;
+                $row++;
             }
 
-            return response()->json(['ok' => true, 'saved' => $saved]);
+            $fileName = 'contactos_' . now()->format('Y-m-d_His') . '.xlsx';
+            $tempPath = storage_path("app/{$fileName}");
 
-        } catch (\Exception $e) {
+            $writer = new \PhpOffice\PhpSpreadsheet\Writer\Xlsx($spreadsheet);
+            $writer->save($tempPath);
+
+            return response()->download($tempPath, $fileName)->deleteFileAfterSend(true);
+
+        } catch (\Throwable $e) {
             return response()->json([
                 'ok' => false,
-                'error' => 'Excepción interna al extraer contactos.',
+                'error' => 'Excepción al generar el Excel.',
                 'message' => $e->getMessage()
             ], 500);
         }
