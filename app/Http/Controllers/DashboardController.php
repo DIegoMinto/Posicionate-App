@@ -18,7 +18,6 @@ use App\Models\Modulo;
 
 class DashboardController extends Controller
 {
-
     public function index()
     {
         $usuario = auth()->user()->load('persona');
@@ -64,9 +63,8 @@ class DashboardController extends Controller
             ->take(3)
             ->values();
 
-        $queryPersonalesMensual = clone $queryPersonalesBase;
-
-        $queryPersonalesMensual->with([
+        $queryPersonalesMensual = Personal::with([
+            'persona',
             'cursoEstudiantes' => function ($q) {
                 $q->where('estado', 'inscrito')
                     ->whereMonth('created_at', now()->month)
@@ -95,16 +93,16 @@ class DashboardController extends Controller
             $puntosPorCursosMes = intdiv($inscritosCursosRegularesMes, 3);
             $residuoCursosMes = $inscritosCursosRegularesMes % 3;
 
-            $personal->total_puntaje_mes = $inscritosDiplomadosMes + $puntosPorCursosMes;
-            $personal->exponente_cursos_mes = $residuoCursosMes;
+            $personal->total_puntaje = $inscritosDiplomadosMes + $puntosPorCursosMes;
+            $personal->exponente_cursos = $residuoCursosMes;
 
             return $personal;
         })
             ->sort(function ($a, $b) {
-                if ($b->total_puntaje_mes === $a->total_puntaje_mes) {
-                    return $b->exponente_cursos_mes <=> $a->exponente_cursos_mes;
+                if ($b->total_puntaje === $a->total_puntaje) {
+                    return $b->exponente_cursos <=> $a->exponente_cursos;
                 }
-                return $b->total_puntaje_mes <=> $a->total_puntaje_mes;
+                return $b->total_puntaje <=> $a->total_puntaje;
             })
             ->take(3)
             ->values();
