@@ -75,15 +75,15 @@ class DashboardController extends Controller
                         ) as primer_pago'),
                         'primer_pago.id_curso_estudiante',
                         '=',
-                        'curso_estudiante.id_curso_estudiante'
+                        'curso_estudiante.id'
                     )
                     ->where('curso_estudiante.estado', 'inscrito')
                     ->whereRaw(
-                        'MONTH(COALESCE(primer_pago.fecha_primer_pago, curso_estudiante.created_at)) = ?',
+                        'EXTRACT(MONTH FROM COALESCE(primer_pago.fecha_primer_pago, curso_estudiante.created_at)) = ?',
                         [now()->month]
                     )
                     ->whereRaw(
-                        'YEAR(COALESCE(primer_pago.fecha_primer_pago, curso_estudiante.created_at)) = ?',
+                        'EXTRACT(YEAR FROM COALESCE(primer_pago.fecha_primer_pago, curso_estudiante.created_at)) = ?',
                         [now()->year]
                     )
                     ->with('curso');
