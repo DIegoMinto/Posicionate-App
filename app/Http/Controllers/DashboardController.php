@@ -172,7 +172,8 @@ class DashboardController extends Controller
 
         $estudiantes = $query
             ->orderBy('curso_estudiante.created_at', 'desc')
-            ->get();
+            ->paginate(10)
+            ->withQueryString();
 
         $personales = Personal::with('persona')->get();
 
@@ -221,7 +222,7 @@ class DashboardController extends Controller
         }
 
 
-        $personales = $query->paginate(25);
+        $personales = $query->paginate(10)->withQueryString();
 
 
         $areas = Personal::select('cargo')
