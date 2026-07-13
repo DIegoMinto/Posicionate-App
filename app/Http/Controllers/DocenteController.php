@@ -106,53 +106,63 @@ class DocenteController extends Controller
             ]);
 
             if ($request->hasFile('curriculum')) {
-                $upload = $cloudinary->uploadApi()->upload(
-                    $request->file('curriculum')->getRealPath(),
-                    [
-                        'folder' => 'curriculums',
-                        'resource_type' => 'auto',
-                        'public_id' => "CV_$idArchivo",
-                        'access_mode' => 'public'
-                    ]
-                );
+                $upload = retry(4, function () use ($cloudinary, $request, $idArchivo) {
+                    return $cloudinary->uploadApi()->upload(
+                        $request->file('curriculum')->getRealPath(),
+                        [
+                            'folder' => 'curriculums',
+                            'resource_type' => 'auto',
+                            'public_id' => "CV_$idArchivo",
+                            'access_mode' => 'public'
+                        ]
+                    );
+                }, 500);
                 $data['curriculum'] = $upload['secure_url'];
             }
 
             if ($request->hasFile('fotocarnet')) {
-                $upload = $cloudinary->uploadApi()->upload(
-                    $request->file('fotocarnet')->getRealPath(),
-                    [
-                        'folder' => 'carnets',
-                        'resource_type' => 'auto',
-                        'public_id' => "CARNET_$idArchivo",
-                        'access_mode' => 'public'
-                    ]
-                );
+                $upload = retry(4, function () use ($cloudinary, $request, $idArchivo) {
+                    return $cloudinary->uploadApi()->upload(
+                        $request->file('fotocarnet')->getRealPath(),
+                        [
+                            'folder' => 'carnets',
+                            'resource_type' => 'auto',
+                            'public_id' => "CARNET_$idArchivo",
+                            'access_mode' => 'public'
+                        ]
+                    );
+                }, 500);
                 $data['fotocarnet'] = $upload['secure_url'];
             }
+
             if ($request->hasFile('fotografia')) {
-                $upload = $cloudinary->uploadApi()->upload(
-                    $request->file('fotografia')->getRealPath(),
-                    [
-                        'folder' => 'fotografias',
-                        'public_id' => "FOTO_$idArchivo"
-                    ]
-                );
+                $upload = retry(4, function () use ($cloudinary, $request, $idArchivo) {
+                    return $cloudinary->uploadApi()->upload(
+                        $request->file('fotografia')->getRealPath(),
+                        [
+                            'folder' => 'fotografias',
+                            'public_id' => "FOTO_$idArchivo"
+                        ]
+                    );
+                }, 500);
                 $data['fotografia'] = $upload['secure_url'];
             }
 
             Docente::create($data);
 
-            return back()->with('success', "¡Docente " . $request->nombre . " registrado con éxito!");
+            return redirect()->route('docentes.create')
+                ->with('success', "¡Docente " . $request->nombre . " registrado con éxito!");
 
-        } catch (\Illuminate\Validation\ValidationException $e) {
-            return back()->withErrors($e->validator)->withInput();
         } catch (\Exception $e) {
-            dd([
-                'Mensaje' => $e->getMessage(),
-                'Linea' => $e->getLine(),
-                'Datos_que_fallaron' => $data
+            \Log::error('Error al registrar docente', [
+                'mensaje' => $e->getMessage(),
+                'linea' => $e->getLine(),
+                'datos' => $data,
             ]);
+
+            return back()
+                ->withErrors(['error' => 'Ocurrió un error al subir los archivos. Por favor intenta nuevamente en unos segundos.'])
+                ->withInput();
         }
     }
 
