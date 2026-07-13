@@ -34,7 +34,7 @@ class StatiticController extends Controller
 
         $inscripciones = CursoEstudiante::query()
             ->leftJoinSub($primerPagoSub, 'primer_pago', function ($join) {
-                $join->on('primer_pago.id_curso_estudiante', '=', 'curso_estudiante.id_curso_estudiante');
+                $join->on('primer_pago.id_curso_estudiante', '=', 'curso_estudiante.id');
             })
             ->select(
                 'curso_estudiante.id_personal',
@@ -62,13 +62,13 @@ class StatiticController extends Controller
             })
             ->when(!$usarRango && $mes, function ($q) use ($mes) {
                 $q->whereRaw(
-                    'MONTH(COALESCE(primer_pago.fecha_primer_pago, curso_estudiante.created_at)) = ?',
+                    'EXTRACT(MONTH FROM COALESCE(primer_pago.fecha_primer_pago, curso_estudiante.created_at)) = ?',
                     [$mes]
                 );
             })
             ->when(!$usarRango && $anio, function ($q) use ($anio) {
                 $q->whereRaw(
-                    'YEAR(COALESCE(primer_pago.fecha_primer_pago, curso_estudiante.created_at)) = ?',
+                    'EXTRACT(YEAR FROM COALESCE(primer_pago.fecha_primer_pago, curso_estudiante.created_at)) = ?',
                     [$anio]
                 );
             })
