@@ -23,19 +23,7 @@ class StatiticController extends Controller
 
         $usarRango = $fecha_inicio || $fecha_fin;
 
-        $cursos = Curso::when($usarRango, function ($q) use ($fecha_inicio, $fecha_fin) {
-            if ($fecha_inicio && $fecha_fin) {
-                $q->whereBetween('fecha_inicio', [$fecha_inicio, $fecha_fin]);
-            } elseif ($fecha_inicio) {
-                $q->where('fecha_inicio', '>=', $fecha_inicio);
-            } elseif ($fecha_fin) {
-                $q->where('fecha_inicio', '<=', $fecha_fin);
-            }
-        })
-            ->when(!$usarRango && $mes, fn($q) => $q->whereMonth('fecha_inicio', $mes))
-            ->when(!$usarRango && $anio, fn($q) => $q->whereYear('fecha_inicio', $anio))
-            ->orderBy('nombre')
-            ->get();
+        $cursos = Curso::orderBy('nombre')->get();
 
         $personales = Personal::with('persona')->get();
 
