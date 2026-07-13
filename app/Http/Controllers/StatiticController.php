@@ -27,24 +27,52 @@ class StatiticController extends Controller
 
         $personales = Personal::with('persona')->get();
 
-        $inscripciones = CursoEstudiante::select(
-            'id_personal',
-            'id_curso',
-            DB::raw('COUNT(*) as total')
-        )
-            ->where('estado', 'inscrito')
+        $primerPagoSub = DB::table('pagos_estudiante')
+            ->select('id_curso_estudiante', DB::raw('MIN(fecha_pagada) as fecha_primer_pago'))
+            ->whereNotNull('fecha_pagada')
+            ->groupBy('id_curso_estudiante');
+
+        $inscripciones = CursoEstudiante::query()
+            ->leftJoinSub($primerPagoSub, 'primer_pago', function ($join) {
+                $join->on('primer_pago.id_curso_estudiante', '=', 'curso_estudiante.id_curso_estudiante');
+            })
+            ->select(
+                'curso_estudiante.id_personal',
+                'curso_estudiante.id_curso',
+                DB::raw('COUNT(*) as total')
+            )
+            ->where('curso_estudiante.estado', 'inscrito')
             ->when($usarRango, function ($q) use ($fecha_inicio, $fecha_fin) {
                 if ($fecha_inicio && $fecha_fin) {
-                    $q->whereBetween('created_at', [$fecha_inicio, $fecha_fin]);
+                    $q->whereRaw(
+                        'COALESCE(primer_pago.fecha_primer_pago, curso_estudiante.created_at) BETWEEN ? AND ?',
+                        [$fecha_inicio, $fecha_fin]
+                    );
                 } elseif ($fecha_inicio) {
-                    $q->where('created_at', '>=', $fecha_inicio);
+                    $q->whereRaw(
+                        'COALESCE(primer_pago.fecha_primer_pago, curso_estudiante.created_at) >= ?',
+                        [$fecha_inicio]
+                    );
                 } elseif ($fecha_fin) {
-                    $q->where('created_at', '<=', $fecha_fin);
+                    $q->whereRaw(
+                        'COALESCE(primer_pago.fecha_primer_pago, curso_estudiante.created_at) <= ?',
+                        [$fecha_fin]
+                    );
                 }
             })
-            ->when(!$usarRango && $mes, fn($q) => $q->whereMonth('created_at', $mes))
-            ->when(!$usarRango && $anio, fn($q) => $q->whereYear('created_at', $anio))
-            ->groupBy('id_personal', 'id_curso')
+            ->when(!$usarRango && $mes, function ($q) use ($mes) {
+                $q->whereRaw(
+                    'MONTH(COALESCE(primer_pago.fecha_primer_pago, curso_estudiante.created_at)) = ?',
+                    [$mes]
+                );
+            })
+            ->when(!$usarRango && $anio, function ($q) use ($anio) {
+                $q->whereRaw(
+                    'YEAR(COALESCE(primer_pago.fecha_primer_pago, curso_estudiante.created_at)) = ?',
+                    [$anio]
+                );
+            })
+            ->groupBy('curso_estudiante.id_personal', 'curso_estudiante.id_curso')
             ->get();
 
         $data = [];

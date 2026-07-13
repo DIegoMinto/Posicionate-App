@@ -62,13 +62,30 @@ class DashboardController extends Controller
             })
             ->take(3)
             ->values();
-
         $queryPersonalesMensual = Personal::with([
             'persona',
             'cursoEstudiantes' => function ($q) {
-                $q->where('estado', 'inscrito')
-                    ->whereMonth('created_at', now()->month)
-                    ->whereYear('created_at', now()->year)
+                $q->select('curso_estudiante.*')
+                    ->leftJoin(
+                        DB::raw('(
+                            SELECT id_curso_estudiante, MIN(fecha_pagada) as fecha_primer_pago
+                            FROM pagos_estudiante
+                            WHERE fecha_pagada IS NOT NULL
+                            GROUP BY id_curso_estudiante
+                        ) as primer_pago'),
+                        'primer_pago.id_curso_estudiante',
+                        '=',
+                        'curso_estudiante.id_curso_estudiante'
+                    )
+                    ->where('curso_estudiante.estado', 'inscrito')
+                    ->whereRaw(
+                        'MONTH(COALESCE(primer_pago.fecha_primer_pago, curso_estudiante.created_at)) = ?',
+                        [now()->month]
+                    )
+                    ->whereRaw(
+                        'YEAR(COALESCE(primer_pago.fecha_primer_pago, curso_estudiante.created_at)) = ?',
+                        [now()->year]
+                    )
                     ->with('curso');
             }
         ]);
@@ -92,7 +109,6 @@ class DashboardController extends Controller
 
             $puntosPorCursosMes = intdiv($inscritosCursosRegularesMes, 3);
             $residuoCursosMes = $inscritosCursosRegularesMes % 3;
-
             $personal->total_puntaje = $inscritosDiplomadosMes + $puntosPorCursosMes;
             $personal->exponente_cursos = $residuoCursosMes;
 
@@ -117,6 +133,7 @@ class DashboardController extends Controller
             )
         );
     }
+
 
     public function students(Request $request)
     {
