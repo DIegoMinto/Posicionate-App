@@ -111,7 +111,7 @@
                             @forelse($estudiantes as $index => $e)
                                 <tr class="border-b border-gray-100 hover:bg-gray-50 transition-colors text-black">
 
-                                    <td class="py-3 px-4">{{ $index + 1 }}</td>
+                                    <td class="py-3 px-4">{{ $estudiantes->firstItem() + $index }}</td>
 
                                     <td class="py-3 px-4 whitespace-nowrap">
                                         {{ $e->ci }}
@@ -152,8 +152,8 @@
                                     <td class="py-3 px-4 text-center">
                                         <span
                                             class="px-2 py-0.5 rounded-full text-[9px] font-black uppercase
-                                                                                                                                                                                                                                                                        {{ $e->estado == 'pre_inscrito' ? 'bg-yellow-100 text-yellow-700' : '' }}
-                                                                                                                                                                                                                                                                        {{ $e->estado == 'inscrito' ? 'bg-green-100 text-green-700' : '' }}">
+                                                                                                                                                                                                                                                                                    {{ $e->estado == 'pre_inscrito' ? 'bg-yellow-100 text-yellow-700' : '' }}
+                                                                                                                                                                                                                                                                                    {{ $e->estado == 'inscrito' ? 'bg-green-100 text-green-700' : '' }}">
                                             {{ $e->estado }}
                                         </span>
                                     </td>
@@ -170,7 +170,7 @@
                                                         d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                                         d="M2.458 12C3.732 7.943 7.523 5 12 5c4.477 0 8.268 2.943 9.542 7-1.274 
-                                                                                                                                                                                                                                                                                                                                                                                    4.057-5.065 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                                                                                                                                                                                                                                                                                                                                                                                4.057-5.065 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                                                 </svg>
                                             </a>
 
@@ -295,6 +295,48 @@
 
                     </table>
                 </div>
+
+                <div class="mt-6 flex justify-center">
+                    <nav class="flex items-center gap-1 font-sans text-[11px]">
+
+                        @if ($estudiantes->onFirstPage())
+                            <span class="px-3 py-1.5 rounded-md text-gray-300 border border-gray-200 cursor-not-allowed">
+                                Anterior
+                            </span>
+                        @else
+                            <a href="{{ $estudiantes->previousPageUrl() }}"
+                                class="px-3 py-1.5 rounded-md border border-brand-green text-brand-green font-bold hover:bg-brand-green hover:text-white transition-colors">
+                                Anterior
+                            </a>
+                        @endif
+
+                        @foreach ($estudiantes->getUrlRange(1, $estudiantes->lastPage()) as $page => $url)
+                            @if ($page == $estudiantes->currentPage())
+                                <span class="px-3 py-1.5 rounded-md bg-brand-green text-white font-bold">
+                                    {{ $page }}
+                                </span>
+                            @else
+                                <a href="{{ $url }}"
+                                    class="px-3 py-1.5 rounded-md border border-brand-green text-brand-green font-bold hover:bg-brand-green hover:text-white transition-colors">
+                                    {{ $page }}
+                                </a>
+                            @endif
+                        @endforeach
+
+                        @if ($estudiantes->hasMorePages())
+                            <a href="{{ $estudiantes->nextPageUrl() }}"
+                                class="px-3 py-1.5 rounded-md border border-brand-green text-brand-green font-bold hover:bg-brand-green hover:text-white transition-colors">
+                                Siguiente
+                            </a>
+                        @else
+                            <span class="px-3 py-1.5 rounded-md text-gray-300 border border-gray-200 cursor-not-allowed">
+                                Siguiente
+                            </span>
+                        @endif
+
+                    </nav>
+                </div>
+
             </div>
         </div>
     </x-layout-dashboard>

@@ -295,7 +295,7 @@ class DashboardController extends Controller
             ]);
         }
 
-        $cursos = $query->orderBy('created_at', 'desc')->get();
+        $cursos = $query->orderBy('created_at', 'desc')->paginate(10)->withQueryString();
 
         $sedes = \App\Models\Sede::all();
         $instituciones = \App\Models\Institucion::all();

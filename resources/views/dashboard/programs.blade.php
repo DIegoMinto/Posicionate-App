@@ -528,13 +528,54 @@
                                         </div>
                                     </div>
                                 </div>
-                                @empty
+                               @empty
                 <div class="col-span-full py-10 text-center text-gray-400 italic text-xs uppercase tracking-widest">
                     No hay cursos registrados actualmente.
                 </div>
             @endforelse
                             </div>
-                        
+
+                <div class="mt-6 flex justify-center">
+                    <nav class="flex items-center gap-1 font-sans text-[11px]">
+
+                        @if ($cursos->onFirstPage())
+                            <span class="px-3 py-1.5 rounded-md text-gray-300 border border-gray-200 cursor-not-allowed">
+                                Anterior
+                            </span>
+                        @else
+                            <a href="{{ $cursos->previousPageUrl() }}"
+                                class="px-3 py-1.5 rounded-md border border-brand-green text-brand-green font-bold hover:bg-brand-green hover:text-white transition-colors">
+                                Anterior
+                            </a>
+                        @endif
+
+                        @foreach ($cursos->getUrlRange(1, $cursos->lastPage()) as $page => $url)
+                            @if ($page == $cursos->currentPage())
+                                <span class="px-3 py-1.5 rounded-md bg-brand-green text-white font-bold">
+                                    {{ $page }}
+                                </span>
+                            @else
+                                <a href="{{ $url }}"
+                                    class="px-3 py-1.5 rounded-md border border-brand-green text-brand-green font-bold hover:bg-brand-green hover:text-white transition-colors">
+                                    {{ $page }}
+                                </a>
+                            @endif
+                        @endforeach
+
+                        @if ($cursos->hasMorePages())
+                            <a href="{{ $cursos->nextPageUrl() }}"
+                                class="px-3 py-1.5 rounded-md border border-brand-green text-brand-green font-bold hover:bg-brand-green hover:text-white transition-colors">
+                                Siguiente
+                            </a>
+                        @else
+                            <span class="px-3 py-1.5 rounded-md text-gray-300 border border-gray-200 cursor-not-allowed">
+                                Siguiente
+                            </span>
+                        @endif
+
+                    </nav>
+                </div>
+
         </div>
         </div>
     </x-layout-dashboard>
