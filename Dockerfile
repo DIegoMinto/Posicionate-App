@@ -23,6 +23,10 @@ COPY . .
 
 RUN composer install --no-dev --optimize-autoloader
 
+RUN apt-get update && apt-get install -y \
+    libicu-dev \
+    && docker-php-ext-install intl
+
 RUN rm -rf node_modules package-lock.json
 
 RUN npm install

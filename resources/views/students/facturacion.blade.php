@@ -121,13 +121,26 @@
                                     </td>
 
                                     <td class="py-3 px-4 text-center" x-data="{ openVerify: false }">
+                                                @if($pago->monto_pagado > 0)
+            <a href="{{ route('pagos.recibo', $pago->id_pagos_estudiante) }}" target="_blank"
+                class="inline-flex items-center justify-center group relative">
+                <svg xmlns="http://www.w3.org/2000/svg"
+                    class="w-5 h-5 text-brand-green group-hover:text-brand-gold transition-colors"
+                    fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round"
+                        d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                </svg>
+                <span class="absolute -top-8 scale-0 transition-all rounded bg-gray-800 px-2 py-1 text-[10px] text-white group-hover:scale-100 whitespace-nowrap z-30 shadow-lg">
+                    Ver Recibo
+                </span>
+            </a>
+        @endif
                                         @if(
                                                 in_array($usuario->cargo, ['contador', 'asistente_contable'])
                                                 || $usuario->rol === 'super_admin'
                                             )
                                             <div class="flex items-center justify-center gap-3">
 
-                                                {{-- Editar pago --}}
                                                 <a href="{{ route('pagos.edit', $pago->id_pagos_estudiante) }}"
                                                     class="inline-flex items-center justify-center group relative">
                                                     <svg xmlns="http://www.w3.org/2000/svg"

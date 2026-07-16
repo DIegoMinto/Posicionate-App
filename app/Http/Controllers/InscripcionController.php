@@ -410,4 +410,70 @@ class InscripcionController extends Controller
         return redirect()->back()->with('success', 'El pago ha sido validado y completado con éxito por el área de Contabilidad.');
     }
 
+    private function montoEnLetras($numero)
+    {
+        $formatter = new \NumberFormatter('es', \NumberFormatter::SPELLOUT);
+        $entero = (int) floor($numero);
+        $centavos = (int) round(($numero - $entero) * 100);
+
+        $letras = mb_strtoupper($formatter->format($entero));
+
+        if ($centavos > 0) {
+            $letrasCentavos = mb_strtoupper($formatter->format($centavos));
+            $letras .= " CON {$letrasCentavos}/100";
+        }
+
+        return $letras;
+    }
+
+    public function reciboPago($id)
+    {
+        $pago = \App\Models\PagoEstudiante::findOrFail($id);
+
+        $inscripcion = \App\Models\CursoEstudiante::with(['estudiante', 'curso', 'asesor.persona'])
+            ->findOrFail($pago->id_curso_estudiante);
+
+        $estudiante = $inscripcion->estudiante;
+        $curso = $inscripcion->curso;
+        $asesorPersona = $inscripcion->asesor->persona ?? null;
+
+        $fecha = $pago->fecha_pagada
+            ? \Carbon\Carbon::parse($pago->fecha_pagada)
+            : \Carbon\Carbon::now();
+
+        $meses = [
+            1 => 'Enero',
+            2 => 'Febrero',
+            3 => 'Marzo',
+            4 => 'Abril',
+            5 => 'Mayo',
+            6 => 'Junio',
+            7 => 'Julio',
+            8 => 'Agosto',
+            9 => 'Septiembre',
+            10 => 'Octubre',
+            11 => 'Noviembre',
+            12 => 'Diciembre'
+        ];
+
+        $data = [
+            'pago' => $pago,
+            'estudiante' => $estudiante,
+            'curso' => $curso,
+            'asesorNombre' => $asesorPersona
+                ? trim("{$asesorPersona->nombre} {$asesorPersona->apellido_p} {$asesorPersona->apellido_m}")
+                : 'N/A',
+            'dia' => $fecha->format('d'),
+            'mes' => $meses[(int) $fecha->format('n')],
+            'anio' => $fecha->format('Y'),
+            'montoLetras' => $this->montoEnLetras($pago->monto_pagado),
+            'saldo' => $pago->monto_pagar - $pago->monto_pagado,
+            'numeroRecibo' => str_pad($pago->id_pagos_estudiante, 4, '0', STR_PAD_LEFT),
+        ];
+
+        $pdf = \PDF::loadView('pagos.recibo', $data)->setPaper('a5', 'landscape');
+
+        return $pdf->stream("recibo-{$data['numeroRecibo']}.pdf");
+    }
+
 }

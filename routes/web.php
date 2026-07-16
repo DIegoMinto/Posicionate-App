@@ -172,6 +172,8 @@ Route::middleware(['auth', 'vigente'])->group(function () {
 
     Route::put('/plans/{id}', [PlanController::class, 'update'])->name('plans.update');
 
+    Route::get('/pagos/{id}/recibo', [InscripcionController::class, 'reciboPago'])->name('pagos.recibo');
+
     // RUTAS CONTRASEÑAS
     Route::controller(ContrasenaController::class)->group(function () {
         Route::get('/contrasenas', 'index')->name('contrasenas.index');
