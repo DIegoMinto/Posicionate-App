@@ -17,7 +17,6 @@
 
             <div class="bg-white p-6 rounded-sm border-2 border-brand-gold shadow-md max-w-3xl mx-auto">
 
-                <!-- INFO -->
                 <div class="mb-6 text-sm text-black space-y-1">
                     <p><strong>Estudiante:</strong> {{ $estudiante->nombre }} {{ $estudiante->apellido_p }}</p>
                     <p><strong>Curso:</strong> {{ $curso->nombre }}</p>
@@ -28,7 +27,6 @@
                     $saldo = $pago->monto_pagar - $pago->monto_pagado;
                 @endphp
 
-                <!-- CARD PAGO -->
                 <div class="border border-brand-green rounded-lg p-5 space-y-4">
 
                     <div class="grid grid-cols-2 gap-4 text-sm">
@@ -48,7 +46,6 @@
                         </div>
                     </div>
 
-                    <!-- FORM -->
                     <form action="{{ route('pagos.update', $pago->id_pagos_estudiante) }}" method="POST">
                         @csrf
                         @method('PUT')

@@ -198,5 +198,7 @@ Route::middleware(['auth', 'vigente'])->group(function () {
         Route::get('/whatsapp/groups', [WhatsappController::class, 'getGroups']);
         Route::post('/whatsapp/groups/extract', [WhatsappController::class, 'extractGroupContacts']);
         Route::post('/whatsapp/groups/export-excel', [WhatsappController::class, 'exportGroupContactsExcel']);
+        Route::get('/whatsapp/labels', [WhatsappController::class, 'getLabels']);
+        Route::post('/whatsapp/labels/export-excel', [WhatsappController::class, 'exportLabelContactsExcel']);
     });
 });

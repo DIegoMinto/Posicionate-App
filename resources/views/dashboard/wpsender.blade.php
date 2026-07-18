@@ -94,9 +94,22 @@
 
                 <div class="bg-white rounded-lg shadow-xl w-full max-w-lg overflow-hidden border border-brand-gold">
                     <div class="bg-gray-100 p-4 border-b border-brand-gold flex justify-between items-center">
-                        <h3 class="text-lg font-bold text-brand-green uppercase">Extraer Contactos de Grupo</h3>
+                        <h3 class="text-lg font-bold text-brand-green uppercase">Extraer Contactos</h3>
                         <button @click="modalOpen = false"
                             class="text-gray-500 hover:text-red-500 text-xl font-bold">&times;</button>
+                    </div>
+
+                    <div class="flex border-b border-gray-200">
+                        <button @click="switchTab('groups')"
+                            :class="activeTab === 'groups' ? 'border-b-2 border-brand-gold text-brand-green font-bold' : 'text-gray-400'"
+                            class="flex-1 py-2 text-sm uppercase">
+                            Por Grupo
+                        </button>
+                        <button @click="switchTab('labels')"
+                            :class="activeTab === 'labels' ? 'border-b-2 border-brand-gold text-brand-green font-bold' : 'text-gray-400'"
+                            class="flex-1 py-2 text-sm uppercase">
+                            Por Etiqueta
+                        </button>
                     </div>
 
                     <div class="p-6">
@@ -106,24 +119,50 @@
                             class="mb-4 p-3 rounded border text-sm" x-text="extractionMessage">
                         </div>
 
-                        <div x-show="loadingGroups" class="text-center text-gray-500 py-4">
-                            Cargando grupos...
+                        <div x-show="activeTab === 'groups'">
+                            <div x-show="loadingGroups" class="text-center text-gray-500 py-4">
+                                Cargando grupos...
+                            </div>
+
+                            <div x-show="!loadingGroups && groups.length === 0" class="text-center text-gray-500 py-4">
+                                No se encontraron grupos para esta instancia.
+                            </div>
+
+                            <div x-show="!loadingGroups && groups.length > 0"
+                                class="max-h-64 overflow-y-auto space-y-2">
+                                <template x-for="group in groups" :key="group.id">
+                                    <label
+                                        class="flex items-center gap-2 p-2 border rounded hover:bg-gray-50 cursor-pointer">
+                                        <input type="checkbox" :value="group.id" x-model="selectedGroups">
+                                        <span class="text-sm text-gray-800" x-text="group.subject"></span>
+                                        <span class="text-xs text-gray-400 ml-auto"
+                                            x-text="'(' + group.size + ' miembros)'"></span>
+                                    </label>
+                                </template>
+                            </div>
                         </div>
 
-                        <div x-show="!loadingGroups && groups.length === 0" class="text-center text-gray-500 py-4">
-                            No se encontraron grupos para esta instancia.
-                        </div>
+                        <div x-show="activeTab === 'labels'">
+                            <div x-show="loadingLabels" class="text-center text-gray-500 py-4">
+                                Cargando etiquetas...
+                            </div>
 
-                        <div x-show="!loadingGroups && groups.length > 0" class="max-h-64 overflow-y-auto space-y-2">
-                            <template x-for="group in groups" :key="group.id">
-                                <label
-                                    class="flex items-center gap-2 p-2 border rounded hover:bg-gray-50 cursor-pointer">
-                                    <input type="checkbox" :value="group.id" x-model="selectedGroups">
-                                    <span class="text-sm text-gray-800" x-text="group.subject"></span>
-                                    <span class="text-xs text-gray-400 ml-auto"
-                                        x-text="'(' + group.size + ' miembros)'"></span>
-                                </label>
-                            </template>
+                            <div x-show="!loadingLabels && labels.length === 0" class="text-center text-gray-500 py-4">
+                                No se encontraron etiquetas en WhatsApp Business.
+                            </div>
+
+                            <div x-show="!loadingLabels && labels.length > 0"
+                                class="max-h-64 overflow-y-auto space-y-2">
+                                <template x-for="label in labels" :key="label.id">
+                                    <label
+                                        class="flex items-center gap-2 p-2 border rounded hover:bg-gray-50 cursor-pointer">
+                                        <input type="checkbox" :value="label.id" x-model="selectedLabels">
+                                        <span class="w-3 h-3 rounded-full inline-block"
+                                            :style="'background-color:' + (label.color || '#ccc')"></span>
+                                        <span class="text-sm text-gray-800" x-text="label.name"></span>
+                                    </label>
+                                </template>
+                            </div>
                         </div>
 
                     </div>
@@ -133,9 +172,18 @@
                             class="px-4 py-2 bg-gray-300 text-gray-700 rounded text-xs uppercase font-bold hover:bg-gray-400">
                             Cancelar
                         </button>
-                        <button @click="processExcelExport()"
+
+                        <button x-show="activeTab === 'groups'" @click="processExcelExport()"
                             :disabled="selectedGroups.length === 0 || processingExtraction"
                             :class="selectedGroups.length === 0 || processingExtraction ? 'opacity-50 cursor-not-allowed' : 'hover:bg-opacity-90'"
+                            class="px-4 py-2 bg-blue-600 text-white rounded text-xs uppercase font-bold flex items-center">
+                            <span x-show="processingExtraction" class="mr-2 animate-spin">⏳</span>
+                            <span x-text="processingExtraction ? 'Generando...' : 'Descargar Excel'"></span>
+                        </button>
+
+                        <button x-show="activeTab === 'labels'" @click="processLabelExcelExport()"
+                            :disabled="selectedLabels.length === 0 || processingExtraction"
+                            :class="selectedLabels.length === 0 || processingExtraction ? 'opacity-50 cursor-not-allowed' : 'hover:bg-opacity-90'"
                             class="px-4 py-2 bg-blue-600 text-white rounded text-xs uppercase font-bold flex items-center">
                             <span x-show="processingExtraction" class="mr-2 animate-spin">⏳</span>
                             <span x-text="processingExtraction ? 'Generando...' : 'Descargar Excel'"></span>
@@ -153,14 +201,17 @@
                     qr: null,
                     status: 'loading',
 
-                    // Propiedades de extracción automática y controlada
                     modalOpen: false,
                     loadingGroups: false,
                     processingExtraction: false,
-                    groups: [],            // Almacena el array directo de grupos devuelto por Laravel
-                    selectedGroups: [],    // Almacena los IDs (JID) seleccionados por el usuario
+                    groups: [],
+                    selectedGroups: [],
                     extractionMessage: '',
                     extractionSuccess: true,
+                    activeTab: 'groups',
+                    labels: [],
+                    selectedLabels: [],
+                    loadingLabels: false,
 
                     async init() {
                         await this.getQR();
@@ -191,7 +242,6 @@
                         }, 5000);
                     },
 
-                    // Abre el modal y limpia/carga de forma automática los grupos
                     async openExtractionModal() {
                         this.modalOpen = true;
                         this.loadingGroups = true;
@@ -206,7 +256,6 @@
                             const data = await res.json();
                             console.log("Grupos cargados en Blade:", data);
 
-                            // Asignación directa del array nativo verificado en Postman
                             this.groups = Array.isArray(data) ? data : [];
 
                         } catch (e) {
@@ -218,7 +267,6 @@
                         }
                     },
 
-                    // Procesa de forma secuencial cada uno de los grupos seleccionados en la UI
                     async processExtraction() {
                         if (this.selectedGroups.length === 0) return;
 
@@ -290,6 +338,72 @@
                             const a = document.createElement('a');
                             a.href = url;
                             a.download = 'contactos.xlsx';
+                            document.body.appendChild(a);
+                            a.click();
+                            a.remove();
+                            window.URL.revokeObjectURL(url);
+
+                            this.extractionSuccess = true;
+                            this.extractionMessage = '¡Excel descargado con éxito!';
+
+                        } catch (e) {
+                            this.extractionSuccess = false;
+                            this.extractionMessage = e.message;
+                        } finally {
+                            this.processingExtraction = false;
+                        }
+                    },
+                    switchTab(tab) {
+                        this.activeTab = tab;
+                        this.extractionMessage = '';
+                        if (tab === 'labels' && this.labels.length === 0) {
+                            this.loadLabels();
+                        }
+                    },
+
+                    async loadLabels() {
+                        this.loadingLabels = true;
+                        try {
+                            const res = await fetch('/whatsapp/labels');
+                            if (!res.ok) throw new Error('Error al cargar etiquetas');
+                            const data = await res.json();
+                            this.labels = Array.isArray(data) ? data : [];
+                        } catch (e) {
+                            this.extractionSuccess = false;
+                            this.extractionMessage = 'Error al cargar etiquetas.';
+                            console.error(e);
+                        } finally {
+                            this.loadingLabels = false;
+                        }
+                    },
+
+                    async processLabelExcelExport() {
+                        if (this.selectedLabels.length === 0) return;
+
+                        this.processingExtraction = true;
+                        this.extractionMessage = '';
+
+                        try {
+                            const res = await fetch('/whatsapp/labels/export-excel', {
+                                method: 'POST',
+                                credentials: 'same-origin',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || ''
+                                },
+                                body: JSON.stringify({ labelIds: this.selectedLabels })
+                            });
+
+                            if (!res.ok) {
+                                const err = await res.json();
+                                throw new Error(err.error || 'Error al generar el Excel');
+                            }
+
+                            const blob = await res.blob();
+                            const url = window.URL.createObjectURL(blob);
+                            const a = document.createElement('a');
+                            a.href = url;
+                            a.download = 'contactos_etiquetas.xlsx';
                             document.body.appendChild(a);
                             a.click();
                             a.remove();

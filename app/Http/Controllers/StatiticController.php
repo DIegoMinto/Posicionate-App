@@ -121,8 +121,8 @@ class StatiticController extends Controller
             }
 
             $fila['puntaje_diplomados'] = $inscritosDiplomados;
-            $fila['puntaje_cursos'] = intdiv($inscritosCursosRegulares, 3);
-            $fila['puntaje'] = $fila['puntaje_diplomados'] + $fila['puntaje_cursos'];
+            $fila['puntaje_cursos'] = $inscritosCursosRegulares;
+            $fila['puntaje'] = $inscritosDiplomados + intdiv($inscritosCursosRegulares, 3);
 
             $data[] = $fila;
         }

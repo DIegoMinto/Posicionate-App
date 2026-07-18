@@ -86,7 +86,6 @@
                                 <th class="py-3 px-4 text-center whitespace-nowrap min-w-[80px]">N°</th>
                                 <th class="py-3 px-4 text-center whitespace-nowrap min-w-[120px]">Código</th>
                                 <th class="py-3 px-4 text-center whitespace-nowrap min-w-[160px]">Asesor</th>
-                                <th class="py-3 px-4 text-center whitespace-nowrap min-w-[120px]">Total Inscritos</th>
                                 <th
                                     class="py-3 px-4 text-center whitespace-nowrap min-w-[120px] text-white border-l border-brand-gold/50">
                                     Pts Cursos</th>
@@ -125,13 +124,6 @@
                                         {{ $row['personal']->persona->nombre }}
                                     </td>
 
-                                    <td class="py-3 px-4 text-center whitespace-nowrap">
-                                        <span
-                                            class="px-2 py-1 rounded-full bg-green-100 text-green-700 text-[10px] font-black">
-                                            {{ $row['total_inscritos'] }}
-                                        </span>
-                                    </td>
-
                                     <td
                                         class="py-3 px-4 text-center whitespace-nowrap bg-gray-50 text-gray-700 border-l border-brand-gold/20">
                                         {{ $row['puntaje_cursos'] }} pts
@@ -155,19 +147,15 @@
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="{{ 7 + count($cursos) }}" class="py-12 text-center text-gray-400 italic">
+                                    <<td colspan="{{ 6 + count($cursos) }}" class="py-12 text-center text-gray-400 italic">
                                         No hay datos disponibles.
-                                    </td>
+                                        </td>
                                 </tr>
                             @endforelse
 
                             <tr class="bg-brand-green font-sans font-medium text-white">
                                 <td colspan="3" class="py-3 px-4 text-right uppercase font-black">
                                     TOTAL GENERAL
-                                </td>
-
-                                <td class="py-3 px-4 text-center text-white font-black">
-                                    {{ $totalInscritosGeneral }}
                                 </td>
 
                                 <td class="py-3 px-4 text-center text-white font-bold border-l border-brand-gold/30">
