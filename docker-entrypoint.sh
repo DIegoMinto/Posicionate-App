@@ -18,4 +18,4 @@ php artisan cache:clear
 php artisan view:clear
 
 echo "Starting server..."
-exec php -S 0.0.0.0:$PORT -t public
+PHP_CLI_SERVER_WORKERS=4 exec php -S 0.0.0.0:$PORT -t public
