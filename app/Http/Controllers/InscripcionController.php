@@ -179,8 +179,19 @@ class InscripcionController extends Controller
                     ? Carbon::parse($curso->fecha_inicio)
                     : Carbon::parse($inscripcion->created_at);
 
+                $fechaBaseContado = $fechaInscripcion;
+                foreach ($plan->detalles as $d) {
+                    if (in_array($d->detalle, ['PAGO INICIAL', 'PAGO DE MATRÍCULA'])) {
+                        $nroIni = $d->nro_cuota;
+                        if (isset($request->cuotas[$nroIni]['fecha_pagada']) && $request->cuotas[$nroIni]['fecha_pagada'] !== '') {
+                            $fechaBaseContado = Carbon::parse($request->cuotas[$nroIni]['fecha_pagada']);
+                        }
+                    }
+                }
+
                 $ultimaFechaProgramada = null;
-                $posicion = 0;
+                $posicionCuotaRegular = 0;
+
                 foreach ($plan->detalles as $detallePlan) {
 
                     $nro = $detallePlan->nro_cuota;
@@ -202,17 +213,23 @@ class InscripcionController extends Controller
 
                     $estado = $montoPagado > 0 ? 'revision' : 'pendiente';
 
-                    if ($detallePlan->detalle === 'TITULACION') {
+                    if (in_array($detallePlan->detalle, ['PAGO INICIAL', 'PAGO DE MATRÍCULA'])) {
+                        $fechaProgramada = null;
+                    } elseif ($detallePlan->detalle === 'TITULACION') {
                         $fechaProgramada = $ultimaFechaProgramada
                             ? $ultimaFechaProgramada->copy()->addDays(15)
                             : $fechaInscripcion->copy()->addDays(15);
+                        $ultimaFechaProgramada = $fechaProgramada->copy();
                     } else {
+                        $posicionCuotaRegular++;
+
                         if ($plan->tipo_plan === 'CONTADO') {
-                            $fechaProgramada = $fechaInscripcion->copy()->addDays($posicion * 30);
+                            $fechaProgramada = $fechaBaseContado->copy()->addDays($posicionCuotaRegular * 30);
                         } else {
-                            $fechaProgramada = $posicion == 0
-                                ? $fechaInscripcion->copy()
-                                : $fechaInscripcion->copy()->startOfMonth()->addMonths($posicion)->day(15);
+                            $fechaProgramada = $fechaInscripcion->copy()
+                                ->startOfMonth()
+                                ->addMonths($posicionCuotaRegular)
+                                ->day(15);
                         }
                         $ultimaFechaProgramada = $fechaProgramada->copy();
                     }
@@ -222,12 +239,10 @@ class InscripcionController extends Controller
                         'detalle' => $detallePlan->detalle,
                         'monto_pagar' => $montoPlan,
                         'monto_pagado' => $montoPagado,
-                        'fecha_programada' => $fechaProgramada->format('Y-m-d'),
+                        'fecha_programada' => $fechaProgramada ? $fechaProgramada->format('Y-m-d') : null,
                         'fecha_pagada' => $fechaPagada,
                         'estado' => $estado,
                     ]);
-
-                    $posicion++;
                 }
 
                 return redirect()->route('curso.estudiantes', $request->id_curso)
@@ -248,17 +263,13 @@ class InscripcionController extends Controller
         $estudiante = \App\Models\Estudiante::findOrFail($id_estudiante);
         $curso = \App\Models\Curso::findOrFail($id_curso);
 
-        // inscripción
         $inscripcion = \App\Models\CursoEstudiante::where('id_estudiante', $id_estudiante)
             ->where('id_curso', $id_curso)
             ->firstOrFail();
 
-        // pagos
         $pagos = PagoEstudiante::where('id_curso_estudiante', $inscripcion->id)
-            ->orderBy('fecha_programada')
+            ->orderBy('id_pagos_estudiante')
             ->get();
-
-
 
         return view('students.facturacion', compact(
             'usuario',
@@ -328,7 +339,6 @@ class InscripcionController extends Controller
         $pago->monto_pagado = $request->monto_pagado;
 
         if ($request->monto_pagado == 0) {
-            // reinicio: sin fecha, vuelve a pendiente
             $pago->fecha_pagada = null;
             $pago->estado = 'pendiente';
         } else {
@@ -339,6 +349,43 @@ class InscripcionController extends Controller
         $pago->save();
 
         $inscripcion = \App\Models\CursoEstudiante::findOrFail($pago->id_curso_estudiante);
+
+        if ($pago->detalle === 'PAGO INICIAL' && $pago->monto_pagado > 0 && $pago->fecha_pagada) {
+
+            $plan = \App\Models\PlanesPago::find($inscripcion->id_planes_pago);
+
+            if ($plan && $plan->tipo_plan === 'CONTADO') {
+                $fechaBase = Carbon::parse($pago->fecha_pagada);
+
+                $pendientes = \App\Models\PagoEstudiante::where('id_curso_estudiante', $pago->id_curso_estudiante)
+                    ->whereNotIn('detalle', ['TITULACION', 'PAGO DE MATRÍCULA', 'PAGO INICIAL'])
+                    ->where('estado', '!=', 'pagado')
+                    ->orderBy('id_pagos_estudiante')
+                    ->get();
+
+                $ultimaFechaRegular = $fechaBase;
+                $indice = 2;
+
+                foreach ($pendientes as $cuota) {
+                    $fechaProgramada = $fechaBase->copy()->addDays(($indice - 1) * 30);
+                    $cuota->fecha_programada = $fechaProgramada->format('Y-m-d');
+                    $cuota->save();
+
+                    $ultimaFechaRegular = $fechaProgramada;
+                    $indice++;
+                }
+
+                $titulacion = \App\Models\PagoEstudiante::where('id_curso_estudiante', $pago->id_curso_estudiante)
+                    ->where('detalle', 'TITULACION')
+                    ->where('estado', '!=', 'pagado')
+                    ->first();
+
+                if ($titulacion) {
+                    $titulacion->fecha_programada = $ultimaFechaRegular->copy()->addDays(15)->format('Y-m-d');
+                    $titulacion->save();
+                }
+            }
+        }
 
         return redirect()->route('students.facturacion', [
             'id' => $inscripcion->id_estudiante,

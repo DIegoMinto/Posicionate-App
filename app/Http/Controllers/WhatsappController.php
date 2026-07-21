@@ -327,72 +327,6 @@ class WhatsappController extends Controller
             'labelIds.*' => 'string',
         ]);
 
-        $chats = \DB::connection('evolution')
-            ->table('Chat')
-            ->whereNotNull('labels')
-            ->get();
-
-        \Log::info('DEBUG labelIds recibidos', ['labelIds' => $request->labelIds]);
-        \Log::info('DEBUG total chats con labels', ['total' => $chats->count()]);
-
-        $lidMap = [];
-        $messages = \DB::connection('evolution')
-            ->table('Message')
-            ->whereRaw("key::text LIKE '%@lid%'")
-            ->whereRaw("key::text LIKE '%remoteJidAlt%'")
-            ->select('key')
-            ->get();
-
-        foreach ($messages as $msg) {
-            $keyData = json_decode($msg->key, true);
-            $lidJid = $keyData['remoteJid'] ?? null;
-            $altJid = $keyData['remoteJidAlt'] ?? null;
-            if ($lidJid && $altJid && str_ends_with($lidJid, '@lid') && !str_ends_with($altJid, '@lid')) {
-                $lidMap[explode('@', $lidJid)[0]] = explode('@', $altJid)[0];
-            }
-        }
-
-        \Log::info('DEBUG lidMap generado', ['total' => count($lidMap)]);
-
-        $phones = [];
-        $matchedChats = 0;
-
-        foreach ($chats as $chat) {
-            $chatLabelIds = json_decode($chat->labels, true) ?? [];
-            $matches = array_intersect($request->labelIds, $chatLabelIds);
-
-            if (!empty($matches)) {
-                $matchedChats++;
-                $jid = $chat->remoteJid ?? null;
-
-                if ($jid && !str_ends_with($jid, '@g.us')) {
-                    $phone = null;
-
-                    if (str_ends_with($jid, '@lid')) {
-                        $lidNumber = explode('@', $jid)[0];
-                        $phone = $lidMap[$lidNumber] ?? null;
-                    } else {
-                        $phone = explode('@', $jid)[0];
-                    }
-
-                    if ($phone && is_numeric($phone) && strlen($phone) < 16) {
-                        $phones[$phone] = true;
-                    }
-                }
-            }
-        }
-
-        \Log::info('DEBUG resultado final', [
-            'chats_matcheados' => $matchedChats,
-            'telefonos_resueltos' => count($phones),
-        ]);
-
-        $phoneList = array_keys($phones);
-
-        if (empty($phoneList)) {
-            return response()->json(['ok' => false, 'error' => 'No se encontraron contactos válidos con esas etiquetas.'], 422);
-        }
-
         try {
             $chats = \DB::connection('evolution')
                 ->table('Chat')
@@ -404,23 +338,29 @@ class WhatsappController extends Controller
             $messages = \DB::connection('evolution')
                 ->table('Message')
                 ->whereRaw("key::text LIKE '%@lid%'")
-                ->whereRaw("key::text LIKE '%remoteJidAlt%'")
                 ->select('key')
                 ->get();
 
             foreach ($messages as $msg) {
                 $keyData = json_decode($msg->key, true);
+                if (!$keyData)
+                    continue;
+
                 $lidJid = $keyData['remoteJid'] ?? null;
                 $altJid = $keyData['remoteJidAlt'] ?? null;
-
                 if ($lidJid && $altJid && str_ends_with($lidJid, '@lid') && !str_ends_with($altJid, '@lid')) {
-                    $lidNumber = explode('@', $lidJid)[0];
-                    $phoneNumber = explode('@', $altJid)[0];
-                    $lidMap[$lidNumber] = $phoneNumber;
+                    $lidMap[explode('@', $lidJid)[0]] = explode('@', $altJid)[0];
+                }
+
+                $participantLid = $keyData['participant'] ?? null;
+                $participantAlt = $keyData['participantAlt'] ?? null;
+                if ($participantLid && $participantAlt && str_ends_with($participantLid, '@lid') && !str_ends_with($participantAlt, '@lid')) {
+                    $lidMap[explode('@', $participantLid)[0]] = explode('@', $participantAlt)[0];
                 }
             }
 
             $phones = [];
+            $sinResolver = [];
 
             foreach ($chats as $chat) {
                 $chatLabelIds = json_decode($chat->labels, true) ?? [];
@@ -441,15 +381,26 @@ class WhatsappController extends Controller
 
                         if ($phone && is_numeric($phone) && strlen($phone) < 16) {
                             $phones[$phone] = true;
+                        } else {
+                            $sinResolver[] = $jid;
                         }
                     }
                 }
             }
 
+            \Log::info('DEBUG export labels', [
+                'telefonos_resueltos' => count($phones),
+                'sin_resolver' => $sinResolver,
+            ]);
+
             $phoneList = array_keys($phones);
 
             if (empty($phoneList)) {
-                return response()->json(['ok' => false, 'error' => 'No se encontraron contactos válidos con esas etiquetas.'], 422);
+                return response()->json([
+                    'ok' => false,
+                    'error' => 'No se encontraron contactos válidos con esas etiquetas.',
+                    'sin_resolver' => $sinResolver,
+                ], 422);
             }
 
             $spreadsheet = new \PhpOffice\PhpSpreadsheet\Spreadsheet();
@@ -472,7 +423,11 @@ class WhatsappController extends Controller
             return response()->download($tempPath, $fileName)->deleteFileAfterSend(true);
 
         } catch (\Throwable $e) {
-            return response()->json(['ok' => false, 'error' => 'Excepción al generar el Excel.', 'message' => $e->getMessage()], 500);
+            return response()->json([
+                'ok' => false,
+                'error' => 'Excepción al generar el Excel.',
+                'message' => $e->getMessage()
+            ], 500);
         }
     }
 }

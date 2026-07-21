@@ -71,7 +71,11 @@
                                     </td>
 
                                     <td class="py-3 px-4 whitespace-nowrap text-right">
-                                        {{ \Carbon\Carbon::parse($pago->fecha_programada)->format('d/m/Y') }}
+                                        @if($pago->fecha_programada)
+                                            {{ \Carbon\Carbon::parse($pago->fecha_programada)->format('d/m/Y') }}
+                                        @else
+                                            <span class="text-gray-400">-</span>
+                                        @endif
                                     </td>
 
                                     <td class="py-3 px-4 whitespace-nowrap text-right">
