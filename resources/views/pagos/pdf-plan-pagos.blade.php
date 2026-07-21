@@ -14,7 +14,6 @@
             padding: 0;
             font-family: 'DejaVu Sans', sans-serif;
             color: #072e2c;
-            background-image: url('{{ public_path('img/fondo_granizado.png') }}');
             background-repeat: repeat;
             background-size: cover;
         }
@@ -220,9 +219,7 @@
                         <td>{{ $pago->monto_pagado > 0 ? number_format($pago->monto_pagado, 2) : '-' }}</td>
                         <td>{{ $saldoFila > 0 ? number_format($saldoFila, 2) : '-' }}</td>
                         <td>
-                            <span class="badge {{ $estaCompleto ? 'badge-completo' : 'badge-incompleto' }}">
-                                {{ $estaCompleto ? 'Completo' : 'Incompleto' }}
-                            </span>
+                            {{ $estaCompleto ? 'Completo' : 'Incompleto' }}
                         </td>
                     </tr>
                 @empty
@@ -245,7 +242,7 @@
     </div>
 
     <div class="footer">
-        <img class="footer-imagen" src="{{ public_path('img/footer.png') }}" alt="Footer">
+        <img class="footer-imagen" src="{{ public_path('img/footer_plan.png') }}" alt="Footer">
     </div>
 
 </body>
