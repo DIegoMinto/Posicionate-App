@@ -11,9 +11,6 @@ php artisan storage:link || true
 echo "Running migrations..."
 php artisan migrate --force
 
-echo "Running dry-run recalculate dates..."
-php artisan pagos:recalcular-fechas
-
 echo "Clearing optimization configs..."
 php artisan config:clear
 php artisan route:clear
