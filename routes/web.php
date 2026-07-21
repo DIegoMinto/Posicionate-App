@@ -174,6 +174,8 @@ Route::middleware(['auth', 'vigente'])->group(function () {
 
     Route::get('/pagos/{id}/recibo', [InscripcionController::class, 'reciboPago'])->name('pagos.recibo');
 
+    Route::get('/pagos/{inscripcion}/pdf', [InscripcionController::class, 'exportarPdf'])->name('pagos.pdf');
+
     // RUTAS CONTRASEÑAS
     Route::controller(ContrasenaController::class)->group(function () {
         Route::get('/contrasenas', 'index')->name('contrasenas.index');

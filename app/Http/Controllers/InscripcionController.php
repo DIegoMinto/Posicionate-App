@@ -16,6 +16,8 @@ use Illuminate\Http\Request;
 use App\Models\Pais;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
+use Barryvdh\DomPDF\Facade\Pdf;
+use App\Models\Inscripcion;
 
 class InscripcionController extends Controller
 {
@@ -521,6 +523,24 @@ class InscripcionController extends Controller
         $pdf = \PDF::loadView('pagos.recibo', $data)->setPaper('a5', 'landscape');
 
         return $pdf->stream("recibo-{$data['numeroRecibo']}.pdf");
+    }
+
+    public function exportarPdf($idCursoEstudiante)
+    {
+        $inscripcion = \App\Models\CursoEstudiante::with(['estudiante', 'curso'])
+            ->findOrFail($idCursoEstudiante);
+
+        $estudiante = $inscripcion->estudiante;
+        $curso = $inscripcion->curso;
+
+        $pagos = PagoEstudiante::where('id_curso_estudiante', $inscripcion->id)
+            ->orderBy('id_pagos_estudiante')
+            ->get();
+
+        $pdf = Pdf::loadView('pagos.pdf-plan-pagos', compact('curso', 'estudiante', 'inscripcion', 'pagos'));
+        $pdf->setPaper('letter', 'portrait');
+
+        return $pdf->stream('plan-pagos-' . $estudiante->ci . '.pdf');
     }
 
 }
