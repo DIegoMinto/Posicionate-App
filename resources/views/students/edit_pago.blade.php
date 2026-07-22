@@ -13,9 +13,6 @@
 
         <x-page-header titulo="Completar Pago">
             <x-page-header titulo="Detalle del Plan">
-                <a href="{{ route('curso.estudiantes', $plan->id_curso) }}" class="btn-back">
-                    ← Volver
-                </a>
             </x-page-header>
         </x-page-header>
 
