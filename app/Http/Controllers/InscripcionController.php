@@ -425,6 +425,7 @@ class InscripcionController extends Controller
     {
         $request->validate([
             'password_contabilidad' => 'required|string',
+            'fecha_pagada' => 'nullable|date',
         ]);
 
         $configuracionArea = \App\Models\ContrasenaArea::whereHas('area', function ($query) {
@@ -436,6 +437,7 @@ class InscripcionController extends Controller
         if (!$configuracionArea) {
             return redirect()->back()->with('error', 'No se encontró la configuración de seguridad para el área de Contabilidad.');
         }
+
         try {
             $passwordDecodificada = \Illuminate\Support\Facades\Crypt::decryptString($configuracionArea->contrasena_encriptada);
 
@@ -450,10 +452,14 @@ class InscripcionController extends Controller
 
         $pago = PagoEstudiante::findOrFail($id);
 
+        $fechaPagada = $request->filled('fecha_pagada')
+            ? $request->fecha_pagada
+            : ($pago->fecha_pagada ?? Carbon::now()->toDateString());
+
         $pago->update([
             'estado' => 'pagado',
             'monto_pagado' => $pago->monto_pagar,
-            'fecha_pagada' => Carbon::now()->toDateString()
+            'fecha_pagada' => $fechaPagada,
         ]);
 
         return redirect()->back()->with('success', 'El pago ha sido validado y completado con éxito por el área de Contabilidad.');
