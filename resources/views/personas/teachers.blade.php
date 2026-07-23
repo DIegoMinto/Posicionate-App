@@ -98,7 +98,7 @@
                         <tbody class="text-gray-700 text-[11px] font-medium">
                             @forelse($docentes as $index => $d)
                                 <tr class="border-b border-gray-100 hover:bg-gray-50 transition-colors text-black">
-                                    <td class="py-3 px-4">{{ $index + 1 }}</td>
+                                    <td class="py-3 px-4">{{ $docentes->firstItem() + $index }}</td>
                                     <td class="py-3 px-4">{{ $d->ci }}</td>
                                     <td class="py-3 px-4">{{ $d->extension_ci }}</td>
                                     <td class="py-3 px-4 whitespace-nowrap">{{ $d->nombre }}</td>
