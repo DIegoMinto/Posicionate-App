@@ -235,6 +235,46 @@
                         </tbody>
                     </table>
                 </div>
+                <div class="mt-6 flex justify-center">
+                    <nav class="flex items-center gap-1 font-sans text-[11px]">
+
+                        @if ($docentes->onFirstPage())
+                            <span class="px-3 py-1.5 rounded-md text-gray-300 border border-gray-200 cursor-not-allowed">
+                                Anterior
+                            </span>
+                        @else
+                            <a href="{{ $docentes->previousPageUrl() }}"
+                                class="px-3 py-1.5 rounded-md border border-brand-green text-brand-green font-bold hover:bg-brand-green hover:text-white transition-colors">
+                                Anterior
+                            </a>
+                        @endif
+
+                        @foreach ($docentes->getUrlRange(1, $docentes->lastPage()) as $page => $url)
+                            @if ($page == $docentes->currentPage())
+                                <span class="px-3 py-1.5 rounded-md bg-brand-green text-white font-bold">
+                                    {{ $page }}
+                                </span>
+                            @else
+                                <a href="{{ $url }}"
+                                    class="px-3 py-1.5 rounded-md border border-brand-green text-brand-green font-bold hover:bg-brand-green hover:text-white transition-colors">
+                                    {{ $page }}
+                                </a>
+                            @endif
+                        @endforeach
+
+                        @if ($docentes->hasMorePages())
+                            <a href="{{ $docentes->nextPageUrl() }}"
+                                class="px-3 py-1.5 rounded-md border border-brand-green text-brand-green font-bold hover:bg-brand-green hover:text-white transition-colors">
+                                Siguiente
+                            </a>
+                        @else
+                            <span class="px-3 py-1.5 rounded-md text-gray-300 border border-gray-200 cursor-not-allowed">
+                                Siguiente
+                            </span>
+                        @endif
+
+                    </nav>
+                </div>
             </div>
         </div>
     </x-layout-dashboard>

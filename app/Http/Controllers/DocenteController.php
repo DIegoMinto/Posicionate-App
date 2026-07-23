@@ -41,7 +41,11 @@ class DocenteController extends Controller
             $query->where('id_ciudad', $request->id_ciudad);
         }
 
-        $docentes = $query->get();
+        $docentes = $query
+            ->orderBy('docente.created_at', 'desc')
+            ->paginate(10)
+            ->withQueryString();
+        ;
 
         $areas = Docente::select('area')->whereNotNull('area')->distinct()->pluck('area');
         $ciudades = \App\Models\Ciudad::all();

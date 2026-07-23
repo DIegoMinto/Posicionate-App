@@ -13,7 +13,7 @@ echo "Configuring Apache for Render Proxy & HTTPS..."
 a2enmod headers rewrite || true
 
 # Indicar a Apache que confíe en el header HTTPS de Render
-echo "SetEnvIf X-Forwarded-Proto \"https\" HTTPS=on" >> /etc/apache2/apache2.doc.conf || true
+echo "SetEnvIf X-Forwarded-Proto \"https\" HTTPS=on" >> /etc/apache2/apache2.conf || true
 
 echo "Configuring Apache port..."
 sed -i "s/Listen 80/Listen $PORT/g" /etc/apache2/ports.conf
