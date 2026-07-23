@@ -152,8 +152,8 @@
                                     <td class="py-3 px-4 text-center">
                                         <span
                                             class="px-2 py-0.5 rounded-full text-[9px] font-black uppercase
-                                                                                                                                                                                                                                                                                    {{ $e->estado == 'pre_inscrito' ? 'bg-yellow-100 text-yellow-700' : '' }}
-                                                                                                                                                                                                                                                                                    {{ $e->estado == 'inscrito' ? 'bg-green-100 text-green-700' : '' }}">
+                                                                                                                                                                                                                                                                                                                {{ $e->estado == 'pre_inscrito' ? 'bg-yellow-100 text-yellow-700' : '' }}
+                                                                                                                                                                                                                                                                                                                {{ $e->estado == 'inscrito' ? 'bg-green-100 text-green-700' : '' }}">
                                             {{ $e->estado }}
                                         </span>
                                     </td>
@@ -162,20 +162,19 @@
                                         <div class="flex justify-center items-center gap-2">
 
                                             <a href="{{ route('people.show', $e->id_estudiante) }}"
-                                                class="text-brand-green hover:text-brand-gold transition"
-                                                title="Ver Información" alt="Ver información">
+                                                class="hover:text-brand-green transition" title="Ver Información"
+                                                alt="Ver información">
                                                 <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none"
                                                     viewBox="0 0 24 24" stroke="currentColor">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                                         d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                        d="M2.458 12C3.732 7.943 7.523 5 12 5c4.477 0 8.268 2.943 9.542 7-1.274 
-                                                                                                                                                                                                                                                                                                                                                                                                4.057-5.065 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                                        d="M2.458 12C3.732 7.943 7.523 5 12 5c4.477 0 8.268 2.943 9.542 7-1.274 4.057-5.065 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                                                 </svg>
                                             </a>
 
                                             <a href="{{ route('estudiantes.edit', $e->id_estudiante) }}"
-                                                class="text-blacks hover:text-brand-gold transition">
+                                                class="hover:text-brand-green transition">
                                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                                         d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z">
@@ -187,10 +186,11 @@
                                                 <a href="{{ route('students.change', $e->id_estudiante) }}?id_curso={{ $curso->id_curso }}"
                                                     class="group relative flex items-center justify-center"
                                                     title="Cambiar Estado">
-                                                    <div>
-                                                        <img src="/img/change_icon.png" class="w-5 h-5 object-contain"
-                                                            alt="Cambiar Estado">
-                                                    </div>
+                                                    <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none"
+                                                        viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                                            d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99" />
+                                                    </svg>
 
                                                     <span
                                                         class="absolute -top-8 scale-0 transition-all rounded bg-gray-800 px-2 py-1 text-[10px] text-white group-hover:scale-100 whitespace-nowrap z-30 shadow-lg">
@@ -201,10 +201,11 @@
 
                                             <a href="{{ route('students.facturacion', $e->id_estudiante) }}?id_curso={{ $curso->id_curso }}"
                                                 class="group relative flex items-center justify-center" title="Facturación">
-                                                <div>
-                                                    <img src="/img/bill_icon.png" class="w-5 h-5 object-contain"
-                                                        alt="Facturación">
-                                                </div>
+                                                <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none"
+                                                    viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                                        d="M9 14.25l6-6m4.5-3.493V21.75l-3.75-1.5-3.75 1.5-3.75-1.5-3.75 1.5V4.757c0-1.108.806-2.057 1.907-2.185a48.507 48.507 0 0111.186 0c1.1.128 1.907 1.077 1.907 2.185zM9.75 9h.008v.008H9.75V9zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zM14.25 12h.008v.008h-.008V12zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z" />
+                                                </svg>
 
                                                 <span
                                                     class="absolute -top-8 scale-0 transition-all rounded bg-gray-800 px-2 py-1 text-[10px] text-white group-hover:scale-100 whitespace-nowrap z-30 shadow-lg">
@@ -217,7 +218,7 @@
                                                         class="group relative flex items-center justify-center pb-1 cursor-pointer">
 
                                                         <svg xmlns="http://www.w3.org/2000/svg"
-                                                            class="w-5 h-5 group-hover:text-red-600 transition-colors"
+                                                            class="w-5 h-5 text-black group-hover:text-red-600 transition-colors"
                                                             fill="none" viewBox="0 0 24 24" stroke="currentColor"
                                                             stroke-width="2">
 
