@@ -54,7 +54,7 @@
                             <label class="form-label-bold text-black">Docente Responsable</label>
                             <select name="id_docente" class="form-select-pill border-2 border-brand-gold mb-2">
                                 <option value="" {{ is_null($curso->id_docente) ? 'selected' : '' }}>
-                                    -- Sin Docente Asignado --
+                                    Sin Designar
                                 </option>
                                 @foreach($docentes as $docente)
                                     <option value="{{ $docente->id_docente }}" {{ $curso->id_docente == $docente->id_docente ? 'selected' : '' }}>
