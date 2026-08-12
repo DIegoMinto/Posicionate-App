@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\DB;
 
 class PagoEstudiante extends Model
 {
@@ -31,5 +32,17 @@ class PagoEstudiante extends Model
     public function cursoEstudiante()
     {
         return $this->belongsTo(CursoEstudiante::class, 'id_curso_estudiante');
+    }
+
+    public static function generarNumeroRecibo(): string
+    {
+        $ultimo = self::whereNotNull('numero_recibo')
+            ->lockForUpdate()
+            ->orderByDesc('numero_recibo')
+            ->value('numero_recibo');
+
+        $siguiente = $ultimo ? ((int) $ultimo) + 1 : 1000;
+
+        return str_pad($siguiente, 6, '0', STR_PAD_LEFT);
     }
 }

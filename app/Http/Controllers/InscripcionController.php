@@ -170,6 +170,8 @@ class InscripcionController extends Controller
                     ->where('id_estudiante', $id_estudiante)
                     ->firstOrFail();
 
+                \App\Models\PagoEstudiante::where('id_curso_estudiante', $inscripcion->id)->delete();
+
                 $inscripcion->update([
                     'id_planes_pago' => $request->id_plan,
                     'id_descuento' => $id_descuento,
@@ -485,6 +487,13 @@ class InscripcionController extends Controller
     {
         $pago = \App\Models\PagoEstudiante::findOrFail($id);
 
+        if (!$pago->numero_recibo) {
+            DB::transaction(function () use ($pago) {
+                $pago->numero_recibo = \App\Models\PagoEstudiante::generarNumeroRecibo();
+                $pago->save();
+            });
+        }
+
         $inscripcion = \App\Models\CursoEstudiante::with(['estudiante', 'curso', 'asesor.persona'])
             ->findOrFail($pago->id_curso_estudiante);
 
@@ -523,7 +532,7 @@ class InscripcionController extends Controller
             'anio' => $fecha->format('Y'),
             'montoLetras' => $this->montoEnLetras($pago->monto_pagado),
             'saldo' => $pago->monto_pagar - $pago->monto_pagado,
-            'numeroRecibo' => str_pad($pago->id_pagos_estudiante, 4, '0', STR_PAD_LEFT),
+            'numeroRecibo' => $pago->numero_recibo
         ];
 
         $pdf = \PDF::loadView('pagos.recibo', $data)->setPaper('a5', 'landscape');
