@@ -98,8 +98,6 @@ Route::middleware(['auth', 'vigente'])->group(function () {
 
     Route::get('/programs/{id}/show', [DashboardController::class, 'programsShow'])->name('programs.show');
     Route::get('/curso/{id}/estudiantes', [InscripcionController::class, 'list'])->name('curso.estudiantes');
-    Route::get('/estudiantes/{id}/cambiar-plan', [InscripcionController::class, 'change'])->name('students.change');
-    Route::post('/estudiantes/{id}/cambiar-plan', [InscripcionController::class, 'store_change'])->name('students.change.store');
 
     //RUTAS PLANES
     Route::middleware('role:super_admin,admin')->group(function () {
