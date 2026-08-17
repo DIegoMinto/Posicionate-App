@@ -203,11 +203,12 @@ class DashboardController extends Controller
 
         if ($request->filled('search')) {
             $search = $request->search;
+
             $query->where(function ($q) use ($search) {
-                $q->where('estudiante.nombre', 'ILIKE', "%$search%")
-                    ->orWhere('estudiante.apellido_p', 'ILIKE', "%$search%")
-                    ->orWhere('estudiante.apellido_m', 'ILIKE', "%$search%")
-                    ->orWhere('estudiante.ci', 'ILIKE', "%$search%");
+                $q->whereRaw("unaccent(estudiante.nombre) ILIKE unaccent(?)", ["%$search%"])
+                    ->orWhereRaw("unaccent(estudiante.apellido_p) ILIKE unaccent(?)", ["%$search%"])
+                    ->orWhereRaw("unaccent(estudiante.apellido_m) ILIKE unaccent(?)", ["%$search%"])
+                    ->orWhereRaw("unaccent(estudiante.ci) ILIKE unaccent(?)", ["%$search%"]);
             });
         }
 
