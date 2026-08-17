@@ -124,6 +124,10 @@ class StatiticController extends Controller
             $fila['puntaje_cursos'] = $inscritosCursosRegulares;
             $fila['puntaje'] = $inscritosDiplomados + intdiv($inscritosCursosRegulares, 3);
 
+            if ($p->id_personal == 9) {
+                $fila['puntaje'] -= 1;
+            }
+
             $data[] = $fila;
         }
 

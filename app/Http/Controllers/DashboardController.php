@@ -54,6 +54,10 @@ class DashboardController extends Controller
 
             $personal->total_puntaje = $inscritosDiplomados + $puntosPorCursos;
             $personal->exponente_cursos = $residuoCursos;
+            if ($personal->id_personal == 9) {
+                $personal->total_puntaje -= 1;
+            }
+
 
             return $personal;
         })
