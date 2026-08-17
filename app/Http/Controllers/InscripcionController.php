@@ -18,6 +18,8 @@ use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
 use Barryvdh\DomPDF\Facade\Pdf;
 use App\Models\Inscripcion;
+use Maatwebsite\Excel\Facades\Excel;
+use App\Exports\StudentsExport;
 
 class InscripcionController extends Controller
 {
@@ -75,19 +77,54 @@ class InscripcionController extends Controller
     {
         $curso = Curso::findOrFail($id);
         $usuario = auth()->user();
+        $estudiantes = $this->buildStudentsQuery($request, $usuario, $id)->paginate(10)->withQueryString();
+        $personales = Personal::with('persona')->get();
 
+        return view('cursos.estudiantes', compact('curso', 'estudiantes', 'usuario', 'personales'));
+    }
+
+    public function exportPdf(Request $request, $id)
+    {
+        $curso = Curso::findOrFail($id);
+        $usuario = auth()->user();
+        $estudiantes = $this->buildStudentsQuery($request, $usuario, $id)->get();
+
+        $pdf = Pdf::loadView('exports.students_pdf', compact('estudiantes', 'curso'))
+            ->setPaper('a4', 'landscape');
+
+        return $pdf->download('estudiantes_curso_' . $id . '_' . now()->format('Ymd_His') . '.pdf');
+    }
+
+    public function exportExcel(Request $request, $id)
+    {
+        $usuario = auth()->user();
+
+        return Excel::download(
+            new StudentsExport($request, $usuario, $id),
+            'estudiantes_curso_' . $id . '_' . now()->format('Ymd_His') . '.xlsx'
+        );
+    }
+
+    private function buildStudentsQuery(Request $request, $usuario, $idCurso = null)
+    {
         $query = DB::table('curso_estudiante')
             ->join('estudiante', 'curso_estudiante.id_estudiante', '=', 'estudiante.id_estudiante')
+            ->join('curso', 'curso_estudiante.id_curso', '=', 'curso.id_curso')
             ->join('personal', 'curso_estudiante.id_personal', '=', 'personal.id_personal')
             ->join('persona', 'personal.id_persona', '=', 'persona.id_persona')
-            ->where('curso_estudiante.id_curso', $id)
             ->select(
                 'estudiante.*',
+                'curso.nombre as curso_nombre',
                 'curso_estudiante.estado',
+                'curso_estudiante.id_curso',
                 'curso_estudiante.created_at as fecha_inscripcion',
                 'persona.nombre as asesor_nombre',
                 'persona.apellido_p as asesor_apellido'
             );
+
+        if ($idCurso) {
+            $query->where('curso_estudiante.id_curso', $idCurso);
+        }
 
         if ($usuario->rol === 'user') {
             $query->where('curso_estudiante.id_personal', $usuario->id_personal);
@@ -103,7 +140,6 @@ class InscripcionController extends Controller
 
         if ($request->filled('search')) {
             $search = $request->search;
-
             $query->where(function ($q) use ($search) {
                 $q->where('estudiante.nombre', 'ILIKE', "%$search%")
                     ->orWhere('estudiante.apellido_p', 'ILIKE', "%$search%")
@@ -120,19 +156,7 @@ class InscripcionController extends Controller
             $query->whereDate('curso_estudiante.created_at', '<=', $request->fecha_fin);
         }
 
-        $estudiantes = $query
-            ->orderBy('curso_estudiante.created_at', 'desc')
-            ->paginate(10)
-            ->withQueryString();
-
-        $personales = Personal::with('persona')->get();
-
-        return view('cursos.estudiantes', compact(
-            'curso',
-            'estudiantes',
-            'usuario',
-            'personales'
-        ));
+        return $query->orderBy('curso_estudiante.created_at', 'desc');
     }
 
     public function change(Request $request, $id)

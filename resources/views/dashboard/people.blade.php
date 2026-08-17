@@ -72,6 +72,18 @@
                 </form>
             </x-slot>
 
+            @if($usuario->rol === 'super_admin')
+                <div class="flex gap-2">
+                    <a href="{{ route('people.export.pdf', request()->query()) }}"
+                        class="bg-red-600 text-white text-[10px] font-bold px-3 py-1.5 rounded-md hover:bg-red-700 transition">
+                        Exportar PDF
+                    </a>
+                    <a href="{{ route('people.export.excel', request()->query()) }}"
+                        class="bg-green-700 text-white text-[10px] font-bold px-3 py-1.5 rounded-md hover:bg-green-800 transition">
+                        Exportar Excel
+                    </a>
+                </div>
+            @endif
         </x-page-header>
 
         <div class="p-6">
@@ -154,8 +166,8 @@
                                     <td class="py-3 px-4 text-center">
                                         <span
                                             class="px-2 py-0.5 rounded-full text-[9px] font-black uppercase
-                                                                                                                                                                                {{ $e->estado == 'pre_inscrito' ? 'bg-yellow-100 text-yellow-700' : '' }}
-                                                                                                                                                                                {{ $e->estado == 'inscrito' ? 'bg-green-100 text-green-700' : '' }}">
+                                                                                                                                                                                        {{ $e->estado == 'pre_inscrito' ? 'bg-yellow-100 text-yellow-700' : '' }}
+                                                                                                                                                                                        {{ $e->estado == 'inscrito' ? 'bg-green-100 text-green-700' : '' }}">
                                             {{ $e->estado }}
                                         </span>
                                     </td>

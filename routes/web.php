@@ -62,7 +62,11 @@ Route::middleware(['auth', 'vigente'])->group(function () {
         });
 
     });
+    Route::get('/people/export/pdf', [DashboardController::class, 'exportPdf'])->name('people.export.pdf');
+    Route::get('/people/export/excel', [DashboardController::class, 'exportExcel'])->name('people.export.excel');
     Route::get('/wpsender', [DashboardController::class, 'wpsender'])->name('wpsender.index');
+    Route::get('/cursos/{id}/estudiantes/export/pdf', [InscripcionController::class, 'exportPdf'])->name('curso.estudiantes.export.pdf');
+    Route::get('/cursos/{id}/estudiantes/export/excel', [InscripcionController::class, 'exportExcel'])->name('curso.estudiantes.export.excel');
 
     //RUTAS CREACIÓN DE USUARIOS
     Route::middleware('role:admin,super_admin')->group(function () {

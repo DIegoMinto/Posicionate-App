@@ -15,6 +15,9 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\DB;
 use App\Models\Modulo;
+use Barryvdh\DomPDF\Facade\Pdf;
+use Maatwebsite\Excel\Facades\Excel;
+use App\Exports\StudentsExport;
 
 class DashboardController extends Controller
 {
@@ -138,7 +141,35 @@ class DashboardController extends Controller
     public function students(Request $request)
     {
         $usuario = auth()->user();
+        $estudiantes = $this->buildStudentsQuery($request, $usuario)->paginate(10)->withQueryString();
+        $personales = Personal::with('persona')->get();
 
+        return view('dashboard.people', compact('usuario', 'estudiantes', 'personales'));
+    }
+
+    public function exportPdf(Request $request)
+    {
+        $usuario = auth()->user();
+        $estudiantes = $this->buildStudentsQuery($request, $usuario)->get();
+
+        $pdf = Pdf::loadView('exports.students_pdf', compact('estudiantes'))
+            ->setPaper('a4', 'landscape');
+
+        return $pdf->download('estudiantes_' . now()->format('Ymd_His') . '.pdf');
+    }
+
+    public function exportExcel(Request $request)
+    {
+        $usuario = auth()->user();
+
+        return Excel::download(
+            new StudentsExport($request, $usuario),
+            'estudiantes_' . now()->format('Ymd_His') . '.xlsx'
+        );
+    }
+
+    private function buildStudentsQuery(Request $request, $usuario, $idCurso = null)
+    {
         $query = DB::table('curso_estudiante')
             ->join('estudiante', 'curso_estudiante.id_estudiante', '=', 'estudiante.id_estudiante')
             ->join('curso', 'curso_estudiante.id_curso', '=', 'curso.id_curso')
@@ -154,6 +185,10 @@ class DashboardController extends Controller
                 'persona.apellido_p as asesor_apellido'
             );
 
+        if ($idCurso) {
+            $query->where('curso_estudiante.id_curso', $idCurso);
+        }
+
         if ($usuario->rol === 'user') {
             $query->where('curso_estudiante.id_personal', $usuario->id_personal);
         }
@@ -168,7 +203,6 @@ class DashboardController extends Controller
 
         if ($request->filled('search')) {
             $search = $request->search;
-
             $query->where(function ($q) use ($search) {
                 $q->where('estudiante.nombre', 'ILIKE', "%$search%")
                     ->orWhere('estudiante.apellido_p', 'ILIKE', "%$search%")
@@ -185,18 +219,7 @@ class DashboardController extends Controller
             $query->whereDate('curso_estudiante.created_at', '<=', $request->fecha_fin);
         }
 
-        $estudiantes = $query
-            ->orderBy('curso_estudiante.created_at', 'desc')
-            ->paginate(10)
-            ->withQueryString();
-
-        $personales = Personal::with('persona')->get();
-
-        return view('dashboard.people', compact(
-            'usuario',
-            'estudiantes',
-            'personales'
-        ));
+        return $query->orderBy('curso_estudiante.created_at', 'desc');
     }
 
     public function creations()
