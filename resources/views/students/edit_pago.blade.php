@@ -34,18 +34,16 @@
 
                     <div class="grid grid-cols-2 gap-4 text-sm">
                         <div>
-                            <p class="font-bold text-brand-green">Monto Total</p>
-                            <p>{{ number_format($pago->monto_pagar, 2) }} Bs</p>
+                            <p class="font-bold text-brand-green">Monto Total del Concepto</p>
+                            <p>{{ number_format($raiz->monto_pagar, 2) }} Bs</p>
                         </div>
-
                         <div>
-                            <p class="font-bold text-brand-green">Monto Pagado</p>
-                            <p>{{ number_format($pago->monto_pagado, 2) }} Bs</p>
+                            <p class="font-bold text-brand-green">Pagado hasta ahora</p>
+                            <p>{{ number_format($totalPagadoGrupo, 2) }} Bs</p>
                         </div>
-
                         <div class="col-span-2">
                             <p class="font-bold text-red-600">Saldo Pendiente</p>
-                            <p class="text-lg font-bold">{{ number_format($saldo, 2) }} Bs</p>
+                            <p class="text-lg font-bold">{{ number_format($saldoDisponible, 2) }} Bs</p>
                         </div>
                     </div>
 
@@ -54,35 +52,29 @@
                         @method('PUT')
 
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
-
                             <div>
                                 <label class="block text-sm font-bold text-brand-green mb-1">
-                                    Monto pagado (total corregido)
+                                    Monto a registrar ahora
                                 </label>
-                                <input type="number" step="0.01" name="monto_pagado" min="0"
-                                    max="{{ $pago->monto_pagar }}" value="{{ $pago->monto_pagado }}" required
+                                <input type="number" step="0.01" name="monto_registrar" min="0.01"
+                                    max="{{ $saldoDisponible }}" value="{{ $saldoDisponible }}" required
                                     class="w-full border border-gray-300 rounded p-2 text-center focus:ring-1 focus:ring-brand-green outline-none">
-                                <p class="text-xs text-gray-500 mt-1">Ingresa el total pagado real (0 para reiniciar)
+                                <p class="text-xs text-gray-500 mt-1">
+                                    Si el cliente paga solo una parte, pon solo ese monto. El resto se registra
+                                    después por separado, sin mover la fecha de este pago.
                                 </p>
                             </div>
 
                             <div>
-                                <label class="block text-sm font-bold text-brand-green mb-1">
-                                    Fecha de pago
-                                </label>
-                                <input type="date" name="fecha_pagada"
-                                    value="{{ $pago->fecha_pagada ? \Carbon\Carbon::parse($pago->fecha_pagada)->format('Y-m-d') : now()->format('Y-m-d') }}"
-                                    ...>
+                                <label class="block text-sm font-bold text-brand-green mb-1">Fecha de pago</label>
+                                <input type="date" name="fecha_pagada" value="{{ now()->format('Y-m-d') }}"
+                                    class="w-full border border-gray-300 rounded p-2 text-center focus:ring-1 focus:ring-brand-green outline-none">
                             </div>
-
                         </div>
 
                         <div class="mt-6 text-right">
-                            <button type="submit" class="btn-gold">
-                                Guardar Pago
-                            </button>
+                            <button type="submit" class="btn-gold">Registrar Pago</button>
                         </div>
-
                     </form>
 
                 </div>

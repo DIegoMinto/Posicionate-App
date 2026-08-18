@@ -15,12 +15,14 @@ class PagoEstudiante extends Model
     public $timestamps = false;
     protected $fillable = [
         'id_curso_estudiante',
+        'id_pago_original',
         'detalle',
         'monto_pagar',
+        'monto_pagado',
         'fecha_programada',
         'fecha_pagada',
-        'monto_pagado',
-        'estado'
+        'estado',
+        'numero_recibo',
     ];
 
     protected $casts = [
@@ -44,5 +46,15 @@ class PagoEstudiante extends Model
         $siguiente = $ultimo ? ((int) $ultimo) + 1 : 1000;
 
         return str_pad($siguiente, 6, '0', STR_PAD_LEFT);
+    }
+    public function divisiones()
+    {
+        return $this->hasMany(PagoEstudiante::class, 'id_pago_original', 'id_pagos_estudiante')
+            ->orderBy('id_pagos_estudiante');
+    }
+
+    public function original()
+    {
+        return $this->belongsTo(PagoEstudiante::class, 'id_pago_original', 'id_pagos_estudiante');
     }
 }

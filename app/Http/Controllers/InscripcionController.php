@@ -286,7 +286,6 @@ class InscripcionController extends Controller
     public function facturacion(Request $request, $id_estudiante)
     {
         $usuario = auth()->user();
-
         $id_curso = $request->query('id_curso');
 
         $estudiante = \App\Models\Estudiante::findOrFail($id_estudiante);
@@ -300,12 +299,24 @@ class InscripcionController extends Controller
             ->orderBy('id_pagos_estudiante')
             ->get();
 
+        $grupos = $pagos->whereNull('id_pago_original')->map(function ($raiz) use ($pagos) {
+            $divisiones = $pagos->where('id_pago_original', $raiz->id_pagos_estudiante)->values();
+
+            return (object) [
+                'raiz' => $raiz,
+                'movimientos' => collect([$raiz])->merge($divisiones),
+                'monto_pagar' => $raiz->monto_pagar,
+                'monto_pagado' => $raiz->monto_pagado + $divisiones->sum('monto_pagado'),
+            ];
+        })->values();
+
         return view('students.facturacion', compact(
             'usuario',
             'estudiante',
             'curso',
             'pagos',
-            'inscripcion'
+            'inscripcion',
+            'grupos'
         ));
     }
 
@@ -335,16 +346,23 @@ class InscripcionController extends Controller
         $usuario = auth()->user();
 
         $pago = \App\Models\PagoEstudiante::findOrFail($id);
+        $raiz = $pago->id_pago_original
+            ? \App\Models\PagoEstudiante::findOrFail($pago->id_pago_original)
+            : $pago;
 
-        $inscripcion = \App\Models\CursoEstudiante::findOrFail($pago->id_curso_estudiante);
+        $totalPagadoGrupo = $raiz->monto_pagado + $raiz->divisiones()->sum('monto_pagado');
+        $saldoDisponible = $raiz->monto_pagar - $totalPagadoGrupo;
 
+        $inscripcion = \App\Models\CursoEstudiante::findOrFail($raiz->id_curso_estudiante);
         $estudiante = \App\Models\Estudiante::findOrFail($inscripcion->id_estudiante);
-
         $curso = \App\Models\Curso::findOrFail($inscripcion->id_curso);
 
         return view('students.edit_pago', compact(
             'usuario',
             'pago',
+            'raiz',
+            'totalPagadoGrupo',
+            'saldoDisponible',
             'estudiante',
             'curso'
         ));
@@ -353,40 +371,56 @@ class InscripcionController extends Controller
     public function updatePago(Request $request, $id)
     {
         $request->validate([
-            'monto_pagado' => 'required|numeric|min:0',
+            'monto_registrar' => 'required|numeric|min:0.01',
             'fecha_pagada' => 'nullable|date',
         ]);
 
         $pago = \App\Models\PagoEstudiante::findOrFail($id);
 
-        if ($request->monto_pagado > $pago->monto_pagar) {
+        $raiz = $pago->id_pago_original
+            ? \App\Models\PagoEstudiante::findOrFail($pago->id_pago_original)
+            : $pago;
+
+        $totalPagadoGrupo = $raiz->monto_pagado + $raiz->divisiones()->sum('monto_pagado');
+        $saldoDisponible = $raiz->monto_pagar - $totalPagadoGrupo;
+
+        if ($request->monto_registrar > $saldoDisponible) {
             return back()->withErrors([
-                'monto_pagado' => 'El monto pagado no puede superar el monto total (' . $pago->monto_pagar . ' Bs)'
+                'monto_registrar' => 'El monto excede el saldo pendiente de este concepto (' . number_format($saldoDisponible, 2) . ' Bs).'
             ]);
         }
 
-        $pago->monto_pagado = $request->monto_pagado;
+        $fecha = $request->filled('fecha_pagada') ? $request->fecha_pagada : now()->format('Y-m-d');
 
-        if ($request->monto_pagado == 0) {
-            $pago->fecha_pagada = null;
-            $pago->estado = 'pendiente';
+        if ($totalPagadoGrupo == 0) {
+            $raiz->monto_pagado = $request->monto_registrar;
+            $raiz->fecha_pagada = $fecha;
+            $raiz->estado = 'revision';
+            $raiz->save();
         } else {
-            $pago->fecha_pagada = $request->fecha_pagada;
-            $pago->estado = 'revision';
+
+            \App\Models\PagoEstudiante::create([
+                'id_curso_estudiante' => $raiz->id_curso_estudiante,
+                'id_pago_original' => $raiz->id_pagos_estudiante,
+                'detalle' => $raiz->detalle,
+                'monto_pagar' => 0,
+                'monto_pagado' => $request->monto_registrar,
+                'fecha_programada' => null,
+                'fecha_pagada' => $fecha,
+                'estado' => 'revision',
+            ]);
         }
 
-        $pago->save();
+        $inscripcion = \App\Models\CursoEstudiante::findOrFail($raiz->id_curso_estudiante);
 
-        $inscripcion = \App\Models\CursoEstudiante::findOrFail($pago->id_curso_estudiante);
-
-        if ($pago->detalle === 'PAGO INICIAL' && $pago->monto_pagado > 0 && $pago->fecha_pagada) {
-
+        if ($raiz->detalle === 'PAGO INICIAL' && $totalPagadoGrupo == 0 && $raiz->fecha_pagada) {
             $plan = \App\Models\PlanesPago::find($inscripcion->id_planes_pago);
 
             if ($plan && $plan->tipo_plan === 'CONTADO') {
-                $fechaBase = Carbon::parse($pago->fecha_pagada);
+                $fechaBase = Carbon::parse($raiz->fecha_pagada);
 
-                $pendientes = \App\Models\PagoEstudiante::where('id_curso_estudiante', $pago->id_curso_estudiante)
+                $pendientes = \App\Models\PagoEstudiante::where('id_curso_estudiante', $raiz->id_curso_estudiante)
+                    ->whereNull('id_pago_original')
                     ->whereNotIn('detalle', ['TITULACION', 'PAGO DE MATRÍCULA', 'PAGO INICIAL'])
                     ->where('estado', '!=', 'pagado')
                     ->orderBy('id_pagos_estudiante')
@@ -399,12 +433,12 @@ class InscripcionController extends Controller
                     $fechaProgramada = $fechaBase->copy()->addDays(($indice - 1) * 30);
                     $cuota->fecha_programada = $fechaProgramada->format('Y-m-d');
                     $cuota->save();
-
                     $ultimaFechaRegular = $fechaProgramada;
                     $indice++;
                 }
 
-                $titulacion = \App\Models\PagoEstudiante::where('id_curso_estudiante', $pago->id_curso_estudiante)
+                $titulacion = \App\Models\PagoEstudiante::where('id_curso_estudiante', $raiz->id_curso_estudiante)
+                    ->whereNull('id_pago_original')
                     ->where('detalle', 'TITULACION')
                     ->where('estado', '!=', 'pagado')
                     ->first();
@@ -419,7 +453,7 @@ class InscripcionController extends Controller
         return redirect()->route('students.facturacion', [
             'id' => $inscripcion->id_estudiante,
             'id_curso' => $inscripcion->id_curso
-        ])->with('success', '¡Pago actualizado con éxito!');
+        ])->with('success', '¡Pago registrado con éxito!');
     }
 
     public function agregarEstudiante(Request $request)
@@ -485,7 +519,6 @@ class InscripcionController extends Controller
 
         $pago->update([
             'estado' => 'pagado',
-            'monto_pagado' => $pago->monto_pagar,
             'fecha_pagada' => $fechaPagada,
         ]);
 
