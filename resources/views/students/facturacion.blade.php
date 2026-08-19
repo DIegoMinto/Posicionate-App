@@ -66,192 +66,246 @@
 
                                 @foreach($movimientos as $movIndex => $mov)
 
-                                    @php
-                                        $montoMovimiento = $mov->monto_pagar;
+                                                        @php
+                                                            $montoMovimiento = $mov->monto_pagar;
 
-                                        $saldoMovimiento = $saldoAnterior - $mov->monto_pagado;
+                                                            $saldoMovimiento = $saldoAnterior - $mov->monto_pagado;
 
-                                        if ($saldoMovimiento < 0 && abs($saldoMovimiento) < 0.01) {
-                                            $saldoMovimiento = 0;
-                                        }
+                                                            if ($saldoMovimiento < 0 && abs($saldoMovimiento) < 0.01) {
+                                                                $saldoMovimiento = 0;
+                                                            }
 
-                                        $saldoMovimiento = max(0, $saldoMovimiento);
+                                                            $saldoMovimiento = max(0, $saldoMovimiento);
 
-                                        $saldoAnterior = $saldoMovimiento;
+                                                            $saldoAnterior = $saldoMovimiento;
 
-                                        $esPrincipal = $movIndex === 0;
-                                    @endphp
+                                                            $esPrincipal = $movIndex === 0;
+                                                        @endphp
 
-                                    <tr
-                                        class="border-b border-gray-100 hover:bg-gray-50 transition-colors text-black align-top">
+                                                        <tr
+                                                            class="border-b border-gray-100 hover:bg-gray-50 transition-colors text-black align-top">
 
-                                        <td class="py-3 px-4">
-                                            @if($esPrincipal)
-                                                {{ $index + 1 }}
-                                            @endif
-                                        </td>
+                                                            <td class="py-3 px-4">
+                                                                @if($esPrincipal)
+                                                                    {{ $index + 1 }}
+                                                                @endif
+                                                            </td>
 
-                                        <td class="py-3 px-4 whitespace-nowrap">
-                                            @if($esPrincipal)
-                                                {{ $raiz->detalle }}
-                                            @else
-                                                <span class="text-gray-400">—</span>
-                                            @endif
-                                        </td>
+                                                            <td class="py-3 px-4 whitespace-nowrap">
+                                                                @if($esPrincipal)
+                                                                    {{ $raiz->detalle }}
+                                                                @else
+                                                                    <span class="text-gray-400">—</span>
+                                                                @endif
+                                                            </td>
 
-                                        <td class="py-3 px-4 whitespace-nowrap text-right">
-                                            @if($esPrincipal && $raiz->fecha_programada)
-                                                {{ \Carbon\Carbon::parse($raiz->fecha_programada)->format('d/m/Y') }}
-                                            @else
-                                                <span class="text-gray-400">-</span>
-                                            @endif
-                                        </td>
+                                                            <td class="py-3 px-4 whitespace-nowrap text-right">
+                                                                @if($esPrincipal && $raiz->fecha_programada)
+                                                                    {{ \Carbon\Carbon::parse($raiz->fecha_programada)->format('d/m/Y') }}
+                                                                @else
+                                                                    <span class="text-gray-400">-</span>
+                                                                @endif
+                                                            </td>
 
-                                        <td class="py-3 px-4 whitespace-nowrap text-right">
-                                            @if($mov->fecha_pagada)
-                                                {{ \Carbon\Carbon::parse($mov->fecha_pagada)->format('d/m/Y') }}
-                                            @else
-                                                <span class="text-yellow-600 font-bold">Pendiente</span>
-                                            @endif
-                                        </td>
+                                                            <td class="py-3 px-4 whitespace-nowrap text-right">
+                                                                @if($mov->fecha_pagada)
+                                                                    {{ \Carbon\Carbon::parse($mov->fecha_pagada)->format('d/m/Y') }}
+                                                                @else
+                                                                    <span class="text-yellow-600 font-bold">Pendiente</span>
+                                                                @endif
+                                                            </td>
 
-                                        <td class="py-3 px-4 whitespace-nowrap text-right">
-                                            {{ number_format($montoMovimiento, 2) }} Bs
-                                        </td>
+                                                            <td class="py-3 px-4 whitespace-nowrap text-right">
+                                                                {{ number_format($montoMovimiento, 2) }} Bs
+                                                            </td>
 
-                                        <td class="py-3 px-4 whitespace-nowrap text-right">
-                                            {{ number_format($mov->monto_pagado, 2) }} Bs
-                                        </td>
+                                                            <td class="py-3 px-4 whitespace-nowrap text-right">
+                                                                {{ number_format($mov->monto_pagado, 2) }} Bs
+                                                            </td>
 
-                                        <td class="py-3 px-4 whitespace-nowrap text-right font-semibold">
-                                            {{ number_format($saldoMovimiento, 2) }} Bs
-                                        </td>
+                                                            <td class="py-3 px-4 whitespace-nowrap text-right font-semibold">
+                                                                {{ number_format($saldoMovimiento, 2) }} Bs
+                                                            </td>
 
-                                        <td class="py-3 px-4 text-center">
-                                            @php
-                                                $claseEstado = match ($mov->estado) {
-                                                    'pagado' => 'bg-green-100 text-green-700',
-                                                    'revision' => 'bg-yellow-100 text-yellow-700',
-                                                    default => 'bg-red-100 text-red-700'
-                                                };
+                                                            <td class="py-3 px-4 text-center">
+                                                                @php
+                                                                    $claseEstado = match ($mov->estado) {
+                                                                        'pagado' => 'bg-green-100 text-green-700',
+                                                                        'revision' => 'bg-yellow-100 text-yellow-700',
+                                                                        default => 'bg-red-100 text-red-700'
+                                                                    };
 
-                                                $textoEstado = match ($mov->estado) {
-                                                    'pagado' => 'Completo',
-                                                    'revision' => 'En revisión',
-                                                    default => 'Pendiente'
-                                                };
-                                            @endphp
+                                                                    $textoEstado = match ($mov->estado) {
+                                                                        'pagado' => 'Completo',
+                                                                        'revision' => 'En revisión',
+                                                                        default => 'Pendiente'
+                                                                    };
+                                                                @endphp
 
-                                            <span
-                                                class="inline-block px-2 py-0.5 rounded-full text-[9px] font-black uppercase {{ $claseEstado }}">
-                                                {{ $textoEstado }}
-                                            </span>
-                                        </td>
+                                                                <span
+                                                                    class="inline-block px-2 py-0.5 rounded-full text-[9px] font-black uppercase {{ $claseEstado }}">
+                                                                    {{ $textoEstado }}
+                                                                </span>
+                                                            </td>
 
-                                        <td class="py-3 px-4 text-center">
-                                            <div class="flex items-center justify-center gap-2"
-                                                x-data="{ openVerify{{ $mov->id_pagos_estudiante }}: false }">
+                                                            <td class="py-3 px-4 text-center">
+                                                                <div class="flex items-center justify-center gap-2" x-data="{
+    openVerify{{ $mov->id_pagos_estudiante }}: false,
+    openRecibo{{ $mov->id_pagos_estudiante }}: false,
+    reciboHtml{{ $mov->id_pagos_estudiante }}: '',
+    cargando{{ $mov->id_pagos_estudiante }}: false,
+    verRecibo{{ $mov->id_pagos_estudiante }}() {
+        this.openRecibo{{ $mov->id_pagos_estudiante }} = true;
+        if (this.reciboHtml{{ $mov->id_pagos_estudiante }}) return;
+        this.cargando{{ $mov->id_pagos_estudiante }} = true;
+        fetch('{{ route('pagos.recibo.html', $mov->id_pagos_estudiante) }}')
+            .then(r => r.text())
+            .then(html => {
+                this.reciboHtml{{ $mov->id_pagos_estudiante }} = html;
+                this.cargando{{ $mov->id_pagos_estudiante }} = false;
+            });
+    }
+}">
 
-                                                @if($mov->estado === 'pagado')
-                                                    <a href="{{ route('pagos.recibo', $mov->id_pagos_estudiante) }}" target="_blank"
-                                                        title="Ver Recibo">
+                                                                    @if($mov->estado === 'pagado')
+            <button type="button"
+    @click="verRecibo{{ $mov->id_pagos_estudiante }}()"
+    title="Ver Recibo" class="cursor-pointer">
+                <svg xmlns="http://www.w3.org/2000/svg"
+                    class="w-5 h-5 text-brand-green hover:text-brand-gold transition-colors "
+                    fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round"
+                        d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                </svg>
+            </button>
 
-                                                        <svg xmlns="http://www.w3.org/2000/svg"
-                                                            class="w-5 h-5 text-brand-green hover:text-brand-gold transition-colors"
-                                                            fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <!-- Modal del recibo -->
+            <div x-show="openRecibo{{ $mov->id_pagos_estudiante }}"
+                class="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 backdrop-blur-sm"
+                x-cloak x-transition>
 
-                                                            <path stroke-linecap="round" stroke-linejoin="round"
-                                                                d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                                                        </svg>
-                                                    </a>
-                                                @endif
+                                <div class="bg-white rounded-sm shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto border-t-4 border-brand-green"
+                    @click.away="openRecibo{{ $mov->id_pagos_estudiante }} = false">
 
-                                                @if(in_array($usuario->cargo, ['contador', 'asistente_contable']) || $usuario->rol === 'super_admin')
+                    <div class="flex justify-between items-center px-5 py-3 border-b border-gray-200 sticky top-0 bg-white z-10">
+                        <h3 class="text-[11px] font-black text-brand-green uppercase">
+                            Recibo de Pago
+                        </h3>
+                        <div class="flex items-center gap-4">
+                            <a href="{{ route('pagos.recibo', $mov->id_pagos_estudiante) }}" target="_blank"
+                                class="text-[9px] font-black text-brand-green uppercase hover:text-brand-gold flex items-center gap-1">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none"
+                                    viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                        d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                </svg>
+                                Descargar PDF
+                            </a>
+                            <button type="button"
+    @click="openRecibo{{ $mov->id_pagos_estudiante }} = false"
+    class="cursor-pointer text-gray-400 hover:text-gray-700 text-lg leading-none">
+    &times;
+</button>
+                        </div>
+                    </div>
 
-                                                    @if($mov->estado === 'revision')
+                    <div class="p-6">
+                        <div x-show="cargando{{ $mov->id_pagos_estudiante }}" class="text-center py-10 text-gray-400 text-xs">
+                            Cargando recibo...
+                        </div>
+                        <div x-show="!cargando{{ $mov->id_pagos_estudiante }}" x-html="reciboHtml{{ $mov->id_pagos_estudiante }}"></div>
+                    </div>
 
-                                                        <button @click="openVerify{{ $mov->id_pagos_estudiante }} = true" type="button"
-                                                            title="Validar Pago">
+                </div>
+            </div>
+        @endif
 
-                                                            <svg xmlns="http://www.w3.org/2000/svg"
-                                                                class="w-5 h-5 text-brand-green hover:text-brand-gold transition-colors"
-                                                                fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                                                    @if(in_array($usuario->cargo, ['contador', 'asistente_contable']) || $usuario->rol === 'super_admin')
 
-                                                                <path stroke-linecap="round" stroke-linejoin="round"
-                                                                    d="M5 13l4 4L19 7" />
-                                                            </svg>
-                                                        </button>
+                                                                        @if($mov->estado === 'revision')
 
-                                                        <div x-show="openVerify{{ $mov->id_pagos_estudiante }}"
-                                                            class="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 backdrop-blur-sm"
-                                                            x-cloak x-transition>
+                                                                            <button @click="openVerify{{ $mov->id_pagos_estudiante }} = true" type="button"
+                                                                                title="Validar Pago">
 
-                                                            <div class="bg-white p-6 rounded-sm shadow-2xl w-85 text-left border-t-4 border-brand-green"
-                                                                @click.away="openVerify{{ $mov->id_pagos_estudiante }} = false">
+                                                                                <svg xmlns="http://www.w3.org/2000/svg"
+                                                                                    class="w-5 h-5 text-brand-green hover:text-brand-gold transition-colors"
+                                                                                    fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
 
-                                                                <h3 class="text-[11px] font-black text-brand-green uppercase mb-2">
-                                                                    Validación de Finanzas
-                                                                </h3>
+                                                                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                                                                        d="M5 13l4 4L19 7" />
+                                                                                </svg>
+                                                                            </button>
 
-                                                                <p class="text-[10px] mb-4 text-gray-600">
-                                                                    Para pasar a estado <strong>COMPLETO</strong> el pago de
-                                                                    <span class="font-bold text-black">
-                                                                        {{ number_format($mov->monto_pagado, 2) }} Bs
-                                                                    </span>,
-                                                                    digite la clave maestra de Contabilidad.
-                                                                </p>
+                                                                            <div x-show="openVerify{{ $mov->id_pagos_estudiante }}"
+                                                                                class="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 backdrop-blur-sm"
+                                                                                x-cloak x-transition>
 
-                                                                <form action="{{ route('pagos.validar', $mov->id_pagos_estudiante) }}"
-                                                                    method="POST">
+                                                                                <div class="bg-white p-6 rounded-sm shadow-2xl w-85 text-left border-t-4 border-brand-green"
+                                                                                    @click.away="openVerify{{ $mov->id_pagos_estudiante }} = false">
 
-                                                                    @csrf
+                                                                                    <h3 class="text-[11px] font-black text-brand-green uppercase mb-2">
+                                                                                        Validación de Finanzas
+                                                                                    </h3>
 
-                                                                    <input type="password" name="password_contabilidad" required
-                                                                        class="w-full border-2 border-brand-gold p-2 text-xs mb-4 focus:outline-none bg-gray-50 uppercase tracking-widest placeholder:normal-case placeholder:tracking-normal"
-                                                                        placeholder="Contraseña de Contabilidad">
+                                                                                    <p class="text-[10px] mb-4 text-gray-600">
+                                                                                        Para pasar a estado <strong>COMPLETO</strong> el pago de
+                                                                                        <span class="font-bold text-black">
+                                                                                            {{ number_format($mov->monto_pagado, 2) }} Bs
+                                                                                        </span>,
+                                                                                        digite la clave maestra de Contabilidad.
+                                                                                    </p>
 
-                                                                    <div class="flex justify-end gap-3">
+                                                                                    <form action="{{ route('pagos.validar', $mov->id_pagos_estudiante) }}"
+                                                                                        method="POST">
 
-                                                                        <button type="button"
-                                                                            @click="openVerify{{ $mov->id_pagos_estudiante }} = false"
-                                                                            class="text-[9px] font-bold text-gray-400 uppercase cursor-pointer">
-                                                                            Cancelar
-                                                                        </button>
+                                                                                        @csrf
 
-                                                                        <button type="submit"
-                                                                            class="bg-brand-green text-white px-4 py-2 rounded-sm text-[9px] font-black uppercase cursor-pointer hover:bg-opacity-90">
-                                                                            Aprobar Pago
-                                                                        </button>
+                                                                                        <input type="password" name="password_contabilidad" required
+                                                                                            class="w-full border-2 border-brand-gold p-2 text-xs mb-4 focus:outline-none bg-gray-50 uppercase tracking-widest placeholder:normal-case placeholder:tracking-normal"
+                                                                                            placeholder="Contraseña de Contabilidad">
 
-                                                                    </div>
-                                                                </form>
-                                                            </div>
-                                                        </div>
+                                                                                        <div class="flex justify-end gap-3">
 
-                                                    @endif
+                                                                                            <button type="button"
+                                                                                                @click="openVerify{{ $mov->id_pagos_estudiante }} = false"
+                                                                                                class="text-[9px] font-bold text-gray-400 uppercase cursor-pointer">
+                                                                                                Cancelar
+                                                                                            </button>
 
-                                                    @if($movIndex === count($movimientos) - 1 && $saldoMovimiento > 0)
+                                                                                            <button type="submit"
+                                                                                                class="bg-brand-green text-white px-4 py-2 rounded-sm text-[9px] font-black uppercase cursor-pointer hover:bg-opacity-90">
+                                                                                                Aprobar Pago
+                                                                                            </button>
 
-                                                        <a href="{{ route('pagos.edit', $mov->id_pagos_estudiante) }}"
-                                                            title="Registrar Pago">
+                                                                                        </div>
+                                                                                    </form>
+                                                                                </div>
+                                                                            </div>
 
-                                                            <svg xmlns="http://www.w3.org/2000/svg"
-                                                                class="w-5 h-5 text-brand-green hover:text-brand-gold transition-colors"
-                                                                fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                                                        @endif
 
-                                                                <path stroke-linecap="round" stroke-linejoin="round"
-                                                                    d="M11 5h2M12 7v10m-7 4h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                                                            </svg>
-                                                        </a>
+                                                                        @if($movIndex === count($movimientos) - 1 && $saldoMovimiento > 0)
 
-                                                    @endif
+                                                                            <a href="{{ route('pagos.edit', $mov->id_pagos_estudiante) }}"
+                                                                                title="Registrar Pago">
 
-                                                @endif
+                                                                                <svg xmlns="http://www.w3.org/2000/svg"
+                                                                                    class="w-5 h-5 text-brand-green hover:text-brand-gold transition-colors"
+                                                                                    fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
 
-                                            </div>
-                                        </td>
+                                                                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                                                                        d="M11 5h2M12 7v10m-7 4h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                                                                </svg>
+                                                                            </a>
 
-                                    </tr>
+                                                                        @endif
+
+                                                                    @endif
+
+                                                                </div>
+                                                            </td>
+
+                                                        </tr>
 
                                 @endforeach
 

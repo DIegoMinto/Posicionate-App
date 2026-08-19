@@ -541,7 +541,7 @@ class InscripcionController extends Controller
         return $letras;
     }
 
-    public function reciboPago($id)
+    private function datosRecibo($id)
     {
         $pago = \App\Models\PagoEstudiante::findOrFail($id);
 
@@ -578,7 +578,7 @@ class InscripcionController extends Controller
             12 => 'Diciembre'
         ];
 
-        $data = [
+        return [
             'pago' => $pago,
             'estudiante' => $estudiante,
             'curso' => $curso,
@@ -590,30 +590,25 @@ class InscripcionController extends Controller
             'anio' => $fecha->format('Y'),
             'montoLetras' => $this->montoEnLetras($pago->monto_pagado),
             'saldo' => $pago->monto_pagar - $pago->monto_pagado,
-            'numeroRecibo' => $pago->numero_recibo
+            'numeroRecibo' => $pago->numero_recibo,
         ];
+    }
+
+    // NUEVO — para el modal, HTML puro, sin dompdf, rapidísimo
+    public function reciboHtml($id)
+    {
+        $data = $this->datosRecibo($id);
+        return view('pagos.recibo-modal', $data);
+    }
+
+    // El que ya tenías, ahora solo arma el PDF con la data del método de arriba
+    public function reciboPago($id)
+    {
+        $data = $this->datosRecibo($id);
 
         $pdf = \PDF::loadView('pagos.recibo', $data)->setPaper('a5', 'landscape');
 
         return $pdf->stream("recibo-{$data['numeroRecibo']}.pdf");
-    }
-
-    public function exportarPdf($idCursoEstudiante)
-    {
-        $inscripcion = \App\Models\CursoEstudiante::with(['estudiante', 'curso'])
-            ->findOrFail($idCursoEstudiante);
-
-        $estudiante = $inscripcion->estudiante;
-        $curso = $inscripcion->curso;
-
-        $pagos = PagoEstudiante::where('id_curso_estudiante', $inscripcion->id)
-            ->orderBy('id_pagos_estudiante')
-            ->get();
-
-        $pdf = Pdf::loadView('pagos.pdf-plan-pagos', compact('curso', 'estudiante', 'inscripcion', 'pagos'));
-        $pdf->setPaper('letter', 'portrait');
-
-        return $pdf->stream('plan-pagos-' . $estudiante->ci . '.pdf');
     }
 
 }

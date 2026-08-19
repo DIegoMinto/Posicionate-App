@@ -177,6 +177,7 @@ Route::middleware(['auth', 'vigente'])->group(function () {
     Route::put('/plans/{id}', [PlanController::class, 'update'])->name('plans.update');
 
     Route::get('/pagos/{id}/recibo', [InscripcionController::class, 'reciboPago'])->name('pagos.recibo');
+    Route::get('/pagos/{id}/recibo-html', [InscripcionController::class, 'reciboHtml'])->name('pagos.recibo.html');
 
     Route::get('/pagos/{inscripcion}/pdf', [InscripcionController::class, 'exportarPdf'])->name('pagos.pdf');
 
