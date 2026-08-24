@@ -233,26 +233,25 @@ class DashboardController extends Controller
     public function staff(Request $request)
     {
         $usuario = auth()->user()->load('persona');
-
         $sedes = Sede::all();
         $cargos = Cargo::all();
+
+        // Obtener las áreas (ya sea desde el modelo Cargo o un modelo Area)
+        $areas = Cargo::pluck('nombre')->unique(); // Ajusta 'nombre' según la columna de tu BD
 
         $query = Personal::with('persona', 'sede', 'cargos');
 
         if ($request->filled('id_sede')) {
             $query->where('id_sede', $request->id_sede);
         }
-
         if ($request->filled('cargo')) {
             $query->whereHas('cargos', function ($q) use ($request) {
                 $q->where('cargos.id_cargo', $request->cargo);
             });
         }
-
         if ($request->filled('estado')) {
             $query->where('es_vigente', $request->estado);
         }
-
         if ($request->filled('search')) {
             $search = $request->search;
             $query->whereHas('persona', function ($q) use ($search) {
@@ -264,7 +263,8 @@ class DashboardController extends Controller
 
         $personales = $query->paginate(10)->withQueryString();
 
-        return view('dashboard.staff', compact('usuario', 'personales', 'sedes', 'cargos'));
+        // Agregar $areas al compact
+        return view('dashboard.staff', compact('usuario', 'personales', 'sedes', 'cargos', 'areas'));
     }
 
     public function programs(Request $request)
