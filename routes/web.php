@@ -62,6 +62,8 @@ Route::middleware(['auth', 'vigente'])->group(function () {
         });
 
     });
+    Route::get('staff/export/pdf', [UserController::class, 'exportPdf'])->name('people.staff.export.pdf');
+    Route::get('staff/export/excel', [UserController::class, 'exportExcel'])->name('people.staff.export.excel');
     Route::get('/people/export/pdf', [DashboardController::class, 'exportPdf'])->name('people.export.pdf');
     Route::get('/people/export/excel', [DashboardController::class, 'exportExcel'])->name('people.export.excel');
     Route::get('/wpsender', [DashboardController::class, 'wpsender'])->name('wpsender.index');

@@ -18,6 +18,7 @@ use App\Models\Modulo;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Exports\StudentsExport;
+use App\Models\Cargo;
 
 class DashboardController extends Controller
 {
@@ -233,44 +234,39 @@ class DashboardController extends Controller
     {
         $usuario = auth()->user()->load('persona');
 
-
         $sedes = Sede::all();
+        $cargos = Cargo::all();
 
+        $query = Personal::with('persona', 'sede', 'cargos');
 
-        $query = Personal::with('persona', 'sede');
-
-        if ($request->has('id_sede') && $request->id_sede != '') {
+        if ($request->filled('id_sede')) {
             $query->where('id_sede', $request->id_sede);
         }
 
-        if ($request->has('cargo') && $request->cargo != '') {
-            $query->where('cargo', $request->cargo);
-        }
-
-        if ($request->has('estado') && $request->estado != '') {
-            $query->where('es_vigente', $request->estado);
-        }
-
-        if ($request->has('search') && $request->search != '') {
-            $search = $request->search;
-            $query->whereHas('persona', function ($q) use ($search) {
-                $q->where('nombre', 'ilike', "%$search%")
-                    ->orWhere('apellido_p', 'ilike', "%$search%")
-                    ->orWhere('apellido_m', 'ilike', "%$search%");
+        if ($request->filled('cargo')) {
+            $query->whereHas('cargos', function ($q) use ($request) {
+                $q->where('cargos.id_cargo', $request->cargo);
             });
         }
 
+        if ($request->filled('estado')) {
+            $query->where('es_vigente', $request->estado);
+        }
+
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->whereHas('persona', function ($q) use ($search) {
+                $q->whereRaw("unaccent(nombre) ILIKE unaccent(?)", ["%$search%"])
+                    ->orWhereRaw("unaccent(apellido_p) ILIKE unaccent(?)", ["%$search%"])
+                    ->orWhereRaw("unaccent(apellido_m) ILIKE unaccent(?)", ["%$search%"]);
+            });
+        }
 
         $personales = $query->paginate(10)->withQueryString();
 
-
-        $areas = Personal::select('cargo')
-            ->distinct()
-            ->orderBy('cargo')
-            ->pluck('cargo');
-
-        return view('dashboard.staff', compact('usuario', 'personales', 'sedes', 'areas'));
+        return view('dashboard.staff', compact('usuario', 'personales', 'sedes', 'cargos'));
     }
+
     public function programs(Request $request)
     {
         $usuario = auth()->user()->load('persona');

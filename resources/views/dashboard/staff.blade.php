@@ -73,11 +73,21 @@
             <div class="bg-white p-6 rounded-sm border-2 border-brand-gold shadow-md">
                 <div class="flex justify-between items-center mb-6">
                     <h1 class="text-2xl font-bold text-brand-green uppercase tracking-tighter">Gestión de Personal</h1>
-                    <a href="{{ route('users.create') }}">
-                        <button class="btn-gold">
-                            VER SOLICITUDES
-                        </button>
-                    </a>
+                    <div class="flex gap-2">
+                        @if($usuario->rol === 'super_admin' || $usuario->hasAnyCargo(['recursos_humanos']))
+                            <a href="{{ route('people.staff.export.pdf', request()->query()) }}"
+                                class="bg-red-600 text-white text-[10px] font-bold px-3 py-1.5 rounded-md hover:bg-red-700 transition">
+                                Exportar PDF
+                            </a>
+                            <a href="{{ route('people.staff.export.excel', request()->query()) }}"
+                                class="bg-brand-green text-white text-[10px] font-bold px-3 py-1.5 rounded-md hover:bg-green-800 transition">
+                                Exportar Excel
+                            </a>
+                        @endif
+                        <a href="{{ route('users.create') }}">
+                            <button class="btn-gold">VER SOLICITUDES</button>
+                        </a>
+                    </div>
                 </div>
 
                 <div class="overflow-x-auto rounded-xl border-brand-green border-1">
@@ -128,59 +138,59 @@
                                     <td class="py-3 px-4">
                                         <span
                                             class="text-brand-green font-bold whitespace-nowrap"">{{ $p->sede->nombre ?? 'N/A' }}</span>
-                                                                                                                                                                                                                                                                                    </td>
-                                                                                                                                @if($usuario->rol === 'super_admin' || $usuario->hasAnyCargo(['recursos_humanos']))                                                                                                                                                        <td class="
-                                                                                                                                            py-3 px-4 text-center" x-data="{ open: false }">
-                                                                                                                                            <button @click="open = true"
-                                                                                                                                                class="cursor-pointer px-2 py-0.5 rounded-full text-[9px] font-black uppercase transition-transform hover:scale-110 {{ $p->es_vigente == 1 ? 'text-green-600 bg-green-100' : 'text-red-600 bg-red-100' }}">
-                                                                                                                                                {{ $p->es_vigente == 1 ? 'VIGENTE' : 'NO VIGENTE' }}
-                                                                                                                                            </button>
+                                                                                                                                                                                                                                                                                        </td>
+                                                                                                                                    @if($usuario->rol === 'super_admin' || $usuario->hasAnyCargo(['recursos_humanos']))                                                                                                                                                        <td class="
+                                                                                                                                                py-3 px-4 text-center" x-data="{ open: false }">
+                                                                                                                                                <button @click="open = true"
+                                                                                                                                                    class="cursor-pointer px-2 py-0.5 rounded-full text-[9px] font-black uppercase transition-transform hover:scale-110 {{ $p->es_vigente == 1 ? 'text-green-600 bg-green-100' : 'text-red-600 bg-red-100' }}">
+                                                                                                                                                    {{ $p->es_vigente == 1 ? 'VIGENTE' : 'NO VIGENTE' }}
+                                                                                                                                                </button>
 
-                                                                                                                                            <div x-show="open"
-                                                                                                                                                class="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 backdrop-blur-sm"
-                                                                                                                                                x-cloak>
+                                                                                                                                                <div x-show="open"
+                                                                                                                                                    class="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 backdrop-blur-sm"
+                                                                                                                                                    x-cloak>
 
-                                                                                                                                                <div class="bg-white p-6 rounded-sm shadow-2xl w-80 text-left border-t-4 border-brand-gold"
-                                                                                                                                                    @click.away="open = false">
-                                                                                                                                                    <h3
-                                                                                                                                                        class="font-sans text-brand-green uppercase mb-2 flex items-center gap-2 uppercase">
-                                                                                                                                                        <svg class="w-4 h-4 text-brand-gold" fill="currentColor"
-                                                                                                                                                            viewBox="0 0 20 20">
-                                                                                                                                                            <path fill-rule="evenodd"
-                                                                                                                                                                d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z"
-                                                                                                                                                                clip-rule="evenodd" />
-                                                                                                                                                        </svg>
-                                                                                                                                                        Confirmar Autorización
-                                                                                                                                                    </h3>
+                                                                                                                                                    <div class="bg-white p-6 rounded-sm shadow-2xl w-80 text-left border-t-4 border-brand-gold"
+                                                                                                                                                        @click.away="open = false">
+                                                                                                                                                        <h3
+                                                                                                                                                            class="font-sans text-brand-green uppercase mb-2 flex items-center gap-2 uppercase">
+                                                                                                                                                            <svg class="w-4 h-4 text-brand-gold" fill="currentColor"
+                                                                                                                                                                viewBox="0 0 20 20">
+                                                                                                                                                                <path fill-rule="evenodd"
+                                                                                                                                                                    d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z"
+                                                                                                                                                                    clip-rule="evenodd" />
+                                                                                                                                                            </svg>
+                                                                                                                                                            Confirmar Autorización
+                                                                                                                                                        </h3>
 
-                                                                                                                                                    <p class="mb-4">
-                                                                                                                                                        Vas a cambiar el estado de: <br>
-                                                                                                                                                        <span class="font-sans text-black">{{ $p->persona->nombre }}
-                                                                                                                                                            {{ $p->persona->apellido_p }}</span>
-                                                                                                                                                    </p>
+                                                                                                                                                        <p class="mb-4">
+                                                                                                                                                            Vas a cambiar el estado de: <br>
+                                                                                                                                                            <span class="font-sans text-black">{{ $p->persona->nombre }}
+                                                                                                                                                                {{ $p->persona->apellido_p }}</span>
+                                                                                                                                                        </p>
 
-                                                                                                                                                    <form action="{{ route('users.toggle', $p->id_personal) }}"
-                                                                                                                                                        method="POST">
-                                                                                                                                                        @csrf
-                                                                                                                                                        <input type="password" name="password_confirm" required
-                                                                                                                                                            class="w-full border border-gray-200 p-2 text-xs mb-4 focus:outline-none focus:border-brand-gold bg-gray-50 uppercase placeholder:normal-case"
-                                                                                                                                                            placeholder="Tu contraseña de administrador">
+                                                                                                                                                        <form action="{{ route('users.toggle', $p->id_personal) }}"
+                                                                                                                                                            method="POST">
+                                                                                                                                                            @csrf
+                                                                                                                                                            <input type="password" name="password_confirm" required
+                                                                                                                                                                class="w-full border border-gray-200 p-2 text-xs mb-4 focus:outline-none focus:border-brand-gold bg-gray-50 uppercase placeholder:normal-case"
+                                                                                                                                                                placeholder="Tu contraseña de administrador">
 
-                                                                                                                                                        <div class="flex justify-end gap-3">
-                                                                                                                                                            <button type="button" @click="open = false"
-                                                                                                                                                                class="text-[9px] font-sans uppercase cursor-pointer">
-                                                                                                                                                                Cancelar
-                                                                                                                                                            </button>
-                                                                                                                                                            <button type="submit"
-                                                                                                                                                                class="bg-brand-gold text-black cursor-pointer px-4 py-2 rounded-sm font-sans uppercase">
-                                                                                                                                                                Actualizar Estado
-                                                                                                                                                            </button>
-                                                                                                                                                        </div>
-                                                                                                                                                    </form>
+                                                                                                                                                            <div class="flex justify-end gap-3">
+                                                                                                                                                                <button type="button" @click="open = false"
+                                                                                                                                                                    class="text-[9px] font-sans uppercase cursor-pointer">
+                                                                                                                                                                    Cancelar
+                                                                                                                                                                </button>
+                                                                                                                                                                <button type="submit"
+                                                                                                                                                                    class="bg-brand-gold text-black cursor-pointer px-4 py-2 rounded-sm font-sans uppercase">
+                                                                                                                                                                    Actualizar Estado
+                                                                                                                                                                </button>
+                                                                                                                                                            </div>
+                                                                                                                                                        </form>
+                                                                                                                                                    </div>
                                                                                                                                                 </div>
-                                                                                                                                            </div>
-                                                                                                                                    </td>
-                                                                                                                                @endif
+                                                                                                                                        </td>
+                                                                                                                                    @endif
                                     <td class="px-4 text-right sticky right-0 bg-white" x-data="{ openDelete: false }">
                                         <div class="flex justify-end gap-2 items-center h-full">
 

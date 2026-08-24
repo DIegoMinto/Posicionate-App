@@ -12,6 +12,9 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
 use Cloudinary\Cloudinary;
+use Barryvdh\DomPDF\Facade\Pdf;
+use Maatwebsite\Excel\Facades\Excel;
+use App\Exports\StaffExport;
 $cargos = \App\Models\Cargo::all();
 
 class UserController extends Controller
@@ -304,5 +307,53 @@ class UserController extends Controller
             DB::rollBack();
             return redirect()->route('users.show', $personal->id_personal)->with('error', 'Error al actualizar: ' . $e->getMessage());
         }
+    }
+
+    public function exportPdf(Request $request)
+    {
+        $personales = $this->buildStaffQuery($request)->get();
+
+        $pdf = Pdf::loadView('exports.staff_pdf', compact('personales'))
+            ->setPaper('a4', 'landscape');
+
+        return $pdf->download('personal_' . now()->format('Ymd_His') . '.pdf');
+    }
+
+    public function exportExcel(Request $request)
+    {
+        return Excel::download(
+            new StaffExport($request),
+            'personal_' . now()->format('Ymd_His') . '.xlsx'
+        );
+    }
+
+    private function buildStaffQuery(Request $request)
+    {
+        $query = Personal::with('persona', 'sede', 'cargos');
+
+        if ($request->filled('id_sede')) {
+            $query->where('id_sede', $request->id_sede);
+        }
+
+        if ($request->filled('cargo')) {
+            $query->whereHas('cargos', function ($q) use ($request) {
+                $q->where('cargos.id_cargo', $request->cargo);
+            });
+        }
+
+        if ($request->filled('estado')) {
+            $query->where('es_vigente', $request->estado);
+        }
+
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->whereHas('persona', function ($q) use ($search) {
+                $q->whereRaw("unaccent(nombre) ILIKE unaccent(?)", ["%$search%"])
+                    ->orWhereRaw("unaccent(apellido_p) ILIKE unaccent(?)", ["%$search%"])
+                    ->orWhereRaw("unaccent(apellido_m) ILIKE unaccent(?)", ["%$search%"]);
+            });
+        }
+
+        return $query;
     }
 }
