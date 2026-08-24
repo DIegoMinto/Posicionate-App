@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
 use Cloudinary\Cloudinary;
+$cargos = \App\Models\Cargo::all();
 
 class UserController extends Controller
 {
@@ -35,7 +36,7 @@ class UserController extends Controller
 
     public function store_user(Request $request)
     {
-        if (auth()->user()->rol !== 'super_admin') {
+        if (!auth()->user()->hasRole('super_admin')) {
             abort(403, 'No autorizado');
         }
         $request->validate([
@@ -43,22 +44,10 @@ class UserController extends Controller
             'user' => 'required|unique:personal,user',
             'password' => 'required|confirmed|min:6',
             'id_sede' => 'required|exists:sede,id_sede',
-            'cargo' => [
-                'required',
-                Rule::in([
-                    'gerente_marketing',
-                    'supervisor_marketing',
-                    'coordinador_marketing',
-                    'asesor_marketing',
-                    'supervisor_academico',
-                    'coordinador_academico',
-                    'asistente_academico',
-                    'contador',
-                    'asistente_contable'
-                ])
-            ],
-
-            'rol' => 'required|in:super_admin,admin,user,viewer'
+            'cargos' => 'required|array|min:1',
+            'cargos.*' => 'exists:cargos,id_cargo',
+            'roles' => 'required|array|min:1',
+            'roles.*' => 'exists:roles,id_rol',
         ]);
 
         $persona = Persona::findOrFail($request->id_persona);
@@ -72,16 +61,17 @@ class UserController extends Controller
 
         $codigoFinal = "{$prefijoSede}-{$iniciales}{$numeroConFormato}";
 
-        Personal::create([
+        $personal = Personal::create([
             'id_persona' => $request->id_persona,
             'codigo_personal' => $codigoFinal,
-            'cargo' => $request->cargo,
             'user' => $request->user,
-            'password' => \Illuminate\Support\Facades\Hash::make($request->password),
-            'rol' => $request->rol,
+            'password' => Hash::make($request->password),
             'id_sede' => $request->id_sede,
             'es_vigente' => true
         ]);
+
+        $personal->cargos()->sync($request->cargos);
+        $personal->roles()->sync($request->roles);
 
         return redirect()->route('people.staff')->with('success', "Personal dado de alta con código: {$codigoFinal}");
     }
@@ -155,6 +145,8 @@ class UserController extends Controller
         $instituciones = \App\Models\InstitucionEgreso::all();
         $bancos = \App\Models\InstitucionBancaria::all();
         $ciudades = \App\Models\Ciudad::all();
+        $roles = \App\Models\Rol::all();
+        $cargos = \App\Models\Cargo::all();
         return view('personas.edit_staff', compact(
             'persona',
             'personal',
@@ -165,7 +157,9 @@ class UserController extends Controller
             'profesiones',
             'instituciones',
             'bancos',
-            'ciudades'
+            'ciudades',
+            'roles',
+            'cargos'
         ));
     }
 
@@ -175,7 +169,7 @@ class UserController extends Controller
         $persona = $personal->persona;
 
         $auth = auth()->user();
-        $esSuperAdmin = $auth->rol === 'super_admin';
+        $esSuperAdmin = $auth->hasRole('super_admin');
         $esMismoUsuario = $auth->id_personal === $personal->id_personal;
 
         if (!$esSuperAdmin && !$esMismoUsuario) {
@@ -205,21 +199,10 @@ class UserController extends Controller
                 'ci' => 'required|unique:persona,ci,' . $persona->id_persona . ',id_persona',
                 'user' => 'required|unique:personal,user,' . $personal->id_personal . ',id_personal',
                 'id_sede' => 'required|exists:sede,id_sede',
-                'cargo' => [
-                    'required',
-                    Rule::in([
-                        'gerente_marketing',
-                        'supervisor_marketing',
-                        'coordinador_marketing',
-                        'asesor_marketing',
-                        'supervisor_academico',
-                        'coordinador_academico',
-                        'asistente_academico',
-                        'contador',
-                        'asistente_contable'
-                    ])
-                ],
-                'rol' => 'required|in:super_admin,admin,user,viewer',
+                'cargos' => 'required|array|min:1',
+                'cargos.*' => 'exists:cargos,id_cargo',
+                'roles' => 'required|array|min:1',
+                'roles.*' => 'exists:roles,id_rol',
             ]);
         }
 
@@ -294,7 +277,7 @@ class UserController extends Controller
 
             $personalData = [];
             if ($esSuperAdmin) {
-                $personalData = $request->only(['user', 'id_sede', 'cargo', 'rol']);
+                $personalData = $request->only(['user', 'id_sede', 'cargo']);
             } else {
                 $personalData['user'] = $request->user ?? $personal->user;
             }
@@ -307,8 +290,15 @@ class UserController extends Controller
                 $personal->update($personalData);
             }
 
+            if ($esSuperAdmin && $request->has('cargos')) {
+                $personal->cargos()->sync($request->cargos);
+            }
+            if ($esSuperAdmin && $request->has('roles')) {
+                $personal->roles()->sync($request->roles);
+            }
+
             DB::commit();
-            return redirect()->route('users.show', $personal->id_personal)->with('error', 'Error al actualizar');
+            return redirect()->route('users.show', $personal->id_personal)->with('success', 'Personal actualizado correctamente');
 
         } catch (\Exception $e) {
             DB::rollBack();

@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class Personal extends Authenticatable
 {
@@ -78,6 +79,56 @@ class Personal extends Authenticatable
             'id_personal',
             'id_personal'
         );
+    }
+
+    public function roles(): BelongsToMany
+    {
+        return $this->belongsToMany(
+            Rol::class,
+            'personal_rol',
+            'id_personal',
+            'id_rol'
+        )->withTimestamps();
+    }
+
+    public function hasRole(string $nombre): bool
+    {
+        return $this->roles->contains('nombre', $nombre);
+    }
+
+    public function hasAnyRole(array $nombres): bool
+    {
+        return $this->roles->whereIn('nombre', $nombres)->isNotEmpty();
+    }
+
+    public function getRolesNombresAttribute()
+    {
+        return $this->roles->pluck('nombre_visible');
+    }
+
+    public function cargos(): BelongsToMany
+    {
+        return $this->belongsToMany(
+            Cargo::class,
+            'personal_cargo',
+            'id_personal',
+            'id_cargo'
+        )->withTimestamps();
+    }
+
+    public function hasCargo(string $nombre): bool
+    {
+        return $this->cargos->contains('nombre', $nombre);
+    }
+
+    public function hasAnyCargo(array $nombres): bool
+    {
+        return $this->cargos->whereIn('nombre', $nombres)->isNotEmpty();
+    }
+
+    public function getCargosNombresAttribute()
+    {
+        return $this->cargos->pluck('nombre_visible')->implode(', ');
     }
 
 

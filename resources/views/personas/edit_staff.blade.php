@@ -216,35 +216,42 @@
 </div>
 
                             <div>
-                                <label class="form-label-bold !text-brand-green">Rol de Usuario</label>
-                                <select name="rol" class="form-select-pill border-2 border-brand-gold {{ !$esSuperAdmin ? 'bg-gray-100 cursor-not-allowed text-gray-500' : '' }}"
-                                    {{ !$esSuperAdmin ? 'disabled' : '' }}>
-                                    <option value="">Seleccionar</option>
-                                    <option value="super_admin" {{ $personal->rol == 'super_admin' ? 'selected' : '' }}>Super Administrador</option>
-                                    <option value="admin" {{ $personal->rol == 'admin' ? 'selected' : '' }}>Administrador</option>
-                                    <option value="user" {{ $personal->rol == 'user' ? 'selected' : '' }}>Usuario</option>
-                                    <option value="viewer" {{ $personal->rol == 'viewer' ? 'selected' : '' }}>Espectador</option>
-                                </select>
-                                @if(!$esSuperAdmin) <input type="hidden" name="rol" value="{{ $personal->rol }}"> @endif
-                            </div>
+    <label class="form-label-bold !text-brand-green">Roles de Usuario</label>
+    <div class="flex flex-col gap-1 p-2 rounded-md border-2 border-brand-gold {{ !$esSuperAdmin ? 'bg-gray-100' : '' }}">
+        @foreach($roles as $rol)
+            <label class="text-xs flex items-center gap-2">
+                <input type="checkbox" name="roles[]" value="{{ $rol->id_rol }}"
+                    {{ $personal->roles->contains('id_rol', $rol->id_rol) ? 'checked' : '' }}
+                    {{ !$esSuperAdmin ? 'disabled' : '' }}>
+                {{ $rol->nombre_visible }}
+            </label>
+        @endforeach
+    </div>
+    @if(!$esSuperAdmin)
+        @foreach($personal->roles as $rol)
+            <input type="hidden" name="roles[]" value="{{ $rol->id_rol }}">
+        @endforeach
+    @endif
+</div>
 
                             <div>
-                                <label class="form-label-bold !text-brand-green">Cargo Institucional</label>
-                                <select name="cargo" class="form-select-pill border-2 border-brand-gold {{ !$esSuperAdmin ? 'bg-gray-100 cursor-not-allowed text-gray-500' : '' }}"
-                                    {{ !$esSuperAdmin ? 'disabled' : '' }}>
-                                    <option value="">Seleccionar</option>
-                                    <option value="gerente_marketing" {{ $personal->cargo == 'gerente_marketing' ? 'selected' : '' }}>Gerente de marketing</option>
-                                    <option value="supervisor_marketing" {{ $personal->cargo == 'supervisor_marketing' ? 'selected' : '' }}>Supervisor de marketing</option>
-                                    <option value="coordinador_marketing" {{ $personal->cargo == 'coordinador_marketing' ? 'selected' : '' }}>Coordinador de marketing</option>
-                                    <option value="asesor_marketing" {{ $personal->cargo == 'asesor_marketing' ? 'selected' : '' }}>Asesor de marketing</option>
-                                    <option value="supervisor_academico" {{ $personal->cargo == 'supervisor_academico' ? 'selected' : '' }}>Supervisor académico</option>
-                                    <option value="coordinador_academico" {{ $personal->cargo == 'coordinador_academico' ? 'selected' : '' }}>Coordinador académico</option>
-                                    <option value="asistente_academico" {{ $personal->cargo == 'asistente_academico' ? 'selected' : '' }}>Asistente académico</option>
-                                    <option value="contador" {{ $personal->cargo == 'contador' ? 'selected' : '' }}>Contador</option>
-                                    <option value="asistente_contable" {{ $personal->cargo == 'asistente_contable' ? 'selected' : '' }}>Asistente contable</option>
-                                </select>
-                                @if(!$esSuperAdmin) <input type="hidden" name="cargo" value="{{ $personal->cargo }}"> @endif
-                            </div>
+    <label class="form-label-bold !text-brand-green">Cargos Institucionales</label>
+    <div class="flex flex-col gap-1 p-2 rounded-md border-2 border-brand-gold {{ !$esSuperAdmin ? 'bg-gray-100' : '' }}">
+        @foreach($cargos as $cargo)
+            <label class="text-xs flex items-center gap-2">
+                <input type="checkbox" name="cargos[]" value="{{ $cargo->id_cargo }}"
+                    {{ $personal->cargos->contains('id_cargo', $cargo->id_cargo) ? 'checked' : '' }}
+                    {{ !$esSuperAdmin ? 'disabled' : '' }}>
+                {{ $cargo->nombre_visible }}
+            </label>
+        @endforeach
+    </div>
+    @if(!$esSuperAdmin)
+        @foreach($personal->cargos as $cargo)
+            <input type="hidden" name="cargos[]" value="{{ $cargo->id_cargo }}">
+        @endforeach
+    @endif
+</div>
 
                             <div>
                                 <label class="form-label-bold !text-brand-green">Ubicación Maps (Link)</label>

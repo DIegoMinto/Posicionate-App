@@ -41,9 +41,6 @@
             <div class="border-2 border-brand-gold m-2 rounded-sm">
                 <nav class="mt-4 flex flex-col gap-1 pb-2">
 
-                    {{-- ============================================================
-                         PRINCIPAL — casa
-                    ============================================================ --}}
                     @php $activeDashboard = request()->routeIs('dashboard'); @endphp
                     <a href="{{ route('dashboard') }}" :class="sidebarOpen ? 'justify-start' : 'justify-center'"
                         class="btn-sidebar group {{ $activeDashboard ? 'is-active' : '' }}"
@@ -60,9 +57,6 @@
                             class="btn-sidebar-text uppercase whitespace-nowrap">PRINCIPAL</span>
                     </a>
 
-                    {{-- ============================================================
-                         PERSONAS — dos personas
-                    ============================================================ --}}
                     @php $activePersonas = request()->routeIs('people.*', 'teachers.*'); @endphp
                     <div>
                         <button @click="sidebarOpen ? personasOpen = !personasOpen : (toggle(), personasOpen = true)"
@@ -93,7 +87,7 @@
 
                         <div x-show="sidebarOpen && personasOpen" x-collapse.duration.250ms
                             class="ml-6 flex flex-col gap-1 mt-1">
-                            @if(in_array($usuario->rol, ['super_admin', 'admin']))
+                            @if($usuario->hasAnyCargo(['gerente_marketing', 'recursos_humanos']))
                                 <a href="{{ route('people.staff') }}"
                                     class="btn-sidebar-sub group {{ request()->routeIs('people.staff') ? 'is-active' : '' }}">
                                     <span class="btn-sidebar-text uppercase text-sm whitespace-nowrap">PERSONAL</span>
@@ -106,8 +100,7 @@
                             </a>
 
                             @if(
-                                    in_array($usuario->cargo, ['asistente_academico', 'supervisor_academico', 'coordinador_academico'])
-                                    || in_array($usuario->rol, ['admin', 'super_admin'])
+                                    $usuario->hasAnyCargo(['gerente_marketing', 'asistente_academico', 'coordinador_academico', 'supervisor_academico'])
                                 )
                                 <a href="{{ route('teachers.index') }}"
                                     class="btn-sidebar-sub group {{ request()->routeIs('teachers.index') ? 'is-active' : '' }}">
@@ -117,9 +110,6 @@
                         </div>
                     </div>
 
-                    {{-- ============================================================
-                         PROGRAMAS — birrete de graduación
-                    ============================================================ --}}
                     @php $activeProgramas = request()->routeIs('programs.index'); @endphp
                     <a href="{{ route('programs.index') }}" :class="sidebarOpen ? 'justify-start' : 'justify-center'"
                         class="btn-sidebar group {{ $activeProgramas ? 'is-active' : '' }}"
@@ -137,10 +127,6 @@
                             class="btn-sidebar-text leading-tight uppercase whitespace-nowrap">PROGRAMAS</span>
                     </a>
 
-                    {{-- ============================================================
-                         WP SENDER — robotcito de automatización
-                         (antena + carita + "brazos" a los costados)
-                    ============================================================ --}}
                     @php $activeWpSender = request()->routeIs('wpsender.index'); @endphp
                     <a href="{{ route('wpsender.index') }}" :class="sidebarOpen ? 'justify-start' : 'justify-center'"
                         class="btn-sidebar group {{ $activeWpSender ? 'is-active' : '' }}"
@@ -162,9 +148,6 @@
                             class="btn-sidebar-text leading-tight uppercase whitespace-nowrap">WP SENDER</span>
                     </a>
 
-                    {{-- ============================================================
-                         GESTIÓN DE DATOS — base de datos
-                    ============================================================ --}}
                     @if(in_array($usuario->rol, ['super_admin']))
                         @php $activeCreations = request()->routeIs('creations.index'); @endphp
                         <a href="{{ route('creations.index') }}" :class="sidebarOpen ? 'justify-start' : 'justify-center'"
@@ -185,10 +168,7 @@
                         </a>
                     @endif
 
-                    {{-- ============================================================
-                         CONTEO / ESTADÍSTICAS — barras
-                    ============================================================ --}}
-                    @if(in_array($usuario->rol, ['super_admin', 'admin']))
+                    @if(in_array($usuario->rol, ['super_admin']))
                         @php $activeStats = request()->routeIs('statitics.index'); @endphp
                         <a href="{{ route('statitics.index') }}" :class="sidebarOpen ? 'justify-start' : 'justify-center'"
                             class="btn-sidebar group {{ $activeStats ? 'is-active' : '' }}"
@@ -228,7 +208,6 @@
     </aside>
     <main class="flex-1 flex flex-col min-w-0 h-screen overflow-hidden bg-gray-50">
 
-        {{-- HEADER --}}
         <div class="bg-brand-green flex-shrink-0 z-10">
             <header
                 class="bg-brand-green p-4 flex justify-between items-center shadow-lg border-2 border-brand-gold m-4 rounded-sm">

@@ -58,38 +58,35 @@
                         </div>
 
                         <div>
-                            <label class="block text-xs font-black text-brand-green uppercase mb-1">Cargo
-                                Laboral</label>
-                            <select name="cargo" required
-                                class="form-select-pill text-xs border-1 border-brand-green outline-none">
-                                <option value="">Seleccionar</option>
-
-                                <option value="gerente_marketing" {{ old('cargo') == 'gerente_marketing' ? 'selected' : '' }}>Gerente de marketing</option>
-                                <option value="supervisor_marketing" {{ old('cargo') == 'supervisor_marketing' ? 'selected' : '' }}>Supervisor de marketing</option>
-                                <option value="coordinador_marketing" {{ old('cargo') == 'coordinador_marketing' ? 'selected' : '' }}>Coordinador de marketing</option>
-                                <option value="asesor_marketing" {{ old('cargo') == 'asesor_marketing' ? 'selected' : '' }}>Asesor de marketing</option>
-
-                                <option value="supervisor_academico" {{ old('cargo') == 'supervisor_academico' ? 'selected' : '' }}>Supervisor académico</option>
-                                <option value="coordinador_academico" {{ old('cargo') == 'coordinador_academico' ? 'selected' : '' }}>Coordinador académico</option>
-                                <option value="asistente_academico" {{ old('cargo') == 'asistente_academico' ? 'selected' : '' }}>Asistente académico</option>
-
-                                <option value="contador" {{ old('cargo') == 'contador' ? 'selected' : '' }}>Contador
-                                </option>
-                                <option value="asistente_contable" {{ old('cargo') == 'asistente_contable' ? 'selected' : '' }}>Asistente contable</option>
-                            </select>
-                        </div>
+    <label class="form-label-bold !text-brand-green">Cargos Institucionales</label>
+    <div class="flex flex-col gap-1 p-2 rounded-md border-2 border-brand-gold {{ !$esSuperAdmin ? 'bg-gray-100' : '' }}">
+        @foreach($cargos as $cargo)
+            <label class="text-xs flex items-center gap-2">
+                <input type="checkbox" name="cargos[]" value="{{ $cargo->id_cargo }}"
+                    {{ $personal->cargos->contains('id_cargo', $cargo->id_cargo) ? 'checked' : '' }}
+                    {{ !$esSuperAdmin ? 'disabled' : '' }}>
+                {{ $cargo->nombre_visible }}
+            </label>
+        @endforeach
+    </div>
+    @if(!$esSuperAdmin)
+        @foreach($personal->cargos as $cargo)
+            <input type="hidden" name="cargos[]" value="{{ $cargo->id_cargo }}">
+        @endforeach
+    @endif
+</div>
 
                         <div>
-                            <label class="block text-xs font-black text-brand-green uppercase mb-1">Rol de
-                                Sistema</label>
-                            <select name="rol" required
-                                class="form-select-pill text-xs border-1 border-brand-green outline-none">
-                                <option value="">Seleccionar</option>
-                                <option value="super_admin" {{ old('rol') == 'super_admin' ? 'selected' : '' }}>Super
-                                    Administrador</option>
-                                <option value="admin" {{ old('rol') == 'admin' ? 'selected' : '' }}>Administrador</option>
-                                <option value="user" {{ old('rol') == 'user' ? 'selected' : '' }}>Usuario</option>
-                            </select>
+                            <label class="block text-xs font-black text-brand-green uppercase mb-1">Roles de Sistema</label>
+                            <div class="flex flex-col gap-1 border border-brand-green p-2 rounded-md">
+                                @foreach($roles as $rol)
+                                    <label class="text-xs flex items-center gap-2">
+                                        <input type="checkbox" name="roles[]" value="{{ $rol->id_rol }}"
+                                            {{ in_array($rol->id_rol, old('roles', [])) ? 'checked' : '' }}>
+                                        {{ $rol->nombre_visible }}
+                                    </label>
+                                @endforeach
+                            </div>
                         </div>
 
                         <div>

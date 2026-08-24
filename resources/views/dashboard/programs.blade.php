@@ -197,7 +197,7 @@
                                                 </span>
                                             </a>
 
-                                            @if (in_array($usuario->cargo, ['coordinador_academico', 'supervisor_academico', 'asistente_academico']) || $usuario->rol === 'super_admin')
+                                            @if ($usuario->hasAnyCargo(['coordinador_academico']) || $usuario->rol === 'super_admin')
 
                                                 <a href="{{ route('modulo.create', ['id_curso' => $curso->id_curso]) }}"
                                                     class="group relative flex items-center justify-center" title="Añadir Clase">
@@ -323,7 +323,7 @@
                                                 </span>
                                             </a>
 
-                                            @if (in_array($usuario->cargo, ['supervisor_academico']) || $usuario->rol === 'super_admin')
+                                            @if ($usuario->hasAnyCargo(['gerente_marketing', 'asistente_contable', 'supervisor_academico', 'asistente_academico']) || $usuario->rol === 'super_admin')
                                                 <a href="{{ route('programs.payments.setup', $curso->id_curso) }}"
                                                     class="group relative flex items-center justify-center" title="Añadir Clase">
                                                     <svg xmlns="http://www.w3.org/2000/svg" class="w-10 h-10 p-1.5 text-brand-green" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
@@ -422,7 +422,7 @@
 
                                             </div>
 
-                                            @if (in_array($usuario->cargo, ['supervisor_academico']) || $usuario->rol === 'super_admin')
+                                            @if ($usuario->hasAnyCargo(['supervisor_academico']) || $usuario->rol === 'super_admin')
 
                                                 <div x-data="{ openDelete: false }">
 
@@ -486,7 +486,6 @@
 
                             </div>
 
-                            {{-- Sede + contadores --}}
                             <div class="flex items-center mt-2 px-4 mb-2">
                                 <div class="text-brand-green font-bold tracking-wider flex items-center gap-1">
                                     {{ $curso->sede?->nombre ?? 'Sin sede asignada' }}
@@ -514,7 +513,6 @@
                     @endforelse
                 </div>
 
-                {{-- Paginación --}}
                 <div class="mt-6 flex justify-center">
                     <nav class="flex items-center gap-1 font-sans text-[11px]">
 

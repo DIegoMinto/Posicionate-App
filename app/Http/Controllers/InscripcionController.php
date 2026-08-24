@@ -67,10 +67,36 @@ class InscripcionController extends Controller
             'updated_at' => now(),
         ]);
 
+        $this->enviarASheets($estudiante, $validated);
+
         return redirect()->route('inscripcion.public', [
             'id_curso' => $validated['id_curso'],
             'id_personal' => $validated['id_personal']
         ])->with('success', '¡Registro exitoso!');
+    }
+
+    private function enviarASheets(Estudiante $estudiante, array $validated)
+    {
+        try {
+            $curso = \App\Models\Curso::find($validated['id_curso']);
+            $asesor = \App\Models\Personal::with('persona')->find($validated['id_personal']);
+            $asesorPersona = $asesor->persona ?? null;
+
+            \Illuminate\Support\Facades\Http::timeout(5)->post(config('services.google_sheets.webhook_url'), [
+                'ci' => $estudiante->ci,
+                'nombre' => $estudiante->nombre,
+                'apellido_p' => $estudiante->apellido_p,
+                'apellido_m' => $estudiante->apellido_m ?? '',
+                'correo_electronico' => $estudiante->correo_electronico,
+                'telefono_movil' => $estudiante->telefono_movil ?? '',
+                'curso' => $curso->nombre ?? '',
+                'asesor' => $asesorPersona
+                    ? trim("{$asesorPersona->nombre} {$asesorPersona->apellido_p}")
+                    : '',
+            ]);
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::warning('No se pudo enviar inscripción a Google Sheets: ' . $e->getMessage());
+        }
     }
 
     public function list(Request $request, $id)

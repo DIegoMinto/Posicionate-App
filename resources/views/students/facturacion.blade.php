@@ -179,7 +179,6 @@
                 </svg>
             </button>
 
-            <!-- Modal del recibo -->
             <div x-show="openRecibo{{ $mov->id_pagos_estudiante }}"
                 class="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 backdrop-blur-sm"
                 x-cloak x-transition>
@@ -220,7 +219,7 @@
             </div>
         @endif
 
-                                                                    @if(in_array($usuario->cargo, ['contador', 'asistente_contable']) || $usuario->rol === 'super_admin')
+                                                                    @if($usuario->hasAnyCargo(['asistente_contable', 'gerente_marketing']) || $usuario->rol === 'super_admin')
 
                                                                         @if($mov->estado === 'revision')
 

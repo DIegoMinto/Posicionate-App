@@ -40,4 +40,8 @@ return [
         'key' => env('EVOLUTION_API_KEY'),
     ],
 
+    'google_sheets' => [
+        'webhook_url' => env('GOOGLE_SHEETS_WEBHOOK_URL'),
+    ],
+
 ];
