@@ -57,7 +57,7 @@ Route::middleware(['auth', 'vigente'])->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
     Route::prefix('people')->name('people.')->group(function () {
         Route::get('/students', [DashboardController::class, 'students'])->name('index');
-        Route::middleware('role:super_admin,admin')->group(function () {
+        Route::middleware('role:super_admin,admin,user')->group(function () {
             Route::get('/staff', [DashboardController::class, 'staff'])->name('staff');
         });
 
