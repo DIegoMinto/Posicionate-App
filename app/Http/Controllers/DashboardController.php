@@ -236,8 +236,7 @@ class DashboardController extends Controller
         $sedes = Sede::all();
         $cargos = Cargo::all();
 
-        // Obtener las áreas (ya sea desde el modelo Cargo o un modelo Area)
-        $areas = Cargo::pluck('nombre')->unique(); // Ajusta 'nombre' según la columna de tu BD
+        $areas = Cargo::pluck('nombre')->unique();
 
         $query = Personal::with('persona', 'sede', 'cargos');
 
