@@ -1,5 +1,4 @@
 #!/bin/sh
-
 set -e
 
 echo "Linking storage..."
@@ -8,19 +7,16 @@ php artisan storage:link || true
 echo "Running migrations..."
 php artisan migrate --force
 
-echo "Configuring Apache for Render Proxy & HTTPS..."
-a2enmod headers rewrite || true
-
-echo "SetEnvIf X-Forwarded-Proto \"https\" HTTPS=on" >> /etc/apache2/apache2.conf || true
-
-echo "Configuring Apache port..."
-sed -i "s/Listen 80/Listen $PORT/g" /etc/apache2/ports.conf
-sed -i "s/<VirtualHost \*:80>/<VirtualHost \*:$PORT>/g" /etc/apache2/sites-available/000-default.conf
-
-echo "Caching Laravel configuration for production..."
+echo "Caching Laravel configuration..."
 php artisan config:cache
 php artisan route:cache
 php artisan view:cache
 
-echo "Starting Apache..."
-exec apache2-foreground
+# Ajustar dinámicamente el puerto de Nginx al puerto que Render asigna ($PORT)
+if [ -n "$PORT" ]; then
+    echo "Configuring Nginx to listen on port $PORT..."
+    sed -i "s/listen 80;/listen $PORT;/g" /etc/nginx/sites-available/default
+fi
+
+# Inicia Supervisor (que a su vez arrancará PHP-FPM y Nginx)
+exec "$@"

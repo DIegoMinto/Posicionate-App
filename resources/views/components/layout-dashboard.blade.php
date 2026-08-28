@@ -87,7 +87,7 @@
 
                         <div x-show="sidebarOpen && personasOpen" x-collapse.duration.250ms
                             class="ml-6 flex flex-col gap-1 mt-1">
-                            @if($usuario->hasAnyCargo(['gerente_marketing', 'recursos_humanos']))
+                            @if($usuario->hasAnyRole(['super_admin', 'admin']) || $usuario->hasAnyCargo(['recursos_humanos']))
                                 <a href="{{ route('people.staff') }}"
                                     class="btn-sidebar-sub group {{ request()->routeIs('people.staff') ? 'is-active' : '' }}">
                                     <span class="btn-sidebar-text uppercase text-sm whitespace-nowrap">PERSONAL</span>
@@ -148,7 +148,7 @@
                             class="btn-sidebar-text leading-tight uppercase whitespace-nowrap">WP SENDER</span>
                     </a>
 
-                    @if(in_array($usuario->rol, ['super_admin']))
+                    @if($usuario->hasAnyRole(['super_admin', 'admin']) || $usuario->hasAnyCargo(['supervisor_academico', 'coordinador_academico', 'asistente_academico']))
                         @php $activeCreations = request()->routeIs('creations.index'); @endphp
                         <a href="{{ route('creations.index') }}" :class="sidebarOpen ? 'justify-start' : 'justify-center'"
                             class="btn-sidebar group {{ $activeCreations ? 'is-active' : '' }}"
@@ -168,7 +168,7 @@
                         </a>
                     @endif
 
-                    @if(in_array($usuario->rol, ['super_admin']))
+                    @if($usuario->hasAnyRole(['super_admin', 'admin']) || $usuario->hasAnyCargo(['supervisor_academico', 'coordinador_academico', 'asistente_academico']))
                         @php $activeStats = request()->routeIs('statitics.index'); @endphp
                         <a href="{{ route('statitics.index') }}" :class="sidebarOpen ? 'justify-start' : 'justify-center'"
                             class="btn-sidebar group {{ $activeStats ? 'is-active' : '' }}"
@@ -229,7 +229,13 @@
                             {{ $usuario->persona->apellido_m }}
                         </h2>
                         <p class="text-brand-gold font-black text-2xl leading-none mt-1 tracking-wider">
-                            {{ $usuario->cargo_nombre }}
+                            {{ 
+                                $usuario->cargos
+        ->where('pivot.es_oficial', 1)
+        ->first()?->nombre_visible
+    ?? $usuario->cargos->first()?->nombre_visible
+    ?? 'Sin Cargo' 
+                            }}
                         </p>
                     </div>
                 </div>

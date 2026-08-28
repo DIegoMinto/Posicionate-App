@@ -20,6 +20,8 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'vigente' => \App\Http\Middleware\CheckVigencia::class,
             'role' => \App\Http\Middleware\CheckRole::class,
+            'cargo' => \App\Http\Middleware\CheckCargo::class,
+            'role_or_cargo' => \App\Http\Middleware\CheckRoleOrCargo::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

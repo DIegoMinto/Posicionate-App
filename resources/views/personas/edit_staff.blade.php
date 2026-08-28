@@ -6,6 +6,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Edición de Personal - Posicionate</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+
 </head>
 
 <body>
@@ -17,6 +19,7 @@
         <div class="p-6">
             <div class="bg-white rounded-sm border-2 border-brand-green shadow-lg">
 
+                <!-- Encabezado -->
                 <div class="flex justify-between items-center mb-6 p-8 bg-brand-green">
                     <h1 class="text-2xl font-sans font-bold text-white tracking-wider">
                         Editar Personal:
@@ -26,24 +29,27 @@
                     </h1>
                 </div>
 
+                <!-- Alertas de Errores -->
                 @if($errors->any())
-                    <div class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-6">
+                    <div class="mx-8 bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-6 rounded">
                         <p class="font-bold">Por favor corrige los siguientes errores:</p>
-                        <ul class="text-sm">
+                        <ul class="text-sm list-disc pl-5">
                             @foreach($errors->all() as $error)
                                 <li>{{ $error }}</li>
                             @endforeach
                         </ul>
                     </div>
                 @endif
- <div class="flex justify-between items-center mb-6 p-8 pt-2">
+
+                <!-- Formulario Principal (Estructura HTML corregida) -->
                 <form action="{{ route('personal.update', $personal->id_personal) }}" method="POST"
-                    enctype="multipart/form-data" class="space-y-6">
+                    enctype="multipart/form-data" class="space-y-6 p-8 pt-0">
                     @csrf
                     @method('PUT')
 
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
 
+                        <!-- COLUMNA 1: Datos Personales -->
                         <div class="space-y-4">
                             <h3 class="font-bold text-brand-green text-sm uppercase border-b border-brand-gold/30 pb-1">Datos Personales</h3>
 
@@ -98,8 +104,8 @@
                                     <label class="form-label-bold !text-brand-green">Género</label>
                                     <select name="genero" class="form-select-pill border-2 border-brand-gold {{ !$esSuperAdmin ? 'bg-gray-100 cursor-not-allowed text-gray-500' : '' }}"
                                         {{ !$esSuperAdmin ? 'disabled' : '' }}>
-                                        <option value="M" {{ $persona->genero == 'M' ? 'selected' : '' }}>Masculino</option>
-                                        <option value="F" {{ $persona->genero == 'F' ? 'selected' : '' }}>Femenino</option>
+                                        <option value="M" {{ old('genero', $persona->genero) == 'M' ? 'selected' : '' }}>Masculino</option>
+                                        <option value="F" {{ old('genero', $persona->genero) == 'F' ? 'selected' : '' }}>Femenino</option>
                                     </select>
                                     @if(!$esSuperAdmin) <input type="hidden" name="genero" value="{{ $persona->genero }}"> @endif
                                 </div>
@@ -123,53 +129,58 @@
                                 <input type="text" name="direccion" value="{{ old('direccion', $persona->direccion ?? $persona->domicilio) }}"
                                     class="form-input-pill border-2 border-brand-gold">
                             </div>
+
                             <div>
-    <label class="form-label-bold !text-brand-green">Profesión</label>
-    <select name="id_profesion" class="form-select-pill border-2 border-brand-gold">
-        <option value="">Seleccione</option>
-        @foreach($profesiones as $prof)
-            <option value="{{ $prof->id_profesion }}"
-                {{ old('id_profesion', $persona->id_profesion) == $prof->id_profesion ? 'selected' : '' }}>
-                {{ $prof->nombre }}
-            </option>
-        @endforeach
-    </select>
-</div>
+                                <label class="form-label-bold !text-brand-green">Profesión</label>
+                                <select name="id_profesion" class="select2-select form-select-pill border-2 border-brand-gold" {{ !$esSuperAdmin ? 'disabled' : '' }}>
+                                    <option value="">Seleccione</option>
+                                    @foreach($profesiones as $prof)
+                                        <option value="{{ $prof->id_profesion }}"
+                                            {{ old('id_profesion', $persona->id_profesion) == $prof->id_profesion ? 'selected' : '' }}>
+                                            {{ $prof->nombre }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                                @if(!$esSuperAdmin)<input type="hidden" name="id_profesion" value="{{ $persona->id_profesion }}">@endif
+                            </div>
 
-<div>
-    <label class="form-label-bold !text-brand-green">Grado Académico</label>
-    <select name="id_grado_academico" class="form-select-pill border-2 border-brand-gold">
-        <option value="">Seleccione</option>
-        @foreach($grados as $grado)
-            <option value="{{ $grado->id_grado_academico }}"
-                {{ old('id_grado_academico', $persona->id_grado_academico) == $grado->id_grado_academico ? 'selected' : '' }}>
-                {{ $grado->nombre }}
-            </option>
-        @endforeach
-    </select>
-</div>
+                            <div>
+                                <label class="form-label-bold !text-brand-green">Grado Académico</label>
+                                <select name="id_grado_academico" class="select2-select form-select-pill border-2 border-brand-gold" {{ !$esSuperAdmin ? 'disabled' : '' }}>
+                                    <option value="">Seleccione</option>
+                                    @foreach($grados as $grado)
+                                        <option value="{{ $grado->id_grado_academico }}"
+                                            {{ old('id_grado_academico', $persona->id_grado_academico) == $grado->id_grado_academico ? 'selected' : '' }}>
+                                            {{ $grado->nombre }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                                @if(!$esSuperAdmin)<input type="hidden" name="id_grado_academico" value="{{ $persona->id_grado_academico }}">@endif
+                            </div>
 
-<div>
-    <label class="form-label-bold !text-brand-green">Institución de Egreso</label>
-    <select name="id_institucion_egreso" class="form-select-pill border-2 border-brand-gold">
-        <option value="">Seleccione</option>
-        @foreach($instituciones as $inst)
-            <option value="{{ $inst->id_institucion_egreso }}"
-                {{ old('id_institucion_egreso', $persona->id_institucion_egreso) == $inst->id_institucion_egreso ? 'selected' : '' }}>
-                {{ $inst->nombre }}
-            </option>
-        @endforeach
-    </select>
-</div>
+                            <div>
+                                <label class="form-label-bold !text-brand-green">Institución de Egreso</label>
+                                <select name="id_institucion_egreso" class="select2-select form-select-pill border-2 border-brand-gold" {{ !$esSuperAdmin ? 'disabled' : '' }}>
+                                    <option value="">Seleccione</option>
+                                    @foreach($instituciones as $inst)
+                                        <option value="{{ $inst->id_institucion_egreso }}"
+                                            {{ old('id_institucion_egreso', $persona->id_institucion_egreso) == $inst->id_institucion_egreso ? 'selected' : '' }}>
+                                            {{ $inst->nombre }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                                @if(!$esSuperAdmin)<input type="hidden" name="id_institucion_egreso" value="{{ $persona->id_institucion_egreso }}">@endif
+                            </div>
                         </div>
 
+                        <!-- COLUMNA 2: Configuración de Sistema -->
                         <div class="space-y-4">
                             <h3 class="font-bold text-brand-green text-sm uppercase border-b border-brand-gold/30 pb-1">Configuración de Sistema</h3>
 
                             <div>
                                 <label class="form-label-bold !text-brand-green">Usuario de Acceso</label>
                                 <input type="text" name="user" value="{{ old('user', $personal->user) }}"
-                                    class="form-input-pill border-2 border-brand-gold bg-gray-50 font-semibold {{ !$esSuperAdmin ? 'bg-gray-100 cursor-not-allowed text-gray-500' : '' }}"
+                                    class="form-input-pill border-2 border-brand-gold font-semibold {{ !$esSuperAdmin ? 'bg-gray-100 cursor-not-allowed text-gray-500' : '' }}"
                                     {{ !$esSuperAdmin ? 'readonly' : '' }}>
                             </div>
 
@@ -189,77 +200,72 @@
                                     {{ !$esSuperAdmin ? 'readonly' : '' }}>
                             </div>
 
-                          <div>
-    <label class="form-label-bold !text-brand-green">Sede Asignada</label>
-
-    <select name="id_sede"
-        class="form-select-pill border-2 border-brand-gold {{ !$esSuperAdmin ? 'bg-gray-100 cursor-not-allowed text-gray-500' : '' }}"
-        {{ !$esSuperAdmin ? 'disabled' : '' }}>
-
-        <option value=""
-            {{ is_null(old('id_sede', $personal->id_sede)) ? 'selected' : '' }}>
-            -- Sin Sede Asignada --
-        </option>
-
-        @foreach($sedes as $sede)
-            <option value="{{ $sede->id_sede }}"
-                {{ old('id_sede', $personal->id_sede) == $sede->id_sede ? 'selected' : '' }}>
-                {{ $sede->nombre }}
-            </option>
-        @endforeach
-
-    </select>
-
-    @if(!$esSuperAdmin)
-        <input type="hidden" name="id_sede" value="{{ $personal->id_sede }}">
-    @endif
-</div>
+                            <div>
+                                <label class="form-label-bold !text-brand-green">Sede Asignada</label>
+                                <select name="id_sede"
+                                    class="form-select-pill border-2 border-brand-gold {{ !$esSuperAdmin ? 'bg-gray-100 cursor-not-allowed text-gray-500' : '' }}"
+                                    {{ !$esSuperAdmin ? 'disabled' : '' }}>
+                                    <option value="" {{ is_null(old('id_sede', $personal->id_sede)) ? 'selected' : '' }}>
+                                        -- Sin Sede Asignada --
+                                    </option>
+                                    @foreach($sedes as $sede)
+                                        <option value="{{ $sede->id_sede }}"
+                                            {{ old('id_sede', $personal->id_sede) == $sede->id_sede ? 'selected' : '' }}>
+                                            {{ $sede->nombre }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                                @if(!$esSuperAdmin)
+                                    <input type="hidden" name="id_sede" value="{{ $personal->id_sede }}">
+                                @endif
+                            </div>
 
                             <div>
-    <label class="form-label-bold !text-brand-green">Roles de Usuario</label>
-    <div class="flex flex-col gap-1 p-2 rounded-md border-2 border-brand-gold {{ !$esSuperAdmin ? 'bg-gray-100' : '' }}">
-        @foreach($roles as $rol)
-            <label class="text-xs flex items-center gap-2">
-                <input type="checkbox" name="roles[]" value="{{ $rol->id_rol }}"
-                    {{ $personal->roles->contains('id_rol', $rol->id_rol) ? 'checked' : '' }}
-                    {{ !$esSuperAdmin ? 'disabled' : '' }}>
-                {{ $rol->nombre_visible }}
-            </label>
-        @endforeach
-    </div>
-    @if(!$esSuperAdmin)
-        @foreach($personal->roles as $rol)
-            <input type="hidden" name="roles[]" value="{{ $rol->id_rol }}">
-        @endforeach
-    @endif
-</div>
+                                <label class="form-label-bold !text-brand-green">Roles de Usuario</label>
+                                <div class="flex flex-col gap-1 p-2 rounded-md border-2 border-brand-gold max-h-36 overflow-y-auto {{ !$esSuperAdmin ? 'bg-gray-100' : '' }}">
+                                    @foreach($roles as $rol)
+                                        <label class="text-xs flex items-center gap-2">
+                                            <input type="checkbox" name="roles[]" value="{{ $rol->id_rol }}"
+                                                {{ $personal->roles->contains('id_rol', $rol->id_rol) ? 'checked' : '' }}
+                                                {{ !$esSuperAdmin ? 'disabled' : '' }}>
+                                            {{ $rol->nombre_visible ?? $rol->nombre }}
+                                        </label>
+                                    @endforeach
+                                </div>
+                                @if(!$esSuperAdmin)
+                                    @foreach($personal->roles as $rol)
+                                        <input type="hidden" name="roles[]" value="{{ $rol->id_rol }}">
+                                    @endforeach
+                                @endif
+                            </div>
 
                             <div>
-    <label class="form-label-bold !text-brand-green">Cargos Institucionales</label>
-    <div class="flex flex-col gap-1 p-2 rounded-md border-2 border-brand-gold {{ !$esSuperAdmin ? 'bg-gray-100' : '' }}">
-        @foreach($cargos as $cargo)
-            <label class="text-xs flex items-center gap-2">
-                <input type="checkbox" name="cargos[]" value="{{ $cargo->id_cargo }}"
-                    {{ $personal->cargos->contains('id_cargo', $cargo->id_cargo) ? 'checked' : '' }}
-                    {{ !$esSuperAdmin ? 'disabled' : '' }}>
-                {{ $cargo->nombre_visible }}
-            </label>
-        @endforeach
-    </div>
-    @if(!$esSuperAdmin)
-        @foreach($personal->cargos as $cargo)
-            <input type="hidden" name="cargos[]" value="{{ $cargo->id_cargo }}">
-        @endforeach
-    @endif
-</div>
+                                <label class="form-label-bold !text-brand-green">Cargos Institucionales</label>
+                                <div class="flex flex-col gap-1 p-2 rounded-md border-2 border-brand-gold max-h-36 overflow-y-auto {{ !$esSuperAdmin ? 'bg-gray-100' : '' }}">
+                                    @foreach($cargos as $cargo)
+                                        <label class="text-xs flex items-center gap-2">
+                                            <input type="checkbox" name="cargos[]" value="{{ $cargo->id_cargo }}"
+                                                {{ $personal->cargos->contains('id_cargo', $cargo->id_cargo) ? 'checked' : '' }}
+                                                {{ !$esSuperAdmin ? 'disabled' : '' }}>
+                                            {{ $cargo->nombre_visible ?? $cargo->nombre }}
+                                        </label>
+                                    @endforeach
+                                </div>
+                                @if(!$esSuperAdmin)
+                                    @foreach($personal->cargos as $cargo)
+                                        <input type="hidden" name="cargos[]" value="{{ $cargo->id_cargo }}">
+                                    @endforeach
+                                @endif
+                            </div>
 
                             <div>
                                 <label class="form-label-bold !text-brand-green">Ubicación Maps (Link)</label>
-                                <input type="text" name="enlace_ubicacion_maps" value="{{ old('enlace_ubicacion_maps', $persona->enlace_ubicacion_maps) }}"
-                                    class="form-input-pill border-2 border-brand-gold">
+                                <input type="url" name="enlace_ubicacion_maps" value="{{ old('enlace_ubicacion_maps', $persona->enlace_ubicacion_maps) }}"
+                                    class="form-input-pill border-2 border-brand-gold" placeholder="https://maps.google.com/...">
                             </div>
                         </div>
 
+                        <!-- COLUMNA 3: Datos Financieros, Referencias y Archivos Cloudinary -->
                         <div class="space-y-4">
                             <h3 class="font-bold text-brand-green text-sm uppercase border-b border-brand-gold/30 pb-1">Otros Datos y Archivos</h3>
 
@@ -278,6 +284,7 @@
                             <div>
                                 <label class="form-label-bold !text-brand-green">Banco para Depósitos</label>
                                 <select name="id_institucion_bancaria" class="form-select-pill border-2 border-brand-gold">
+                                    <option value="">Seleccione Banco</option>
                                     @foreach($bancos as $banco)
                                         <option value="{{ $banco->id_institucion_bancaria }}"
                                             {{ old('id_institucion_bancaria', $persona->id_institucion_bancaria) == $banco->id_institucion_bancaria ? 'selected' : '' }}>
@@ -319,64 +326,85 @@
                                 </div>
                             </div>
 
+                            <!-- Archivos y Previsualización Cloudinary -->
                             <div class="pt-2">
                                 <label class="form-label-bold !text-brand-green">Actualizar Documentos</label>
-                                <div class="space-y-3 p-3 rounded-xl border-2 border-brand-gold">
+                                <div class="space-y-3 p-3 rounded-xl border-2 border-brand-gold bg-gray-50">
+                                    
+                                    <!-- Fotografía -->
                                     <div>
-                                        <span class="text-[10px] font-bold uppercase text-brand-green/70">Fotografía Perfil:</span>
-                                        <input type="file" name="fotografia" class="text-xs w-full mt-1">
+                                        <div class="flex justify-between items-center mb-1">
+                                            <span class="text-[10px] font-bold uppercase text-brand-green">Fotografía Perfil:</span>
+                                            @if($persona->fotografia)
+                                                <a href="{{ $persona->fotografia }}" target="_blank" class="text-[10px] text-blue-600 underline font-semibold">Ver Actual</a>
+                                            @endif
+                                        </div>
+                                        <input type="file" name="fotografia" accept="image/*" class="text-xs w-full bg-white p-1 rounded border">
                                     </div>
+
+                                    <!-- CV -->
                                     <div>
-                                        <span class="text-[10px] font-bold uppercase text-brand-green/70">Currículum Vitae:</span>
-                                        <input type="file" name="curriculum" class="text-xs w-full mt-1">
+                                        <div class="flex justify-between items-center mb-1">
+                                            <span class="text-[10px] font-bold uppercase text-brand-green">Currículum Vitae (PDF):</span>
+                                            @if($persona->curriculum)
+                                                <a href="{{ $persona->curriculum }}" target="_blank" class="text-[10px] text-blue-600 underline font-semibold">Ver PDF</a>
+                                            @endif
+                                        </div>
+                                        <input type="file" name="curriculum" accept="application/pdf" class="text-xs w-full bg-white p-1 rounded border">
                                     </div>
+
+                                    <!-- Carnet -->
                                     <div>
-                                        <span class="text-[10px] font-bold uppercase text-brand-green/70">Fotocopia Carnet:</span>
-                                        <input type="file" name="foto_carnet" class="text-xs w-full mt-1">
+                                        <div class="flex justify-between items-center mb-1">
+                                            <span class="text-[10px] font-bold uppercase text-brand-green">Fotocopia Carnet (PDF):</span>
+                                            @if($persona->foto_carnet)
+                                                <a href="{{ $persona->foto_carnet }}" target="_blank" class="text-[10px] text-blue-600 underline font-semibold">Ver Documento</a>
+                                            @endif
+                                        </div>
+                                        <input type="file" name="foto_carnet" accept="application/pdf" class="text-xs w-full bg-white p-1 rounded border">
                                     </div>
+
                                 </div>
                             </div>
                         </div>
 
                     </div>
 
-                    <div class="btn-container-center">
+                    <div class="flex justify-center pt-4">
                         <button type="submit" class="btn-gold">
-                            Actualizar
+                            Actualizar Informacion
                         </button>
                     </div>
 
                 </form>
-                </div>
             </div>
-            
         </div>
     </x-layout-dashboard>
-    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 
-<script>
-    $(document).ready(function () {
-        $('select[name="id_profesion"]').select2({
-            placeholder: "Seleccione Profesión",
-            allowClear: true,
-            width: '100%'
-        });
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 
-        $('select[name="id_grado_academico"]').select2({
-            placeholder: "Seleccione Grado",
-            allowClear: true,
-            width: '100%'
-        });
+    <script>
+        $(document).ready(function () {
+            $('select[name="id_profesion"]').select2({
+                placeholder: "Seleccione Profesión",
+                allowClear: true,
+                width: '100%'
+            });
 
-        $('select[name="id_institucion_egreso"]').select2({
-            placeholder: "Seleccione Institución",
-            allowClear: true,
-            width: '100%'
+            $('select[name="id_grado_academico"]').select2({
+                placeholder: "Seleccione Grado",
+                allowClear: true,
+                width: '100%'
+            });
+
+            $('select[name="id_institucion_egreso"]').select2({
+                placeholder: "Seleccione Institución",
+                allowClear: true,
+                width: '100%'
+            });
         });
-    });
-</script>
+    </script>
 </body>
 
 </html>

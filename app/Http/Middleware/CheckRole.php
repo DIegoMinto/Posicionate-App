@@ -11,21 +11,21 @@ class CheckRole
     /**
      * Handle an incoming request.
      *
-     * @param  Closure(Request): (Response)  $next
+     * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
+     * @param  string  ...$roles
      */
-    public function handle($request, Closure $next, ...$roles)
+    public function handle(Request $request, Closure $next, ...$roles): Response
     {
-        if (!auth()->check()) {
+        // 1. Verificar si el usuario está autenticado
+        if (!$request->user()) {
             return redirect()->route('login');
         }
 
-        $user = auth()->user();
-
-        if (!in_array($user->rol, $roles)) {
-            abort(403, 'No tienes permisos para acceder');
+        // 2. Comprobar mediante la relación pivote N:M si el usuario tiene alguno de los roles
+        if (!$request->user()->hasAnyRole($roles)) {
+            abort(403, 'No tienes permisos para acceder a esta sección.');
         }
 
         return $next($request);
     }
-
 }

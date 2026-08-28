@@ -33,7 +33,7 @@
 
                         <div class="flex items-center">
                             <div class="font-black text-brand-green text-2xl">
-                                {{ $personal->cargo_nombre }}
+                                {{ $personal->cargo_nombre ?: 'Sin cargo' }}
                             </div>
                             <div class="ml-3">
                                 CI: {{ $personal->persona->ci }}
@@ -92,7 +92,10 @@
                 <div class="bg-gray-50 p-4 rounded-lg border">
                     <h3 class="font-bold text-brand-green mb-2">Datos Laborales</h3>
 
-                    <p><strong>Cargo:</strong> {{ $personal->cargo }}</p>
+                    <p>
+                        <strong>Cargo:</strong>
+                        {{ $personal->cargo_nombre ?: '-' }}
+                    </p>
                     <p><strong>Sede:</strong> {{ $personal->sede->nombre ?? 'N/A' }}</p>
                 </div>
 

@@ -35,13 +35,11 @@ class Personal extends Authenticatable
         return 'password';
     }
 
-    // Relación con Persona (Ya la tenías)
     public function persona()
     {
         return $this->belongsTo(Persona::class, 'id_persona', 'id_persona');
     }
 
-    // NUEVA: Relación con Sede
     public function sede(): BelongsTo
     {
         return $this->belongsTo(Sede::class, 'id_sede', 'id_sede');
@@ -50,17 +48,9 @@ class Personal extends Authenticatable
 
     public function getCargoNombreAttribute()
     {
-        return [
-            'gerente_marketing' => 'Gerente de Marketing',
-            'supervisor_marketing' => 'Supervisor de Marketing',
-            'coordinador_marketing' => 'Coordinador de Marketing',
-            'asesor_marketing' => 'Asesor de Marketing',
-            'supervisor_academico' => 'Supervisor Académico',
-            'coordinador_academico' => 'Coordinador Académico',
-            'asistente_academico' => 'Asistente Académico',
-            'contador' => 'Contador',
-            'asistente_contable' => 'Asistente Contable',
-        ][$this->cargo] ?? $this->cargo;
+        return $this->cargos
+            ->pluck('nombre_visible')
+            ->implode(', ');
     }
     public function getRolNombreAttribute()
     {
