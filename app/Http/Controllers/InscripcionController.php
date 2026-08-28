@@ -152,7 +152,10 @@ class InscripcionController extends Controller
             $query->where('curso_estudiante.id_curso', $idCurso);
         }
 
-        if ($usuario->rol === 'user') {
+        $puedeVerTodos = $usuario->hasAnyRole(['admin', 'super_admin'])
+            || $usuario->hasAnyCargo(['coordinador_marketing']);
+
+        if (!$puedeVerTodos) {
             $query->where('curso_estudiante.id_personal', $usuario->id_personal);
         }
 

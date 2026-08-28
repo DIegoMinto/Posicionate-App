@@ -15,7 +15,7 @@
 
             <form method="GET" action="{{ route('people.index') }}"
                 class="flex flex-col lg:flex-row lg:items-end gap-3 flex-wrap">
-                @if(in_array($usuario->rol, ['admin', 'super_admin']))
+                @if($usuario->hasAnyRole(['admin', 'super_admin']) || $usuario->hasAnyCargo(['coordinador_marketing']))
                     <select name="id_personal" onchange="this.form.submit()"
                         class="bg-white text-black text-[10px] font-bold px-3 py-1.5 rounded-md">
 
@@ -72,7 +72,7 @@
                 </form>
             </x-slot>
 
-            @if($usuario->rol === 'super_admin' || $usuario->hasAnyCargo(['coordinador_marketing', 'asistente_academico', 'coordinador_academico']))
+            @if($usuario->hasRole('super_admin') || $usuario->hasAnyCargo(['coordinador_marketing', 'asistente_academico', 'coordinador_academico']))
                 <div class="flex gap-2">
                     <a href="{{ route('people.export.pdf', request()->query()) }}"
                         class="bg-red-600 text-white text-[10px] font-bold px-3 py-1.5 rounded-md hover:bg-red-700 transition">
@@ -166,8 +166,8 @@
                                     <td class="py-3 px-4 text-center">
                                         <span
                                             class="px-2 py-0.5 rounded-full text-[9px] font-black uppercase
-                                                                                                                                                                                                        {{ $e->estado == 'pre_inscrito' ? 'bg-yellow-100 text-yellow-700' : '' }}
-                                                                                                                                                                                                        {{ $e->estado == 'inscrito' ? 'bg-green-100 text-green-700' : '' }}">
+                                                                                                                                                                                                                    {{ $e->estado == 'pre_inscrito' ? 'bg-yellow-100 text-yellow-700' : '' }}
+                                                                                                                                                                                                                    {{ $e->estado == 'inscrito' ? 'bg-green-100 text-green-700' : '' }}">
                                             {{ $e->estado }}
                                         </span>
                                     </td>
@@ -226,7 +226,7 @@
                                                 </span>
                                             </a>
 
-                                            @if($usuario->rol === 'super_admin')
+                                            @if($usuario->hasRole('super_admin'))
                                                 <div x-data="{ openDelete: false }">
                                                     <button @click="openDelete = true"
                                                         class="group relative flex items-center justify-center pb-1 cursor-pointer">
