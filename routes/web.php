@@ -119,7 +119,7 @@ Route::middleware(['auth', 'vigente'])->group(function () {
     });
 
     // RUTAS DE EXPORTACIÓN (Restringidas)
-    Route::middleware('role_or_cargo:roles=super_admin,admin|cargos=coordinador_marketing,recursos_humanos,supervisor_academico,coordinador_academico,asistente_academico')->group(function () {
+    Route::middleware('role_or_cargo:roles=super_admin+admin|cargos=coordinador_marketing+recursos_humanos+supervisor_academico+coordinador_academico+asistente_academico')->group(function () {
 
         // Exportaciones de Staff
         Route::get('staff/export/pdf', [UserController::class, 'exportPdf'])->name('people.staff.export.pdf');
@@ -154,7 +154,7 @@ Route::middleware(['auth', 'vigente'])->group(function () {
 
     // RUTAS ACADÉMICOS 
 
-    Route::middleware('role_or_cargo:roles=super_admin,admin|cargos=supervisor_academico,coordinador_academico,asistente_academico')->group(function () {
+    Route::middleware('role_or_cargo:roles=super_admin+admin|cargos=supervisor_academico+coordinador_academico+asistente_academico')->group(function () {
         Route::get('/programs/create', [DashboardController::class, 'programsCreate'])->name('programs.create');
         Route::get('/programs/{id}/edit', [DashboardController::class, 'programsEdit'])->name('programs.edit');
         Route::post('/programs/store', [DashboardController::class, 'programsStore'])->name('programs.store');
@@ -190,7 +190,7 @@ Route::middleware(['auth', 'vigente'])->group(function () {
     });
 
     // RUTAS PLANES DE PAGO (Super Admin + Área Contable)
-    Route::middleware('role_or_cargo:roles=super_admin|cargos=contador,asistente_contable')->group(function () {
+    Route::middleware('role_or_cargo:roles=super_admin|cargos=contador+asistente_contable')->group(function () {
 
         // RUTAS PLANES
 
