@@ -16,7 +16,7 @@ class CheckRoleOrCargo
             return redirect()->route('login');
         }
 
-        // 1. SuperAdmin siempre tiene acceso total
+        // 1. SuperAdmin siempre pasa
         if ($user->rol === 'super_admin' || (method_exists($user, 'hasRole') && $user->hasRole('super_admin'))) {
             return $next($request);
         }
@@ -24,7 +24,7 @@ class CheckRoleOrCargo
         $rolesAllowed = [];
         $cargosAllowed = [];
 
-        // Parsear la cadena 'roles=admin,super_admin|cargos=recursos_humanos,asistente_rrhh'
+        // Parsear 'roles=super_admin,admin|cargos=recursos_humanos,asistente_rrhh'
         $segments = explode('|', $params);
         foreach ($segments as $segment) {
             $segment = trim($segment);
@@ -38,27 +38,27 @@ class CheckRoleOrCargo
             }
         }
 
-        // 2. Verificar Roles (vía método hasAnyRole O columna estática 'rol')
-        $hasRole = false;
+        // 2. Comprobar Roles
         if (!empty($rolesAllowed)) {
-            $hasRoleInPivot = method_exists($user, 'hasAnyRole') && $user->hasAnyRole($rolesAllowed);
-            $hasRoleInColumn = in_array($user->rol, $rolesAllowed);
-            $hasRole = $hasRoleInPivot || $hasRoleInColumn;
+            if (in_array($user->rol, $rolesAllowed)) {
+                return $next($request);
+            }
+            if ($user->roles()->whereIn('nombre', $rolesAllowed)->exists()) {
+                return $next($request);
+            }
         }
 
-        // 3. Verificar Cargos (vía método hasAnyCargo O columna estática 'cargo')
-        $hasCargo = false;
+        // 3. Comprobar Cargos (Verifica en columna estática Y en la relación pivote)
         if (!empty($cargosAllowed)) {
-            $hasCargoInPivot = method_exists($user, 'hasAnyCargo') && $user->hasAnyCargo($cargosAllowed);
-            $hasCargoInColumn = in_array($user->cargo, $cargosAllowed);
-            $hasCargo = $hasCargoInPivot || $hasCargoInColumn;
+            if (in_array($user->cargo, $cargosAllowed)) {
+                return $next($request);
+            }
+            if ($user->cargos()->whereIn('nombre', $cargosAllowed)->exists()) {
+                return $next($request);
+            }
         }
 
-        // Pasa si cumple al menos UN rol o UN cargo
-        if (!($hasRole || $hasCargo)) {
-            abort(403, 'No tienes el rol ni el cargo requerido para acceder.');
-        }
-
-        return $next($request);
+        // Si nada coincide, abortar con 403
+        abort(403, 'No tienes el rol ni el cargo requerido para acceder.');
     }
 }
