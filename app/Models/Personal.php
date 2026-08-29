@@ -45,13 +45,13 @@ class Personal extends Authenticatable
         return $this->belongsTo(Sede::class, 'id_sede', 'id_sede');
     }
 
-
     public function getCargoNombreAttribute()
     {
         return $this->cargos
             ->pluck('nombre_visible')
             ->implode(', ');
     }
+
     public function getRolNombreAttribute()
     {
         return [
@@ -71,6 +71,7 @@ class Personal extends Authenticatable
         );
     }
 
+    // RELACIÓN DE ROLES
     public function roles(): BelongsToMany
     {
         return $this->belongsToMany(
@@ -83,12 +84,20 @@ class Personal extends Authenticatable
 
     public function hasRole(string $nombre): bool
     {
-        return $this->roles->contains('nombre', $nombre);
+        return $this->rol === $nombre || $this->roles->contains('nombre', $nombre);
     }
 
     public function hasAnyRole(array $nombres): bool
     {
-        return $this->roles->whereIn('nombre', $nombres)->isNotEmpty();
+        // Revisa columna estática 'rol'
+        if (in_array($this->rol, $nombres)) {
+            return true;
+        }
+
+        // Revisa la relación pivot N:M en colecciones
+        return $this->roles->contains(function ($role) use ($nombres) {
+            return in_array($role->nombre, $nombres);
+        });
     }
 
     public function getRolesNombresAttribute()
@@ -96,6 +105,7 @@ class Personal extends Authenticatable
         return $this->roles->pluck('nombre_visible');
     }
 
+    // RELACIÓN DE CARGOS
     public function cargos(): BelongsToMany
     {
         return $this->belongsToMany(
@@ -108,19 +118,26 @@ class Personal extends Authenticatable
 
     public function hasCargo(string $nombre): bool
     {
-        return $this->cargos->contains('nombre', $nombre);
+        return $this->cargo === $nombre || $this->cargos->contains('nombre', $nombre);
     }
 
     public function hasAnyCargo(array $nombres): bool
     {
-        return $this->cargos->whereIn('nombre', $nombres)->isNotEmpty();
+        // Revisa columna estática 'cargo'
+        if (in_array($this->cargo, $nombres)) {
+            return true;
+        }
+
+        // Revisa la relación pivot N:M en colecciones
+        return $this->cargos->contains(function ($cargo) use ($nombres) {
+            return in_array($cargo->nombre, $nombres);
+        });
     }
 
     public function getCargosNombresAttribute()
     {
         return $this->cargos->pluck('nombre_visible')->implode(', ');
     }
-
 
     public $timestamps = true;
     protected $casts = [
