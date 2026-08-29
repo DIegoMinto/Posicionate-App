@@ -113,7 +113,7 @@ Route::middleware(['auth', 'vigente'])->group(function () {
         Route::get('/students', [DashboardController::class, 'students'])->name('index');
 
         // ACCESO AL PERSONAL PARA RECURSOS HUMANOS
-        Route::middleware('role_or_cargo:roles=super_admin,admin|cargos=recursos_humanos,asistente_rrhh')->group(function () {
+        Route::middleware('role_or_cargo:roles=super_admin+admin|cargos=recursos_humanos+asistente_rrhh')->group(function () {
             Route::get('/staff', [DashboardController::class, 'staff'])->name('staff');
         });
     });
