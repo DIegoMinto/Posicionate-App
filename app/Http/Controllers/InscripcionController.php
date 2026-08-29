@@ -546,10 +546,21 @@ class InscripcionController extends Controller
             ? $request->fecha_pagada
             : ($pago->fecha_pagada ?? Carbon::now()->toDateString());
 
-        $pago->update([
-            'estado' => 'pagado',
-            'fecha_pagada' => $fechaPagada,
-        ]);
+        \DB::transaction(function () use ($pago, $fechaPagada) {
+
+            $pagoBloqueado = PagoEstudiante::where('id_pagos_estudiante', $pago->id_pagos_estudiante)
+                ->lockForUpdate()
+                ->first();
+
+            $pagoBloqueado->estado = 'pagado';
+            $pagoBloqueado->fecha_pagada = $fechaPagada;
+
+            if (!$pagoBloqueado->numero_recibo) {
+                $pagoBloqueado->numero_recibo = PagoEstudiante::generarNumeroRecibo();
+            }
+
+            $pagoBloqueado->save();
+        });
 
         return redirect()->back()->with('success', 'El pago ha sido validado y completado con éxito por el área de Contabilidad.');
     }

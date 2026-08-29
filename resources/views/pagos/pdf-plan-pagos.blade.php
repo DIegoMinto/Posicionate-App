@@ -195,6 +195,7 @@
                     <th style="width:15%">Monto Pagado</th>
                     <th style="width:15%">Saldo</th>
                     <th style="width:15%">Estado</th>
+                    <th style="width:12%">N° Recibo</th>
                 </tr>
             </thead>
             <tbody>
@@ -218,10 +219,16 @@
                         <td>{{ number_format($pago->monto_pagar, 2) }}</td>
                         <td>{{ $pago->monto_pagado > 0 ? number_format($pago->monto_pagado, 2) : '-' }}</td>
                         <td>{{ $saldoFila > 0 ? number_format($saldoFila, 2) : '-' }}</td>
+                        <td>{{ $estaCompleto ? 'Completo' : 'Incompleto' }}</td>
                         <td>
-                            {{ $estaCompleto ? 'Completo' : 'Incompleto' }}
+                            @if($estaCompleto && $pago->numero_recibo)
+                                {{ $pago->numero_recibo }}
+                            @else
+                                -
+                            @endif
                         </td>
                     </tr>
+
                 @empty
                     <tr>
                         <td colspan="7">No hay pagos registrados para este estudiante.</td>
@@ -234,6 +241,7 @@
                     <td>{{ number_format($total, 2) }}</td>
                     <td>{{ number_format($pagado, 2) }}</td>
                     <td>{{ number_format($pendiente, 2) }}</td>
+                    <td></td>
                     <td></td>
                 </tr>
             </tfoot>

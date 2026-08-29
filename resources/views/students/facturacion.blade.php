@@ -50,6 +50,7 @@
                                 <th class="py-3 px-4 whitespace-nowrap text-right">Monto Pagado</th>
                                 <th class="py-3 px-4 whitespace-nowrap text-right">Saldo Pendiente</th>
                                 <th class="py-3 px-4 text-center whitespace-nowrap">Estado</th>
+                                <th class="py-3 px-4 whitespace-nowrap text-right">N° Recibo</th>
                                 <th class="py-3 px-4 text-center whitespace-nowrap">Adicionales</th>
                             </tr>
                         </thead>
@@ -147,6 +148,14 @@
                                                                     {{ $textoEstado }}
                                                                 </span>
                                                             </td>
+
+                                                            <td class="py-3 px-4 whitespace-nowrap text-right">
+    @if($mov->estado === 'pagado' && $mov->numero_recibo)
+        <span class="font-semibold text-brand-green">#{{ $mov->numero_recibo }}</span>
+    @else
+        <span class="text-gray-400">-</span>
+    @endif
+</td>
 
                                                             <td class="py-3 px-4 text-center">
                                                                 <div class="flex items-center justify-center gap-2" x-data="{
@@ -333,6 +342,7 @@
                                 <td class="py-3 px-4 text-right whitespace-nowrap">
                                     {{ number_format($pendiente, 2) }} Bs
                                 </td>
+                                <td colspan="2"></td>
                                 <td colspan="2"></td>
 
                             </tr>
