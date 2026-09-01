@@ -15,8 +15,15 @@
             <a href="{{ route('programs.index') }}" class="btn-back">
                 ← Volver
             </a>
+
             <form method="GET" action="{{ route('curso.estudiantes', $curso->id_curso) }}"
                 class="flex flex-col lg:flex-row lg:items-end gap-3 flex-wrap">
+
+                {{-- Mantener el parámetro de búsqueda textual si existe --}}
+                @if(request('search'))
+                    <input type="hidden" name="search" value="{{ request('search') }}">
+                @endif
+
                 @if($usuario->hasAnyRole(['admin', 'super_admin']) || $usuario->hasAnyCargo(['coordinador_marketing']))
                     <select name="id_personal" onchange="this.form.submit()"
                         class="bg-white text-black text-[10px] font-bold px-3 py-1.5 rounded-md">
@@ -25,13 +32,12 @@
 
                         @foreach($personales as $per)
                             <option value="{{ $per->id_personal }}" {{ request('id_personal') == $per->id_personal ? 'selected' : '' }}>
-
                                 {{ strtoupper($per->persona->nombre . ' ' . $per->persona->apellido_p) }}
-
                             </option>
                         @endforeach
                     </select>
                 @endif
+
                 <select name="estado" onchange="this.form.submit()"
                     class="bg-white text-black text-[10px] font-bold px-3 py-1.5 rounded-md">
 
@@ -45,6 +51,23 @@
                         INSCRITO
                     </option>
                 </select>
+
+                {{-- FILTRO POR ESTADÍA --}}
+                <select name="estadia" onchange="this.form.submit()"
+                    class="bg-white text-black text-[10px] font-bold px-3 py-1.5 rounded-md">
+
+                    <option value="">ESTADÍA: TODAS</option>
+                    <option value="activo" {{ request('estadia') == 'activo' ? 'selected' : '' }}>
+                        ACTIVO
+                    </option>
+                    <option value="abandono" {{ request('estadia') == 'abandono' ? 'selected' : '' }}>
+                        ABANDONO
+                    </option>
+                    <option value="retirado" {{ request('estadia') == 'retirado' ? 'selected' : '' }}>
+                        RETIRADO
+                    </option>
+                </select>
+
                 <div>
                     <div class="font-sans text-[12px]">Fecha inicio</div>
                     <input type="date" name="fecha_inicio" value="{{ request('fecha_inicio') }}"
@@ -58,9 +81,20 @@
                 </div>
 
             </form>
+
             <x-slot name="search">
                 <form method="GET" action="{{ route('curso.estudiantes', $curso->id_curso) }}"
                     class="relative bg-white rounded-full">
+
+                    {{-- Preservar filtros seleccionados al realizar una búsqueda --}}
+                    @if(request('id_personal')) <input type="hidden" name="id_personal"
+                    value="{{ request('id_personal') }}"> @endif
+                    @if(request('estado')) <input type="hidden" name="estado" value="{{ request('estado') }}"> @endif
+                    @if(request('estadia')) <input type="hidden" name="estadia" value="{{ request('estadia') }}"> @endif
+                    @if(request('fecha_inicio')) <input type="hidden" name="fecha_inicio"
+                    value="{{ request('fecha_inicio') }}"> @endif
+                    @if(request('fecha_fin')) <input type="hidden" name="fecha_fin" value="{{ request('fecha_fin') }}">
+                    @endif
 
                     <input type="text" name="search" value="{{ request('search') }}"
                         placeholder="Buscar por nombre o CI..."
@@ -116,6 +150,9 @@
                                 <th class="py-3 px-4 whitespace-nowrap">Asesor</th>
                                 <th class="py-3 px-4 whitespace-nowrap">Fecha de Registro</th>
                                 <th class="py-3 px-4 text-center whitespace-nowrap">Estado</th>
+                                @if(auth()->user()->hasAnyRole(['super_admin', 'admin']) || auth()->user()->hasAnyCargo(['supervisor_academico', 'coordinador_academico', 'asistente_academico', 'coordinador_marketing']))
+                                    <th class="py-3 px-4 text-center">Estadía</th>
+                                @endif
                                 <th class="py-3 px-4 text-center sticky right-0 bg-brand-green">Operaciones</th>
                             </tr>
                         </thead>
@@ -165,11 +202,38 @@
                                     <td class="py-3 px-4 text-center">
                                         <span
                                             class="px-2 py-0.5 rounded-full text-[9px] font-black uppercase
-                                                                                                                                                                                                                                                                                                                                                                    {{ $e->estado == 'pre_inscrito' ? 'bg-yellow-100 text-yellow-700' : '' }}
-                                                                                                                                                                                                                                                                                                                                                                    {{ $e->estado == 'inscrito' ? 'bg-green-100 text-green-700' : '' }}">
+                                                        {{ $e->estado == 'pre_inscrito' ? 'bg-yellow-100 text-yellow-700' : '' }}
+                                                        {{ $e->estado == 'inscrito' ? 'bg-green-100 text-green-700' : '' }}">
                                             {{ $e->estado }}
                                         </span>
                                     </td>
+
+                                    @if(auth()->user()->hasAnyRole(['super_admin', 'admin']) || auth()->user()->hasAnyCargo(['supervisor_academico', 'coordinador_academico', 'asistente_academico', 'coordinador_marketing']))
+                                                        <td class="py-3 px-4 text-center">
+                                                            <form action="{{ route('students.updateEstadia', $e->id_estudiante) }}"
+                                                                method="POST" class="inline-block">
+                                                                @csrf
+                                                                @method('PATCH')
+                                                                <input type="hidden" name="id_curso" value="{{ $curso->id_curso }}">
+
+                                                                <select name="estadia" onchange="this.form.submit()" class="px-2 py-0.5 rounded-full text-[9px] font-black uppercase border-0 cursor-pointer focus:ring-1 focus:ring-gray-400 font-poppins
+                                        {{ ($e->estadia ?? 'activo') === 'activo' ? 'bg-green-100 text-green-700' : '' }}
+                                        {{ ($e->estadia ?? 'activo') === 'abandono' ? 'bg-yellow-100 text-yellow-700' : '' }}
+                                        {{ ($e->estadia ?? 'activo') === 'retirado' ? 'bg-red-100 text-red-700' : '' }}">
+
+                                                                    <option value="activo" {{ ($e->estadia ?? 'activo') === 'activo' ? 'selected' : '' }}
+                                                                        class="bg-white text-gray-800 font-sans font-normal normal-case">Activo
+                                                                    </option>
+                                                                    <option value="abandono" {{ ($e->estadia ?? 'activo') === 'abandono' ? 'selected' : '' }}
+                                                                        class="bg-white text-gray-800 font-sans font-normal normal-case">
+                                                                        Abandono</option>
+                                                                    <option value="retirado" {{ ($e->estadia ?? 'activo') === 'retirado' ? 'selected' : '' }}
+                                                                        class="bg-white text-gray-800 font-sans font-normal normal-case">
+                                                                        Retirado</option>
+                                                                </select>
+                                                            </form>
+                                                        </td>
+                                    @endif
 
                                     <td class="px-4 text-right sticky right-0 bg-white min-w-[150px]">
                                         <div class="flex justify-center items-center gap-2">
@@ -300,7 +364,7 @@
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="12" class="py-12 text-center text-gray-400 italic">
+                                    <td colspan="13" class="py-12 text-center text-gray-400 italic">
                                         No hay estudiantes registrados en este curso.
                                     </td>
                                 </tr>

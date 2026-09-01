@@ -60,6 +60,7 @@
                 <th>Asesor</th>
                 <th>Fecha Registro</th>
                 <th>Estado</th>
+                <th>Estadía</th>
             </tr>
         </thead>
         <tbody>
@@ -78,6 +79,12 @@
                     <td>{{ $e->asesor_nombre }} {{ $e->asesor_apellido }}</td>
                     <td>{{ \Carbon\Carbon::parse($e->fecha_inscripcion)->format('d/m/Y H:i') }}</td>
                     <td>{{ $e->estado }}</td>
+                    <td>
+                        <span style="font-weight: bold; text-transform: uppercase;">
+                            {{ $e->estadia ?? 'activo' }}
+                        </span>
+                    </td>
+
                 </tr>
             @empty
                 <tr>

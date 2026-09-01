@@ -67,13 +67,15 @@
                                     </div>
                                 </div>
 
-                                <div x-data="{ ext: '{{ old('extension_select', $docente->extension_ci) }}' }">
+                                <div x-data="{ ext: '{{ old('extension_ci', $docente->extension_ci) }}' }">
                                     <label class="form-label-bold font-sans text-brand-green">Documento de
                                         Identidad</label>
                                     <div class="flex gap-1">
                                         <input type="number" name="ci" value="{{ old('ci', $docente->ci) }}"
                                             class="flex-1 form-input-pill w-full border-2 border-brand-gold">
-                                        <select name="extension_select" x-model="ext"
+
+                                        <!-- SE CAMBIÓ name="extension_select" A name="extension_ci" -->
+                                        <select name="extension_ci" x-model="ext"
                                             class="w-20 form-select-pill border-2 border-brand-gold">
                                             @foreach(['CH', 'LP', 'CB', 'OR', 'PT', 'TJ', 'SC', 'BE', 'PD', 'OTRO'] as $ext)
                                                 <option value="{{ $ext }}">{{ $ext }}</option>
@@ -83,11 +85,16 @@
                                 </div>
 
                                 <div>
-                                    <label class="form-label-bold font-sans text-brand-green">Teléfono /
-                                        Móvil</label>
-                                    <input type="text" name="telefono_movil"
-                                        value="{{ old('telefono_movil', $docente->telefono_movil) }}"
-                                        class="form-input-pill w-full border-2 border-brand-gold">
+                                    <label class="form-label-bold font-sans text-brand-green">Teléfono / Móvil</label>
+                                    <div class="flex gap-1">
+                                        <input type="text" name="codigo_pais_movil" placeholder="+591"
+                                            value="{{ old('codigo_pais_movil', explode(' ', $docente->telefono_movil)[0] ?? '+591') }}"
+                                            class="w-20 form-input-pill border-2 border-brand-gold">
+
+                                        <input type="text" name="numero_movil"
+                                            value="{{ old('numero_movil', ltrim(strstr($docente->telefono_movil, ' '), ' ') ?: $docente->telefono_movil) }}"
+                                            class="flex-1 form-input-pill w-full border-2 border-brand-gold">
+                                    </div>
                                 </div>
 
                                 <div>

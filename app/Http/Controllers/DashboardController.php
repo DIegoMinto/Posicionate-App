@@ -144,8 +144,9 @@ class DashboardController extends Controller
         $usuario = auth()->user();
         $estudiantes = $this->buildStudentsQuery($request, $usuario)->paginate(10)->withQueryString();
         $personales = Personal::with('persona')->get();
+        $cursos = Curso::orderBy('nombre', 'asc')->get();
 
-        return view('dashboard.people', compact('usuario', 'estudiantes', 'personales'));
+        return view('dashboard.people', compact('usuario', 'estudiantes', 'personales', 'cursos'));
     }
 
     public function exportPdf(Request $request)
@@ -222,6 +223,13 @@ class DashboardController extends Controller
 
         if ($request->filled('fecha_fin')) {
             $query->whereDate('curso_estudiante.created_at', '<=', $request->fecha_fin);
+        }
+        if ($request->filled('id_curso')) {
+            $query->where('curso_estudiante.id_curso', $request->id_curso);
+        }
+
+        if ($request->filled('estadia')) {
+            $query->where('curso_estudiante.estadia', $request->estadia);
         }
 
         return $query->orderBy('curso_estudiante.created_at', 'desc');

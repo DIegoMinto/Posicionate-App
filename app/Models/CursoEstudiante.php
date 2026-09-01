@@ -19,6 +19,7 @@ class CursoEstudiante extends Model
         'id_estudiante',
         'id_personal',
         'estado',
+        'estadia',
         'id_planes_pago',
         'id_descuento',
         'id_personal'

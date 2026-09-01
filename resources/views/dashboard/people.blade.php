@@ -15,34 +15,51 @@
 
             <form method="GET" action="{{ route('people.index') }}"
                 class="flex flex-col lg:flex-row lg:items-end gap-3 flex-wrap">
+
+                {{-- Mantener los demás parámetros de búsqueda activos al filtrar --}}
+                @if(request('search'))
+                    <input type="hidden" name="search" value="{{ request('search') }}">
+                @endif
+
+                {{-- FILTRO POR CURSO --}}
+                <select name="id_curso" onchange="this.form.submit()"
+                    class="bg-white text-black text-[10px] font-bold px-3 py-1.5 rounded-md">
+                    <option value="">CURSO: TODOS</option>
+                    @foreach($cursos as $c)
+                        <option value="{{ $c->id_curso }}" {{ request('id_curso') == $c->id_curso ? 'selected' : '' }}>
+                            {{ strtoupper($c->nombre) }}
+                        </option>
+                    @endforeach
+                </select>
+
                 @if($usuario->hasAnyRole(['admin', 'super_admin']) || $usuario->hasAnyCargo(['coordinador_marketing']))
                     <select name="id_personal" onchange="this.form.submit()"
                         class="bg-white text-black text-[10px] font-bold px-3 py-1.5 rounded-md">
-
                         <option value="">ASESOR: TODOS</option>
-
                         @foreach($personales as $per)
                             <option value="{{ $per->id_personal }}" {{ request('id_personal') == $per->id_personal ? 'selected' : '' }}>
-
                                 {{ strtoupper($per->persona->nombre . ' ' . $per->persona->apellido_p) }}
-
                             </option>
                         @endforeach
                     </select>
                 @endif
+
                 <select name="estado" onchange="this.form.submit()"
                     class="bg-white text-black text-[10px] font-bold px-3 py-1.5 rounded-md">
-
                     <option value="">ESTADO: TODOS</option>
-
-                    <option value="pre_inscrito" {{ request('estado') == 'pre_inscrito' ? 'selected' : '' }}>
-                        PRE INSCRITO
+                    <option value="pre_inscrito" {{ request('estado') == 'pre_inscrito' ? 'selected' : '' }}>PRE INSCRITO
                     </option>
-
-                    <option value="inscrito" {{ request('estado') == 'inscrito' ? 'selected' : '' }}>
-                        INSCRITO
-                    </option>
+                    <option value="inscrito" {{ request('estado') == 'inscrito' ? 'selected' : '' }}>INSCRITO</option>
                 </select>
+
+                <select name="estadia" onchange="this.form.submit()"
+                    class="bg-white text-black text-[10px] font-bold px-3 py-1.5 rounded-md">
+                    <option value="">ESTADÍA: TODAS</option>
+                    <option value="activo" {{ request('estadia') == 'activo' ? 'selected' : '' }}>ACTIVO</option>
+                    <option value="abandono" {{ request('estadia') == 'abandono' ? 'selected' : '' }}>ABANDONO</option>
+                    <option value="retirado" {{ request('estadia') == 'retirado' ? 'selected' : '' }}>RETIRADO</option>
+                </select>
+
                 <div>
                     <div class="font-sans text-[12px]">Fecha inicio</div>
                     <input type="date" name="fecha_inicio" value="{{ request('fecha_inicio') }}"
@@ -56,9 +73,21 @@
                 </div>
 
             </form>
+
             <x-slot name="search">
                 <form action="{{ route('people.index') }}" method="GET" class="relative bg-white rounded-full">
-                    <input type="text" name="search" value="{{ request('search') }}" placeholder="Buscar docente..."
+                    @if(request('id_curso')) <input type="hidden" name="id_curso" value="{{ request('id_curso') }}">
+                    @endif
+                    @if(request('id_personal')) <input type="hidden" name="id_personal"
+                    value="{{ request('id_personal') }}"> @endif
+                    @if(request('estado')) <input type="hidden" name="estado" value="{{ request('estado') }}"> @endif
+                    @if(request('estadia')) <input type="hidden" name="estadia" value="{{ request('estadia') }}"> @endif
+                    @if(request('fecha_inicio')) <input type="hidden" name="fecha_inicio"
+                    value="{{ request('fecha_inicio') }}"> @endif
+                    @if(request('fecha_fin')) <input type="hidden" name="fecha_fin" value="{{ request('fecha_fin') }}">
+                    @endif
+
+                    <input type="text" name="search" value="{{ request('search') }}" placeholder="Buscar estudiante..."
                         class="pl-10 pr-4 py-1.5 text-xs w-64 outline-none rounded-full">
                     <button type="submit"
                         class="absolute left-3 top-1/2 -translate-y-1/2 text-black cursor-pointer hover:opacity-70 focus:outline-none">
@@ -164,8 +193,8 @@
                                     <td class="py-3 px-4 text-center">
                                         <span
                                             class="px-2 py-0.5 rounded-full text-[9px] font-black uppercase
-                                                                                                                                                                                                                                    {{ $e->estado == 'pre_inscrito' ? 'bg-yellow-100 text-yellow-700' : '' }}
-                                                                                                                                                                                                                                    {{ $e->estado == 'inscrito' ? 'bg-green-100 text-green-700' : '' }}">
+                                                                                                                                                                                                                                        {{ $e->estado == 'pre_inscrito' ? 'bg-yellow-100 text-yellow-700' : '' }}
+                                                                                                                                                                                                                                        {{ $e->estado == 'inscrito' ? 'bg-green-100 text-green-700' : '' }}">
                                             {{ $e->estado }}
                                         </span>
                                     </td>

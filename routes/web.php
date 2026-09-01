@@ -187,6 +187,10 @@ Route::middleware(['auth', 'vigente'])->group(function () {
 
         Route::resource('statitics', StatiticController::class)->names('statitics');
 
+        //RUTAS DE ESTUDIANTES
+
+        Route::patch('/estudiantes/{id_estudiante}/estadia', [InscripcionController::class, 'updateEstadia'])->name('students.updateEstadia');
+
     });
 
     // RUTAS PLANES DE PAGO (Super Admin + Área Contable)

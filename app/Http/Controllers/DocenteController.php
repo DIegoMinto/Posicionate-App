@@ -184,6 +184,7 @@ class DocenteController extends Controller
         if (auth()->user()->rol !== 'super_admin') {
             abort(403, 'No autorizado');
         }
+
         $paises = Pais::all();
         $profesiones = Profesion::all();
         $instituciones = InstitucionEgreso::all();
@@ -210,9 +211,10 @@ class DocenteController extends Controller
         if (auth()->user()->rol !== 'super_admin') {
             abort(403, 'No autorizado');
         }
-        $data = [];
+
         try {
-            $request->validate([
+            // 1. Validación (se ajustó nullable en archivos para evitar requerirlos al editar)
+            $validated = $request->validate([
                 'nombre' => 'required|string|max:100',
                 'apellido_p' => 'required|string|max:100',
                 'ci' => 'required|numeric|unique:docente,ci,' . $docente->id_docente . ',id_docente',
@@ -226,18 +228,31 @@ class DocenteController extends Controller
                 'emite_factura' => 'required',
                 'numero_movil' => 'required|string|max:20',
                 'codigo_pais_movil' => 'required|string|max:5',
+                'curriculum' => 'nullable|file|mimes:pdf,doc,docx|max:10240',
+                'fotocarnet' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:5120',
+                'fotografia' => 'nullable|image|max:5120',
             ]);
 
+            // 2. Extraer solo los campos que van a la BD (excluyendo archivos e inputs auxiliares)
+            $data = $request->except([
+                '_token',
+                '_method',
+                'id_pais',
+                'id_departamento',
+                'codigo_pais_movil',
+                'numero_movil',
+                'curriculum',
+                'fotocarnet',
+                'fotografia'
+            ]);
+
+            // 3. Formatear valores
             $extensionFinal = strtoupper(trim($request->extension_ci));
-
-            $data = $request->except(['_token', '_method', 'id_pais', 'id_departamento', 'codigo_pais_movil', 'numero_movil']);
-
             $data['extension_ci'] = $extensionFinal;
             $data['telefono_movil'] = trim($request->codigo_pais_movil . ' ' . $request->numero_movil);
-            $data['emite_factura'] = ($request->emite_factura == '1') ? 'SI' : 'NO';
+            $data['emite_factura'] = ($request->emite_factura == '1' || $request->emite_factura == 'SI') ? 'SI' : 'NO';
 
-            $idArchivo = $request->ci . '_' . $extensionFinal;
-
+            // 4. Instanciar Cloudinary
             $cloudinary = new Cloudinary([
                 'cloud' => [
                     'cloud_name' => env('CLOUDINARY_CLOUD_NAME'),
@@ -247,6 +262,9 @@ class DocenteController extends Controller
                 'url' => ['secure' => true]
             ]);
 
+            $idArchivo = $request->ci . '_' . $extensionFinal;
+
+            // 5. Cargar archivos únicamente si fueron adjuntados
             if ($request->hasFile('curriculum')) {
                 $upload = $cloudinary->uploadApi()->upload(
                     $request->file('curriculum')->getRealPath(),
@@ -271,6 +289,7 @@ class DocenteController extends Controller
                 $data['fotografia'] = $upload['secure_url'];
             }
 
+            // 6. Actualizar registro
             $docente->update($data);
 
             return redirect()->route('teachers.index')->with('success', "Docente " . $request->nombre . " actualizado correctamente.");

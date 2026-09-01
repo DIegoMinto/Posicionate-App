@@ -21,6 +21,7 @@ use App\Models\Inscripcion;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Exports\StudentsExport;
 
+
 class InscripcionController extends Controller
 {
     public function showForm($id_curso, $id_personal)
@@ -90,6 +91,7 @@ class InscripcionController extends Controller
                 'correo_electronico' => $estudiante->correo_electronico,
                 'telefono_movil' => $estudiante->telefono_movil ?? '',
                 'curso' => $curso->nombre ?? '',
+                'estadia' => $validated['estadia'] ?? 'activo',
                 'asesor' => $asesorPersona
                     ? trim("{$asesorPersona->nombre} {$asesorPersona->apellido_p}")
                     : '',
@@ -107,6 +109,21 @@ class InscripcionController extends Controller
         $personales = Personal::with('persona')->get();
 
         return view('cursos.estudiantes', compact('curso', 'estudiantes', 'usuario', 'personales'));
+    }
+
+    public function updateEstadia(Request $request, $id_estudiante)
+    {
+        $request->validate([
+            'id_curso' => 'required|exists:curso,id_curso',
+            'estadia' => 'required|in:activo,abandono,retirado',
+        ]);
+
+        DB::table('curso_estudiante')
+            ->where('id_estudiante', $id_estudiante)
+            ->where('id_curso', $request->id_curso)
+            ->update(['estadia' => $request->estadia]);
+
+        return back()->with('success', 'Estadía actualizada correctamente.');
     }
 
     public function exportPdf(Request $request, $id)
@@ -142,6 +159,7 @@ class InscripcionController extends Controller
                 'estudiante.*',
                 'curso.nombre as curso_nombre',
                 'curso_estudiante.estado',
+                'curso_estudiante.estadia',
                 'curso_estudiante.id_curso',
                 'curso_estudiante.created_at as fecha_inscripcion',
                 'persona.nombre as asesor_nombre',
@@ -184,6 +202,10 @@ class InscripcionController extends Controller
 
         if ($request->filled('fecha_fin')) {
             $query->whereDate('curso_estudiante.created_at', '<=', $request->fecha_fin);
+        }
+
+        if ($request->filled('estadia')) {
+            $query->where('curso_estudiante.estadia', $request->estadia);
         }
 
         return $query->orderBy('curso_estudiante.created_at', 'desc');
