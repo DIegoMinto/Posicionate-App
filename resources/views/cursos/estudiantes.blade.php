@@ -63,14 +63,16 @@
                     class="relative bg-white rounded-full">
 
                     <input type="text" name="search" value="{{ request('search') }}"
-                        placeholder="Buscar por nombre o CI..." class="pl-10 pr-4 py-1.5 text-xs w-64 outline-none">
+                        placeholder="Buscar por nombre o CI..."
+                        class="pl-10 pr-4 py-1.5 text-xs w-64 outline-none rounded-full">
 
-                    <div class="absolute left-3 top-1/2 -translate-y-1/2 text-black">
+                    <button type="submit"
+                        class="absolute left-3 top-1/2 -translate-y-1/2 text-black cursor-pointer hover:opacity-70 focus:outline-none">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                 d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                         </svg>
-                    </div>
+                    </button>
 
                 </form>
             </x-slot>
@@ -163,8 +165,8 @@
                                     <td class="py-3 px-4 text-center">
                                         <span
                                             class="px-2 py-0.5 rounded-full text-[9px] font-black uppercase
-                                                                                                                                                                                                                                                                                                                                                            {{ $e->estado == 'pre_inscrito' ? 'bg-yellow-100 text-yellow-700' : '' }}
-                                                                                                                                                                                                                                                                                                                                                            {{ $e->estado == 'inscrito' ? 'bg-green-100 text-green-700' : '' }}">
+                                                                                                                                                                                                                                                                                                                                                                    {{ $e->estado == 'pre_inscrito' ? 'bg-yellow-100 text-yellow-700' : '' }}
+                                                                                                                                                                                                                                                                                                                                                                    {{ $e->estado == 'inscrito' ? 'bg-green-100 text-green-700' : '' }}">
                                             {{ $e->estado }}
                                         </span>
                                     </td>
@@ -308,47 +310,7 @@
                     </table>
                 </div>
 
-                <div class="mt-6 flex justify-center">
-                    <nav class="flex items-center gap-1 font-sans text-[11px]">
-
-                        @if ($estudiantes->onFirstPage())
-                            <span class="px-3 py-1.5 rounded-md text-gray-300 border border-gray-200 cursor-not-allowed">
-                                Anterior
-                            </span>
-                        @else
-                            <a href="{{ $estudiantes->previousPageUrl() }}"
-                                class="px-3 py-1.5 rounded-md border border-brand-green text-brand-green font-bold hover:bg-brand-green hover:text-white transition-colors">
-                                Anterior
-                            </a>
-                        @endif
-
-                        @foreach ($estudiantes->getUrlRange(1, $estudiantes->lastPage()) as $page => $url)
-                            @if ($page == $estudiantes->currentPage())
-                                <span class="px-3 py-1.5 rounded-md bg-brand-green text-white font-bold">
-                                    {{ $page }}
-                                </span>
-                            @else
-                                <a href="{{ $url }}"
-                                    class="px-3 py-1.5 rounded-md border border-brand-green text-brand-green font-bold hover:bg-brand-green hover:text-white transition-colors">
-                                    {{ $page }}
-                                </a>
-                            @endif
-                        @endforeach
-
-                        @if ($estudiantes->hasMorePages())
-                            <a href="{{ $estudiantes->nextPageUrl() }}"
-                                class="px-3 py-1.5 rounded-md border border-brand-green text-brand-green font-bold hover:bg-brand-green hover:text-white transition-colors">
-                                Siguiente
-                            </a>
-                        @else
-                            <span class="px-3 py-1.5 rounded-md text-gray-300 border border-gray-200 cursor-not-allowed">
-                                Siguiente
-                            </span>
-                        @endif
-
-                    </nav>
-                </div>
-
+                <x-pagination :paginator="$estudiantes" />
             </div>
         </div>
     </x-layout-dashboard>

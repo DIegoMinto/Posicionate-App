@@ -57,18 +57,16 @@
 
             </form>
             <x-slot name="search">
-                <form method="GET" action="{{ route('people.index') }}" class="relative bg-white rounded-full">
-
-                    <input type="text" name="search" value="{{ request('search') }}"
-                        placeholder="Buscar por nombre o CI..." class="pl-10 pr-4 py-1.5 text-xs w-64 outline-none">
-
-                    <div class="absolute left-3 top-1/2 -translate-y-1/2 text-black">
+                <form action="{{ route('people.index') }}" method="GET" class="relative bg-white rounded-full">
+                    <input type="text" name="search" value="{{ request('search') }}" placeholder="Buscar docente..."
+                        class="pl-10 pr-4 py-1.5 text-xs w-64 outline-none rounded-full">
+                    <button type="submit"
+                        class="absolute left-3 top-1/2 -translate-y-1/2 text-black cursor-pointer hover:opacity-70 focus:outline-none">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
                         </svg>
-                    </div>
-
+                    </button>
                 </form>
             </x-slot>
 
@@ -166,8 +164,8 @@
                                     <td class="py-3 px-4 text-center">
                                         <span
                                             class="px-2 py-0.5 rounded-full text-[9px] font-black uppercase
-                                                                                                                                                                                                                    {{ $e->estado == 'pre_inscrito' ? 'bg-yellow-100 text-yellow-700' : '' }}
-                                                                                                                                                                                                                    {{ $e->estado == 'inscrito' ? 'bg-green-100 text-green-700' : '' }}">
+                                                                                                                                                                                                                                    {{ $e->estado == 'pre_inscrito' ? 'bg-yellow-100 text-yellow-700' : '' }}
+                                                                                                                                                                                                                                    {{ $e->estado == 'inscrito' ? 'bg-green-100 text-green-700' : '' }}">
                                             {{ $e->estado }}
                                         </span>
                                     </td>
@@ -326,18 +324,44 @@
                             </a>
                         @endif
 
-                        @foreach ($estudiantes->getUrlRange(1, $estudiantes->lastPage()) as $page => $url)
-                            @if ($page == $estudiantes->currentPage())
+                        @php
+                            $currentPage = $estudiantes->currentPage();
+                            $lastPage = $estudiantes->lastPage();
+                            $window = 1; 
+                        @endphp
+
+                        @if ($currentPage > $window + 1)
+                            <a href="{{ $estudiantes->url(1) }}"
+                                class="px-3 py-1.5 rounded-md border border-brand-green text-brand-green font-bold hover:bg-brand-green hover:text-white transition-colors">
+                                1
+                            </a>
+                            @if ($currentPage > $window + 2)
+                                <span class="px-2 py-1.5 text-gray-400 font-bold">...</span>
+                            @endif
+                        @endif
+
+                        @for ($i = max(1, $currentPage - $window); $i <= min($lastPage, $currentPage + $window); $i++)
+                            @if ($i == $currentPage)
                                 <span class="px-3 py-1.5 rounded-md bg-brand-green text-white font-bold">
-                                    {{ $page }}
+                                    {{ $i }}
                                 </span>
                             @else
-                                <a href="{{ $url }}"
+                                <a href="{{ $estudiantes->url($i) }}"
                                     class="px-3 py-1.5 rounded-md border border-brand-green text-brand-green font-bold hover:bg-brand-green hover:text-white transition-colors">
-                                    {{ $page }}
+                                    {{ $i }}
                                 </a>
                             @endif
-                        @endforeach
+                        @endfor
+
+                        @if ($currentPage < $lastPage - $window)
+                            @if ($currentPage < $lastPage - $window - 1)
+                                <span class="px-2 py-1.5 text-gray-400 font-bold">...</span>
+                            @endif
+                            <a href="{{ $estudiantes->url($lastPage) }}"
+                                class="px-3 py-1.5 rounded-md border border-brand-green text-brand-green font-bold hover:bg-brand-green hover:text-white transition-colors">
+                                {{ $lastPage }}
+                            </a>
+                        @endif
 
                         @if ($estudiantes->hasMorePages())
                             <a href="{{ $estudiantes->nextPageUrl() }}"

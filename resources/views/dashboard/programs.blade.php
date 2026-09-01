@@ -69,20 +69,18 @@
             </div>
 
             <x-slot name="search">
-                <form action="{{ route('programs.index') }}" method="GET" class="relative bg-white rounded-full">
-
-                    <input type="text" name="search" value="{{ request('search') }}" placeholder="Buscar programa..."
-                        class="pl-10 pr-4 py-1.5 text-xs w-64 outline-none">
-
-                    <div class="absolute left-3 top-1/2 -translate-y-1/2 text-black">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                        </svg>
-                    </div>
-
-                </form>
-            </x-slot>
+                    <form action="{{ route('programs.index') }}" method="GET" class="relative bg-white rounded-full">
+                        <input type="text" name="search" value="{{ request('search') }}" placeholder="Buscar docente..."
+                            class="pl-10 pr-4 py-1.5 text-xs w-64 outline-none rounded-full">
+                        <button type="submit"
+                            class="absolute left-3 top-1/2 -translate-y-1/2 text-black cursor-pointer hover:opacity-70 focus:outline-none">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                            </svg>
+                        </button>
+                    </form>
+                </x-slot>
 
         </x-page-header>
 
