@@ -16,18 +16,16 @@
             <form method="GET" action="{{ route('people.index') }}"
                 class="flex flex-col lg:flex-row lg:items-end gap-3 flex-wrap">
 
-                {{-- Mantener los demás parámetros de búsqueda activos al filtrar --}}
                 @if(request('search'))
                     <input type="hidden" name="search" value="{{ request('search') }}">
                 @endif
 
-                {{-- FILTRO POR CURSO --}}
                 <select name="id_curso" onchange="this.form.submit()"
                     class="bg-white text-black text-[10px] font-bold px-3 py-1.5 rounded-md">
                     <option value="">CURSO: TODOS</option>
                     @foreach($cursos as $c)
                         <option value="{{ $c->id_curso }}" {{ request('id_curso') == $c->id_curso ? 'selected' : '' }}>
-                            {{ strtoupper($c->nombre) }}
+                            {{ $c->nombre }}
                         </option>
                     @endforeach
                 </select>
@@ -50,14 +48,6 @@
                     <option value="pre_inscrito" {{ request('estado') == 'pre_inscrito' ? 'selected' : '' }}>PRE INSCRITO
                     </option>
                     <option value="inscrito" {{ request('estado') == 'inscrito' ? 'selected' : '' }}>INSCRITO</option>
-                </select>
-
-                <select name="estadia" onchange="this.form.submit()"
-                    class="bg-white text-black text-[10px] font-bold px-3 py-1.5 rounded-md">
-                    <option value="">ESTADÍA: TODAS</option>
-                    <option value="activo" {{ request('estadia') == 'activo' ? 'selected' : '' }}>ACTIVO</option>
-                    <option value="abandono" {{ request('estadia') == 'abandono' ? 'selected' : '' }}>ABANDONO</option>
-                    <option value="retirado" {{ request('estadia') == 'retirado' ? 'selected' : '' }}>RETIRADO</option>
                 </select>
 
                 <div>
