@@ -141,12 +141,6 @@ class UserController extends Controller
             'roles'
         ])->findOrFail($id);
 
-        $esMismoUsuario = $auth->id_personal === $personal->id_personal;
-
-        if (!$esMismoUsuario) {
-            abort(403, 'No autorizado');
-        }
-
         $usuario = $auth;
 
         return view('users.show', compact('personal', 'usuario'));
