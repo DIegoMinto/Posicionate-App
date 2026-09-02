@@ -141,10 +141,9 @@ class UserController extends Controller
             'roles'
         ])->findOrFail($id);
 
-        $esSuperAdmin = $auth->rol === 'super_admin';
         $esMismoUsuario = $auth->id_personal === $personal->id_personal;
 
-        if (!$esSuperAdmin && !$esMismoUsuario) {
+        if (!$esMismoUsuario) {
             abort(403, 'No autorizado');
         }
 
