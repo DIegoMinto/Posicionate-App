@@ -70,4 +70,16 @@ class Estudiante extends Model
     {
         return $this->belongsTo(Departamento::class, 'id_departamento');
     }
+
+    public function cursos()
+    {
+        return $this->belongsToMany(
+            Curso::class,
+            'curso_estudiante',
+            'id_estudiante',
+            'id_curso'
+        )
+            ->withPivot('id', 'estado', 'estadia', 'id_personal', 'id_planes_pago', 'id_descuento')
+            ->withTimestamps();
+    }
 }

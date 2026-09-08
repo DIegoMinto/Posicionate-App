@@ -468,9 +468,12 @@ class DashboardController extends Controller
             'ciudad.departamento',
             'institucionEgreso',
             'gradoAcademico',
-            'profesion'
+            'profesion',
+            'cursos'
         ])->findOrFail($id);
+
         $usuario = auth()->user();
+
         return view('students.show', compact('estudiante', 'usuario'));
     }
 

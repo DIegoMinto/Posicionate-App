@@ -256,7 +256,7 @@
 
                             <div>
                                 <label class="form-label-bold-2">
-                                    País
+                                    País de Nacimiento
                                 </label>
 
                                 <select name="id_pais" id="select-pais" class="form-select-pill-2">
@@ -276,7 +276,7 @@
 
                             <div>
                                 <label class="form-label-bold-2">
-                                    Departamento
+                                    Departamento de Nacimiento
                                 </label>
 
                                 <select name="id_departamento" id="select-departamento" class="form-select-pill-2">
@@ -290,7 +290,7 @@
 
                             <div>
                                 <label class="form-label-bold-2">
-                                    Ciudad
+                                    Ciudad de Nacimiento
                                 </label>
 
                                 <input type="text" name="ciudad_residencia" value="{{ old('ciudad_residencia') }}"
@@ -303,7 +303,7 @@
 
                             <div>
                                 <label class="form-label-bold-2">
-                                    Domicilio
+                                    Domicilio Actual
                                 </label>
 
                                 <input type="text" name="domicilio" value="{{ old('domicilio') }}"

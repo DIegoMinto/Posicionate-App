@@ -129,8 +129,6 @@ class UserController extends Controller
     public function show($id)
     {
         $auth = auth()->user();
-
-        // CORREGIDO: Redundancia eliminada
         $personal = Personal::with([
             'persona.ciudad.departamento',
             'persona.institucion',
