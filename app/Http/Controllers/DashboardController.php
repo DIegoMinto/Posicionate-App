@@ -7,18 +7,15 @@ use Illuminate\Http\Request;
 use App\Models\Personal;
 use App\Models\Sede;
 use App\Models\Curso;
-use App\Models\Institucion;
-use App\Models\Docente;
 use Cloudinary\Cloudinary;
-use App\Models\Clase;
-use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\DB;
-use App\Models\Modulo;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Exports\StudentsExport;
 use App\Models\Cargo;
+use App\Models\EventoCalendario;
+
+
 
 class DashboardController extends Controller
 {
@@ -66,17 +63,18 @@ class DashboardController extends Controller
             })
             ->take(3)
             ->values();
+
         $queryPersonalesMensual = Personal::with([
             'persona',
             'cursoEstudiantes' => function ($q) {
                 $q->select('curso_estudiante.*')
                     ->leftJoin(
                         DB::raw('(
-                            SELECT id_curso_estudiante, MIN(fecha_pagada) as fecha_primer_pago
-                            FROM pagos_estudiante
-                            WHERE fecha_pagada IS NOT NULL
-                            GROUP BY id_curso_estudiante
-                        ) as primer_pago'),
+                        SELECT id_curso_estudiante, MIN(fecha_pagada) as fecha_primer_pago
+                        FROM pagos_estudiante
+                        WHERE fecha_pagada IS NOT NULL
+                        GROUP BY id_curso_estudiante
+                    ) as primer_pago'),
                         'primer_pago.id_curso_estudiante',
                         '=',
                         'curso_estudiante.id'
@@ -127,7 +125,6 @@ class DashboardController extends Controller
             ->take(3)
             ->values();
 
-
         return view(
             'dashboard.index',
             compact(
@@ -136,6 +133,55 @@ class DashboardController extends Controller
                 'rankingMensual'
             )
         );
+    }
+
+    public function eventosCalendario()
+    {
+        $eventos = EventoCalendario::all();
+
+        return response()->json(
+            $eventos->map(function ($evento) {
+                return [
+                    'id' => $evento->id,
+                    'title' => $evento->titulo,
+                    'start' => $evento->fecha_inicio,
+                    'end' => $evento->fecha_fin,
+                    'extendedProps' => [
+                        'tipo' => $evento->tipo,
+                        'descripcion' => $evento->descripcion,
+                        'fecha_inicio' => $evento->fecha_inicio,
+                        'fecha_fin' => $evento->fecha_fin,
+                    ],
+                ];
+            })
+        );
+    }
+    public function guardarEvento(Request $request)
+    {
+        $data = $request->validate([
+            'titulo' => 'required|string|max:150',
+            'descripcion' => 'nullable|string',
+            'tipo' => 'required|in:curso,diplomado,evento,webinar,otro',
+            'fecha_inicio' => 'required|date',
+            'fecha_fin' => 'nullable|date|after_or_equal:fecha_inicio',
+        ]);
+
+        $data['id_personal'] = auth()->id();
+
+        $evento = EventoCalendario::create($data);
+
+        return response()->json(['ok' => true, 'evento' => $evento]);
+    }
+
+    private function colorPorTipo(string $tipo): array
+    {
+        return match (strtolower($tipo)) {
+            'diplomado' => ['#8b5cf6', '#7c3aed'],
+            'curso' => ['#1e3a8a', '#1e40af'],
+            'webinar' => ['#CCB463', '#b8a24f'],
+            'evento' => ['#059669', '#047857'],
+            default => ['#6b7280', '#4b5563'],
+        };
     }
 
 

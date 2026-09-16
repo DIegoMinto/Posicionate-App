@@ -102,6 +102,245 @@
 .select-filter{
     @apply text-black bg-white py-1 rounded-xl;
 }
+
+.fc-posicionate {
+    --fc-border-color: #f1f5f9;
+    --fc-button-bg-color: var(--color-brand-green);
+    --fc-button-border-color: var(--color-brand-green);
+    --fc-button-hover-bg-color: rgb(10, 60, 57);
+    --fc-button-hover-border-color: rgb(10, 60, 57);
+    --fc-button-active-bg-color: var(--color-brand-gold);
+    --fc-button-active-border-color: var(--color-brand-gold);
+    --fc-today-bg-color: rgb(204 180 99 / 0.08);
+
+    font-family: var(--font-sans);
+    font-size: 0.9rem;
+}
+
+.fc-posicionate .fc-toolbar-title {
+    font-weight: 800;
+    color: var(--color-brand-green) !important;
+    text-transform: capitalize;
+    font-size: 1.15rem;
+}
+
+.fc-posicionate .fc-button {
+    padding: 0.35rem 0.7rem;
+    font-size: 0.78rem;
+    border-radius: 0.6rem;
+    text-transform: capitalize;
+    border: none !important;
+    box-shadow: none !important;
+}
+
+.fc-posicionate .fc-button:focus,
+.fc-posicionate .fc-button:focus-visible,
+.fc-posicionate .fc-button-primary:focus,
+.fc-posicionate .fc-button-primary:focus-visible {
+    outline: none !important;
+    box-shadow: none !important;
+    border: none !important;
+}
+
+.fc-posicionate .fc-button-primary:not(:disabled).fc-button-active,
+.fc-posicionate .fc-button-primary:not(:disabled):active {
+    background-color: var(--color-brand-gold) !important;
+    border: none !important;
+    outline: none !important;
+    box-shadow: none !important;
+    color: black !important;
+    font-weight: 700;
+}
+
+.fc-posicionate .fc-col-header-cell-cushion {
+    font-size: 0.78rem;
+    text-transform: uppercase;
+    color: var(--color-brand-green);
+    font-weight: 700;
+}
+
+.fc-posicionate .fc-daygrid-day-number {
+    font-size: 0.82rem;
+    color: #4b5563;
+}
+
+/* EVENTOS DEL CALENDARIO */
+
+.fc-posicionate .fc-event,
+.fc-posicionate .fc-daygrid-event,
+.fc-posicionate .fc-h-event {
+    border: none !important;
+    border-radius: 6px !important;
+    padding: 2px 5px;
+    font-size: 0.78rem;
+    cursor: pointer;
+    font-weight: 600;
+    color: #ffffff !important;
+    box-shadow: none !important;
+    opacity: 1 !important;
+    filter: none !important;
+}
+
+/* HOVER SIN CAMBIAR EL COLOR */
+
+.fc-posicionate .fc-event:hover,
+.fc-posicionate .fc-daygrid-event:hover,
+.fc-posicionate .fc-h-event:hover {
+    color: #ffffff !important;
+    opacity: 1 !important;
+    filter: none !important;
+    box-shadow: none !important;
+}
+
+/* CLASE */
+
+.fc-posicionate .fc-event[data-event-type="clase"],
+.fc-posicionate .fc-event[data-event-type="clase"]:hover {
+    background-color: #072E2C !important;
+    border-color: #072E2C !important;
+}
+
+/* EVENTO */
+
+.fc-posicionate .fc-event[data-event-type="evento"],
+.fc-posicionate .fc-event[data-event-type="evento"]:hover {
+    background-color: #9B843F !important;
+    border-color: #9B843F !important;
+}
+
+/* WEBINAR */
+
+.fc-posicionate .fc-event[data-event-type="webinar"],
+.fc-posicionate .fc-event[data-event-type="webinar"]:hover {
+    background-color: #343434 !important;
+    border-color: #343434 !important;
+}
+
+/* CONTENIDO DEL EVENTO */
+
+.fc-posicionate .calendar-event-content,
+.fc-posicionate .calendar-event-title,
+.fc-posicionate .calendar-event-icon {
+    color: #ffffff !important;
+}
+
+.fc-posicionate .calendar-event-content {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    width: 100%;
+    overflow: hidden;
+}
+
+.fc-posicionate .calendar-event-title {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    min-width: 0;
+}
+
+.fc-posicionate .calendar-event-icon {
+    width: 15px !important;
+    height: 15px !important;
+    min-width: 15px !important;
+    flex-shrink: 0 !important;
+    color: #ffffff !important;
+}
+
+/* VISTA AGENDA */
+
+.fc-posicionate .fc-list-event {
+    border: none !important;
+}
+
+.fc-posicionate .fc-list-event td {
+    padding-top: 9px !important;
+    padding-bottom: 9px !important;
+}
+
+/* Dejamos espacio a la izquierda */
+
+.fc-posicionate .fc-list-event-graphic {
+    display: table-cell !important;
+    width: 28px !important;
+    min-width: 28px !important;
+    padding: 0 0 0 14px !important;
+}
+
+.fc-posicionate .fc-list-event-dot {
+    display: none !important;
+}
+
+.fc-posicionate .fc-list-event-title {
+    padding-left: 8px !important;
+    padding-right: 14px !important;
+    font-size: 0.9rem !important;
+    font-weight: 600 !important;
+}
+
+.fc-posicionate .fc-list-event-time {
+    padding-left: 14px !important;
+    padding-right: 14px !important;
+    font-size: 0.85rem !important;
+}
+
+/* Texto de los eventos en agenda */
+
+.fc-posicionate .fc-list-event-title a,
+.fc-posicionate .fc-list-event-title a:hover,
+.fc-posicionate .fc-list-event-title a:focus {
+    color: #ffffff !important;
+    text-decoration: none !important;
+}
+
+/* COLORES DE LA AGENDA */
+
+.fc-posicionate .fc-list-event[data-event-type="clase"] td {
+    background-color: #072E2C !important;
+    color: #ffffff !important;
+}
+
+.fc-posicionate .fc-list-event[data-event-type="evento"] td {
+    background-color: #9B843F !important;
+    color: #ffffff !important;
+}
+
+.fc-posicionate .fc-list-event[data-event-type="webinar"] td {
+    background-color: #343434 !important;
+    color: #ffffff !important;
+}
+
+/* HOVER DE LA AGENDA: MANTIENE EL MISMO COLOR */
+
+.fc-posicionate .fc-list-event[data-event-type="clase"]:hover td {
+    background-color: #072E2C !important;
+    color: #ffffff !important;
+}
+
+.fc-posicionate .fc-list-event[data-event-type="evento"]:hover td {
+    background-color: #9B843F !important;
+    color: #ffffff !important;
+}
+
+.fc-posicionate .fc-list-event[data-event-type="webinar"]:hover td {
+    background-color: #343434 !important;
+    color: #ffffff !important;
+}
+
+/* DÍAS DE LA AGENDA */
+
+.fc-posicionate .fc-list-day-cushion {
+    padding: 9px 14px !important;
+}
+
+.fc-posicionate .fc-list-day-text,
+.fc-posicionate .fc-list-day-side-text {
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--color-brand-green) !important;
+}
+
+
 }
 
 .btn-adduser{

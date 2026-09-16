@@ -93,6 +93,9 @@ Route::middleware(['auth', 'vigente'])->group(function () {
     Route::get('/whatsapp/labels', [WhatsappController::class, 'getLabels']);
     Route::post('/whatsapp/labels/export-excel', [WhatsappController::class, 'exportLabelContactsExcel']);
 
+    //RUTAS CALENDARIO
+    Route::get('/calendario/eventos', [DashboardController::class, 'eventosCalendario'])->name('calendario.eventos');
+
     //RUTAS ESTUDIANTES
 
     Route::get('/estudiantes/change/{id}', [InscripcionController::class, 'change'])->name('students.change');
@@ -190,6 +193,9 @@ Route::middleware(['auth', 'vigente'])->group(function () {
         //RUTAS DE ESTUDIANTES
 
         Route::patch('/estudiantes/{id_estudiante}/estadia', [InscripcionController::class, 'updateEstadia'])->name('students.updateEstadia');
+
+        //RUTAS CALENDARIO
+        Route::post('/calendario/eventos', [DashboardController::class, 'guardarEvento'])->name('calendario.guardarEvento');
 
     });
 
