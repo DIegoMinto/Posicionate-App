@@ -225,18 +225,18 @@
                     </div>
                     <div class="leading-tight">
                         <h2
-                            class="text-sm lg:text-base font-sans font-light truncate max-w-[150px] lg:max-w-none text-white">
+                            class="text-sm lg:text-base font-sans font-bold uppercase truncate max-w-[150px] lg:max-w-none text-white">
                             {{ $usuario->persona->nombre }} {{ $usuario->persona->apellido_p }}
                             {{ $usuario->persona->apellido_m }}
                         </h2>
-                        <p class="text-brand-gold font-bold text-xs lg:text-sm tracking-wide">
+                        <p class="text-brand-gold font-bold text-xs lg:text-sm tracking-wide uppercase">
                             {{ 
-                            $usuario->cargos
+            $usuario->cargos
         ->where('pivot.es_oficial', 1)
         ->first()?->nombre_visible
     ?? $usuario->cargos->first()?->nombre_visible
     ?? 'Sin Cargo' 
-                        }}
+        }}
                         </p>
                     </div>
                 </div>
