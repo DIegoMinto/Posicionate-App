@@ -210,44 +210,46 @@
 
         <div class="bg-brand-green flex-shrink-0 z-10">
             <header
-                class="bg-brand-green p-4 flex justify-between items-center shadow-lg border-2 border-brand-gold m-4 rounded-sm">
-                <div class="flex items-center gap-4">
+                class="bg-brand-green py-1.5 px-4 flex justify-between items-center shadow-md border border-brand-gold mx-4 my-2 rounded-sm">
+                <div class="flex items-center gap-3">
                     <div
-                        class="w-16 h-16 rounded-full border-2 border-brand-gold overflow-hidden bg-gray-200 shadow-md">
+                        class="w-10 h-10 rounded-full border border-brand-gold overflow-hidden bg-gray-200 shadow-sm flex-shrink-0">
                         @if($usuario->persona && $usuario->persona->fotografia)
                             <img src="{{ $usuario->persona->fotografia }}" class="w-full h-full object-cover" alt="Perfil">
                         @else
-                            <div class="flex items-center justify-center h-full text-brand-green font-bold bg-gray-300">
+                            <div
+                                class="flex items-center justify-center h-full text-brand-green font-bold bg-gray-300 text-sm">
                                 {{ substr($usuario->persona->nombre, 0, 1) }}
                             </div>
                         @endif
                     </div>
-                    <div>
+                    <div class="leading-tight">
                         <h2
-                            class="text-base lg:text-xl font-sans font-light truncate max-w-[150px] lg:max-w-none text-white">
+                            class="text-sm lg:text-base font-sans font-light truncate max-w-[150px] lg:max-w-none text-white">
                             {{ $usuario->persona->nombre }} {{ $usuario->persona->apellido_p }}
                             {{ $usuario->persona->apellido_m }}
                         </h2>
-                        <p class="text-brand-gold font-black text-2xl leading-none mt-1 tracking-wider">
+                        <p class="text-brand-gold font-bold text-xs lg:text-sm tracking-wide">
                             {{ 
-                                $usuario->cargos
+                            $usuario->cargos
         ->where('pivot.es_oficial', 1)
         ->first()?->nombre_visible
     ?? $usuario->cargos->first()?->nombre_visible
     ?? 'Sin Cargo' 
-                            }}
+                        }}
                         </p>
                     </div>
                 </div>
-                <div class="flex items-center gap-4">
-                    <div class="text-white text-s font-sans font-light">{{ $usuario->codigo_personal }}</div>
+                <div class="flex items-center gap-3">
+                    <div class="text-white text-xs font-sans font-light">{{ $usuario->codigo_personal }}</div>
                     <a href="{{ route('users.show', $usuario->id_personal) }}"
-                        class="btn-gold inline-flex items-center justify-center">
+                        class="btn-gold inline-flex items-center justify-center text-xs py-1 px-3">
                         Ver mi perfil
                     </a>
                 </div>
             </header>
         </div>
+
         <div class="flex-1 overflow-auto">
             {{ $slot }}
         </div>
