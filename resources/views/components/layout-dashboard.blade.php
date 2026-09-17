@@ -224,12 +224,11 @@
                         @endif
                     </div>
                     <div class="leading-tight">
-                        <h2
-                            class="text-sm lg:text-base font-sans font-bold uppercase truncate max-w-[150px] lg:max-w-none text-white">
+                        <h2 class="btn-header-user truncate max-w-[150px] lg:max-w-none">
                             {{ $usuario->persona->nombre }} {{ $usuario->persona->apellido_p }}
                             {{ $usuario->persona->apellido_m }}
                         </h2>
-                        <p class="text-brand-gold font-bold text-xs lg:text-sm tracking-wide uppercase">
+                        <p class="btn-header-cargo">
                             {{ 
             $usuario->cargos
         ->where('pivot.es_oficial', 1)
