@@ -148,6 +148,7 @@
 
                         </div>
 
+                        {{-- ÚNICO INPUT REAL DE monto_titulacion (el que se envía al backend) --}}
                         <div id="contenedor_titulacion" class="{{ !$plan->tiene_titulacion ? 'hidden' : '' }}">
 
                             <div class="bg-brand-gold/10 p-3 border-l-4 border-brand-gold rounded-r-sm">
@@ -156,8 +157,8 @@
                                     Pago de Titulación
                                 </p>
 
-                                <input type="number" step="0.01" name="monto_titulacion"
-                                    value="{{ $plan->monto_titulacion }}"
+                                <input type="number" step="0.01" id="monto_titulacion" name="monto_titulacion"
+                                    value="{{ $titulacion->monto_cuota ?? $plan->monto_titulacion }}"
                                     class="w-40 bg-transparent border-b border-brand-gold outline-none">
 
                             </div>
@@ -282,7 +283,7 @@
                         @endforeach
 
 
-                        {{-- TITULACIÓN --}}
+                        {{-- TITULACIÓN (solo informativo/preview, NO tiene name, no se envía) --}}
 
                         @if($titulacion)
 
@@ -304,8 +305,8 @@
 
                                     <div class="w-48">
 
-                                        <input type="number" step="0.01" name="monto_titulacion"
-                                            value="{{ $titulacion->monto_cuota }}"
+                                        <input type="number" step="0.01" id="monto_titulacion_preview"
+                                            value="{{ $titulacion->monto_cuota }}" readonly
                                             class="w-full bg-transparent border-b border-brand-gold text-right font-bold outline-none">
 
                                     </div>
@@ -380,6 +381,19 @@
             }
 
         });
+
+        // Sincroniza el input real (Configuración del Plan) con el preview
+        // de la sección "Cuotas Configuradas" (si existe, o sea si ya había titulación guardada)
+        const montoTitulacionReal = document.getElementById('monto_titulacion');
+        const montoTitulacionPreview = document.getElementById('monto_titulacion_preview');
+
+        if (montoTitulacionReal && montoTitulacionPreview) {
+
+            montoTitulacionReal.addEventListener('input', function () {
+                montoTitulacionPreview.value = this.value;
+            });
+
+        }
 
     </script>
 </body>

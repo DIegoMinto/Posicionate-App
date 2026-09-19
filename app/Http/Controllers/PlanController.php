@@ -119,17 +119,21 @@ class PlanController extends Controller
             'usuario'
         ));
     }
+
     public function update(Request $request, $id)
     {
         $plan = PlanesPago::findOrFail($id);
+
+        $tieneTitulacion = $request->has('tiene_titulacion');
 
         $plan->update([
             'nombre' => $request->nombre,
             'precio_base' => $request->precio_base,
             'tipo_plan' => $request->tipo_plan,
             'incluye_matricula' => $request->has('incluye_matricula'),
-            'tiene_titulacion' => $request->has('tiene_titulacion'),
-            'monto_titulacion' => $request->monto_titulacion
+            'tiene_titulacion' => $tieneTitulacion,
+            // Si no tiene titulación, no dejamos basura en la columna
+            'monto_titulacion' => $tieneTitulacion ? $request->monto_titulacion : null,
         ]);
 
         PlanCuotaDetalle::where(
@@ -165,7 +169,7 @@ class PlanController extends Controller
             }
         }
 
-        if ($request->has('tiene_titulacion')) {
+        if ($tieneTitulacion) {
 
             $ultimaCuota = collect($request->cuotas)
                 ->max('nro_cuota');
