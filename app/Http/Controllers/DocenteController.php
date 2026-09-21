@@ -93,7 +93,7 @@ class DocenteController extends Controller
             'emite_factura' => 'required|in:0,1',
             'curriculum' => 'required|file|mimes:pdf',
             'fotocarnet' => 'required|file|mimes:pdf,jpg,jpeg,png',
-            'fotografia' => 'nullable|file|mimes:jpg,jpeg,png',
+            'fotografia' => 'nullable|file|mimetypes:image/jpeg,image/png',
         ], [
             // Mensajes en español, específicos por regla
             'required' => 'Este campo es obligatorio.',
