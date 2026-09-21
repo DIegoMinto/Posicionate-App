@@ -134,24 +134,42 @@ class DocenteController extends Controller
             if ($request->hasFile('curriculum')) {
                 $upload = retry(4, fn() => $cloudinary->uploadApi()->upload(
                     $request->file('curriculum')->getRealPath(),
-                    ['folder' => 'curriculums', 'resource_type' => 'auto', 'public_id' => "CV_$idArchivo", 'access_mode' => 'public']
+                    [
+                        'folder' => 'curriculums',
+                        'resource_type' => 'auto',
+                        'public_id' => "CV_$idArchivo",
+                        'access_mode' => 'public',
+                    ]
                 ), 500);
+
                 $data['curriculum'] = $upload['secure_url'];
             }
 
             if ($request->hasFile('fotocarnet')) {
                 $upload = retry(4, fn() => $cloudinary->uploadApi()->upload(
                     $request->file('fotocarnet')->getRealPath(),
-                    ['folder' => 'carnets', 'resource_type' => 'auto', 'public_id' => "CARNET_$idArchivo", 'access_mode' => 'public']
+                    [
+                        'folder' => 'carnets',
+                        'resource_type' => 'auto',
+                        'public_id' => "CARNET_$idArchivo",
+                        'access_mode' => 'public',
+                    ]
                 ), 500);
+
                 $data['fotocarnet'] = $upload['secure_url'];
             }
 
             if ($request->hasFile('fotografia')) {
                 $upload = retry(4, fn() => $cloudinary->uploadApi()->upload(
                     $request->file('fotografia')->getRealPath(),
-                    ['folder' => 'fotografias', 'public_id' => "FOTO_$idArchivo"]
+                    [
+                        'folder' => 'fotografias',
+                        'resource_type' => 'image',
+                        'public_id' => "FOTO_$idArchivo",
+                        'access_mode' => 'public',
+                    ]
                 ), 500);
+
                 $data['fotografia'] = $upload['secure_url'];
             }
 
