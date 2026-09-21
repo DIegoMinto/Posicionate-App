@@ -68,33 +68,55 @@ class DocenteController extends Controller
 
     public function store(Request $request)
     {
-
         $data = [];
 
-        try {
-            $request->validate([
-                'nombre' => 'required|string|max:100',
-                'apellido_p' => 'required|string|max:100',
-                'ci' => 'required|numeric|unique:docente,ci',
-                'extension_ci' => 'required|string|max:10',
-                'correo_electronico' => 'required|email|unique:docente,correo_electronico',
-                'id_ciudad' => 'required',
-                'id_institucion_egreso' => 'required',
-                'id_grado_academico' => 'required',
-                'id_profesion' => 'required',
-                'id_institucion_bancaria' => 'required',
-                'emite_factura' => 'required',
-                'numero_movil' => 'required|string|max:20',
-                'codigo_pais_movil' => 'required|string|max:5',
-            ]);
+        $validated = $request->validate([
+            'nombre' => 'required|string|max:100',
+            'apellido_p' => 'required|string|max:100',
+            'apellido_m' => 'nullable|string|max:100',
+            'fecha_nacimiento' => 'required|date|before:-18 years',
+            'ci' => 'required|numeric|digits_between:5,10|unique:docente,ci',
+            'extension_ci' => 'required|string|max:10',
+            'correo_electronico' => 'required|email|unique:docente,correo_electronico',
+            'id_pais' => 'required',
+            'id_departamento' => 'required',
+            'id_ciudad' => 'required',
+            'domicilio' => 'nullable|string|max:255',
+            'genero' => 'required|in:M,F',
+            'id_institucion_bancaria' => 'required',
+            'numero_cuenta_bancaria' => 'required|string|max:30',
+            'id_profesion' => 'required',
+            'id_grado_academico' => 'required',
+            'id_institucion_egreso' => 'required',
+            'codigo_pais_movil' => 'required|string|max:5',
+            'numero_movil' => 'required|numeric|digits_between:6,15',
+            'emite_factura' => 'required|in:0,1',
+            'curriculum' => 'required|file|mimes:pdf',
+            'fotocarnet' => 'required|file|mimes:pdf,jpg,jpeg,png',
+            'fotografia' => 'nullable|image|mimes:jpg,jpeg,png',
+        ], [
+            // Mensajes en español, específicos por regla
+            'required' => 'Este campo es obligatorio.',
+            'nombre.required' => 'Ingresa tu nombre.',
+            'apellido_p.required' => 'Ingresa tu primer apellido.',
+            'fecha_nacimiento.before' => 'Debes tener al menos 18 años.',
+            'ci.numeric' => 'El carnet debe contener solo números.',
+            'ci.unique' => 'Este número de carnet ya está registrado.',
+            'ci.digits_between' => 'El carnet debe tener entre 5 y 10 dígitos.',
+            'correo_electronico.email' => 'Escribe un correo electrónico válido.',
+            'correo_electronico.unique' => 'Este correo ya está registrado.',
+            'numero_movil.numeric' => 'El número de celular debe contener solo dígitos.',
+            'curriculum.required' => 'Debes adjuntar tu Curriculum Vitae en PDF.',
+            'curriculum.mimes' => 'El Curriculum debe ser un archivo PDF.',
+            'fotocarnet.required' => 'Debes adjuntar una foto o PDF de tu carnet.',
+            'fotocarnet.mimes' => 'El carnet debe ser PDF, JPG o PNG.',
+            'fotografia.image' => 'La fotografía debe ser JPG o PNG.',
+        ]);
 
-            // El campo extension_ci ya viene con el valor final desde el formulario
-            // (el JS alterna el "name" entre el <select> y el <input> de "OTRO",
-            // pero ambos usan siempre extension_ci).
+        try {
             $extensionFinal = strtoupper(trim($request->extension_ci));
 
             $data = $request->except(['_token', 'id_pais', 'id_departamento', 'codigo_pais_movil', 'numero_movil']);
-
             $data['extension_ci'] = $extensionFinal;
             $data['telefono_movil'] = trim($request->codigo_pais_movil . ' ' . $request->numero_movil);
             $data['emite_factura'] = ($request->emite_factura == '1') ? 'SI' : 'NO';
@@ -110,45 +132,26 @@ class DocenteController extends Controller
             ]);
 
             if ($request->hasFile('curriculum')) {
-                $upload = retry(4, function () use ($cloudinary, $request, $idArchivo) {
-                    return $cloudinary->uploadApi()->upload(
-                        $request->file('curriculum')->getRealPath(),
-                        [
-                            'folder' => 'curriculums',
-                            'resource_type' => 'auto',
-                            'public_id' => "CV_$idArchivo",
-                            'access_mode' => 'public'
-                        ]
-                    );
-                }, 500);
+                $upload = retry(4, fn() => $cloudinary->uploadApi()->upload(
+                    $request->file('curriculum')->getRealPath(),
+                    ['folder' => 'curriculums', 'resource_type' => 'auto', 'public_id' => "CV_$idArchivo", 'access_mode' => 'public']
+                ), 500);
                 $data['curriculum'] = $upload['secure_url'];
             }
 
             if ($request->hasFile('fotocarnet')) {
-                $upload = retry(4, function () use ($cloudinary, $request, $idArchivo) {
-                    return $cloudinary->uploadApi()->upload(
-                        $request->file('fotocarnet')->getRealPath(),
-                        [
-                            'folder' => 'carnets',
-                            'resource_type' => 'auto',
-                            'public_id' => "CARNET_$idArchivo",
-                            'access_mode' => 'public'
-                        ]
-                    );
-                }, 500);
+                $upload = retry(4, fn() => $cloudinary->uploadApi()->upload(
+                    $request->file('fotocarnet')->getRealPath(),
+                    ['folder' => 'carnets', 'resource_type' => 'auto', 'public_id' => "CARNET_$idArchivo", 'access_mode' => 'public']
+                ), 500);
                 $data['fotocarnet'] = $upload['secure_url'];
             }
 
             if ($request->hasFile('fotografia')) {
-                $upload = retry(4, function () use ($cloudinary, $request, $idArchivo) {
-                    return $cloudinary->uploadApi()->upload(
-                        $request->file('fotografia')->getRealPath(),
-                        [
-                            'folder' => 'fotografias',
-                            'public_id' => "FOTO_$idArchivo"
-                        ]
-                    );
-                }, 500);
+                $upload = retry(4, fn() => $cloudinary->uploadApi()->upload(
+                    $request->file('fotografia')->getRealPath(),
+                    ['folder' => 'fotografias', 'public_id' => "FOTO_$idArchivo"]
+                ), 500);
                 $data['fotografia'] = $upload['secure_url'];
             }
 

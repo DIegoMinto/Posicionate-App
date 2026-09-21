@@ -57,6 +57,7 @@
             <form action="{{ route('docentes.store') }}" method="POST" enctype="multipart/form-data" class="space-y-12">
                 @csrf
 
+                {{-- ==================== SECCIÓN 1: DATOS PERSONALES ==================== --}}
                 <div class="space-y-6">
                     <div class="flex items-center space-x-3 rounded-lg p-3">
                         <div class="w-1 h-6 bg-brand-gold rounded"></div>
@@ -67,163 +68,234 @@
 
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                         <div>
-                            <label class="form-label-bold text-brand-green uppercase">Nombre</label>
-                            <input type="text" name="nombre" class="form-input-pill border-brand-green border">
+                            <label class="form-label-bold text-brand-green uppercase">
+                                Nombre <span class="text-red-500">*</span>
+                            </label>
+                            <input type="text" name="nombre" value="{{ old('nombre') }}" required
+                                class="form-input-pill border-brand-green border @error('nombre') border-red-500 @enderror">
+                            @error('nombre')
+                                <p class="text-red-600 text-xs font-bold mt-1">{{ $message }}</p>
+                            @enderror
                         </div>
                         <div>
-                            <label class="form-label-bold text-brand-green uppercase">Primer
-                                Apellido</label>
-                            <input type="text" name="apellido_p" class="form-input-pill border-brand-green border">
+                            <label class="form-label-bold text-brand-green uppercase">
+                                Primer Apellido <span class="text-red-500">*</span>
+                            </label>
+                            <input type="text" name="apellido_p" value="{{ old('apellido_p') }}" required
+                                class="form-input-pill border-brand-green border @error('apellido_p') border-red-500 @enderror">
+                            @error('apellido_p')
+                                <p class="text-red-600 text-xs font-bold mt-1">{{ $message }}</p>
+                            @enderror
                         </div>
                         <div>
-                            <label class="form-label-bold text-brand-green uppercase">Segundo
-                                Apellido</label>
-                            <input type="text" name="apellido_m" class="form-input-pill border-brand-green border">
+                            <label class="form-label-bold text-brand-green uppercase">Segundo Apellido</label>
+                            <input type="text" name="apellido_m" value="{{ old('apellido_m') }}"
+                                class="form-input-pill border-brand-green border @error('apellido_m') border-red-500 @enderror">
+                            @error('apellido_m')
+                                <p class="text-red-600 text-xs font-bold mt-1">{{ $message }}</p>
+                            @enderror
                         </div>
                     </div>
 
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                         <div>
-                            <label class="form-label-bold text-brand-green uppercase">Fecha
-                                de Nacimiento</label>
-                            <input type="date" name="fecha_nacimiento"
-                                class="form-input-pill border-brand-green border">
+                            <label class="form-label-bold text-brand-green uppercase">
+                                Fecha de Nacimiento <span class="text-red-500">*</span>
+                            </label>
+                            <input type="date" name="fecha_nacimiento" value="{{ old('fecha_nacimiento') }}" required
+                                class="form-input-pill border-brand-green border @error('fecha_nacimiento') border-red-500 @enderror">
+                            @error('fecha_nacimiento')
+                                <p class="text-red-600 text-xs font-bold mt-1">{{ $message }}</p>
+                            @enderror
                         </div>
                         <div>
-                            <label class="form-label-bold text-brand-green uppercase">Carnet
-                                de Identidad</label>
-                            <input type="text" name="ci" class="form-input-pill border-brand-green border">
+                            <label class="form-label-bold text-brand-green uppercase">
+                                Carnet de Identidad <span class="text-red-500">*</span>
+                            </label>
+                            <input type="text" name="ci" value="{{ old('ci') }}" required inputmode="numeric"
+                                class="form-input-pill border-brand-green border @error('ci') border-red-500 @enderror">
+                            @error('ci')
+                                <p class="text-red-600 text-xs font-bold mt-1">{{ $message }}</p>
+                            @enderror
                         </div>
                         <div>
-                            <label class="form-label-bold text-brand-green uppercase">Extensión
-                                del Carnet</label>
+                            <label class="form-label-bold text-brand-green uppercase">
+                                Extensión del Carnet <span class="text-red-500">*</span>
+                            </label>
                             <div class="flex flex-col gap-2">
                                 <select id="select-extension" name="extension_ci"
-                                    class="form-select-pill border-brand-green border">
-                                    <option value="" selected disabled>Seleccione extensión</option>
-                                    <option value="LP">LP</option>
-                                    <option value="SC">SC</option>
-                                    <option value="CB">CB</option>
-                                    <option value="CH">CH</option>
-                                    <option value="OR">OR</option>
-                                    <option value="PT">PT</option>
-                                    <option value="TJ">TJ</option>
-                                    <option value="BE">BE</option>
-                                    <option value="PD">PD</option>
+                                    class="form-select-pill border-brand-green border @error('extension_ci') border-red-500 @enderror">
+                                    <option value="" disabled {{ old('extension_ci') ? '' : 'selected' }}>Seleccione extensión</option>
+                                    @foreach(['LP', 'SC', 'CB', 'CH', 'OR', 'PT', 'TJ', 'BE', 'PD'] as $ext)
+                                        <option value="{{ $ext }}" {{ old('extension_ci') === $ext ? 'selected' : '' }}>{{ $ext }}</option>
+                                    @endforeach
                                     <option value="OTRO">OTRO (Escribir...)</option>
                                 </select>
                                 <input type="text" id="input-extension-otro"
                                     class="hidden form-input-pill border-brand-green border"
                                     placeholder="Escriba la extensión (ej: EXT)">
                             </div>
+                            @error('extension_ci')
+                                <p class="text-red-600 text-xs font-bold mt-1">{{ $message }}</p>
+                            @enderror
                         </div>
                     </div>
 
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                         <div>
-                            <label class="form-label-bold text-brand-green uppercase">País de
-                                Residencia</label>
-                            <select name="id_pais" id="select-pais" class="form-select-pill border-brand-green border">
+                            <label class="form-label-bold text-brand-green uppercase">
+                                País de Residencia <span class="text-red-500">*</span>
+                            </label>
+                            <select name="id_pais" id="select-pais"
+                                class="form-select-pill border-brand-green border @error('id_pais') border-red-500 @enderror">
                                 <option value="">Seleccione País</option>
                                 @foreach($paises as $pais)
-                                    <option value="{{ $pais->id_pais }}">{{ $pais->nombre }}</option>
+                                    <option value="{{ $pais->id_pais }}" {{ old('id_pais') == $pais->id_pais ? 'selected' : '' }}>
+                                        {{ $pais->nombre }}
+                                    </option>
                                 @endforeach
                             </select>
+                            @error('id_pais')
+                                <p class="text-red-600 text-xs font-bold mt-1">{{ $message }}</p>
+                            @enderror
                         </div>
                         <div>
-                            <label class="form-label-bold text-brand-green uppercase">Departamento
-                                de Residencia</label>
+                            <label class="form-label-bold text-brand-green uppercase">
+                                Departamento de Residencia <span class="text-red-500">*</span>
+                            </label>
                             <select name="id_departamento" id="select-departamento"
-                                class="form-select-pill border-brand-green border">
+                                class="form-select-pill border-brand-green border @error('id_departamento') border-red-500 @enderror">
                                 <option value="">Seleccione un país primero</option>
                             </select>
+                            @error('id_departamento')
+                                <p class="text-red-600 text-xs font-bold mt-1">{{ $message }}</p>
+                            @enderror
                         </div>
                         <div>
-                            <label class="form-label-bold text-brand-green uppercase">Ciudad
-                                de Residencia</label>
+                            <label class="form-label-bold text-brand-green uppercase">
+                                Ciudad de Residencia <span class="text-red-500">*</span>
+                            </label>
                             <select name="id_ciudad" id="select-ciudad"
-                                class="form-select-pill border-brand-green border">
+                                class="form-select-pill border-brand-green border @error('id_ciudad') border-red-500 @enderror">
                                 <option value="">Seleccione un depto primero</option>
                             </select>
+                            @error('id_ciudad')
+                                <p class="text-red-600 text-xs font-bold mt-1">{{ $message }}</p>
+                            @enderror
                         </div>
                     </div>
 
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div>
                             <label class="form-label-bold text-brand-green uppercase">Domicilio</label>
-                            <input type="text" name="domicilio" class="form-input-pill border-brand-green border"
+                            <input type="text" name="domicilio" value="{{ old('domicilio') }}"
+                                class="form-input-pill border-brand-green border @error('domicilio') border-red-500 @enderror"
                                 placeholder="Calle, número, zona">
+                            @error('domicilio')
+                                <p class="text-red-600 text-xs font-bold mt-1">{{ $message }}</p>
+                            @enderror
                         </div>
                     </div>
 
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-6 pt-2">
 
                         <div
-                            class="bg-slate-50 p-5 rounded-xl border-2 border-slate-300 hover:border-brand-green transition-all shadow-sm">
-                            <label class="form-label-bold text-brand-green uppercase">Curriculum
-                                Vitae (Documentado)</label>
+                            class="bg-slate-50 p-5 rounded-xl border-2 {{ $errors->has('curriculum') ? 'border-red-500' : 'border-slate-300' }} hover:border-brand-green transition-all shadow-sm">
+                            <label class="form-label-bold text-brand-green uppercase">
+                                Curriculum Vitae (Documentado) <span class="text-red-500">*</span>
+                            </label>
                             <p class="text-[11px] font-bold text-slate-500 mb-3">Requerido: Formato PDF</p>
-                            <input type="file" name="curriculum" class="form-input-pill border-brand-green border">
+                            <input type="file" name="curriculum" accept=".pdf" required
+                                class="form-input-pill border-brand-green border">
+                            @error('curriculum')
+                                <p class="text-red-600 text-xs font-bold mt-1">{{ $message }}</p>
+                            @enderror
                         </div>
 
                         <div
-                            class="bg-slate-50 p-5 rounded-xl border-2 border-slate-300 hover:border-brand-green transition-all shadow-sm">
-                            <label class="form-label-bold text-brand-green uppercase">Carnet
-                                de Identidad</label>
-                            <p class="text-[11px] font-bold text-slate-500 mb-3">Requerido: Formato PDF</p>
-                            <input type="file" name="fotocarnet" class="form-input-pill border-brand-green border">
+                            class="bg-slate-50 p-5 rounded-xl border-2 {{ $errors->has('fotocarnet') ? 'border-red-500' : 'border-slate-300' }} hover:border-brand-green transition-all shadow-sm">
+                            <label class="form-label-bold text-brand-green uppercase">
+                                Carnet de Identidad <span class="text-red-500">*</span>
+                            </label>
+                            <p class="text-[11px] font-bold text-slate-500 mb-3">Requerido: PDF, JPG o PNG</p>
+                            <input type="file" name="fotocarnet" accept=".pdf,.jpg,.jpeg,.png" required
+                                class="form-input-pill border-brand-green border">
+                            @error('fotocarnet')
+                                <p class="text-red-600 text-xs font-bold mt-1">{{ $message }}</p>
+                            @enderror
                         </div>
 
                         <div
-                            class="bg-slate-50 p-5 rounded-xl border-2 border-slate-300 hover:border-brand-green transition-all shadow-sm">
-                            <label class="form-label-bold text-brand-green uppercase">Fotografía
-                                de Perfil</label>
+                            class="bg-slate-50 p-5 rounded-xl border-2 {{ $errors->has('fotografia') ? 'border-red-500' : 'border-slate-300' }} hover:border-brand-green transition-all shadow-sm">
+                            <label class="form-label-bold text-brand-green uppercase">Fotografía de Perfil</label>
                             <p class="text-[11px] font-bold text-slate-500 mb-3">Formatos: JPG o PNG</p>
-                            <input type="file" name="fotografia" class="form-input-pill border-brand-green border">
+                            <input type="file" name="fotografia" accept=".jpg,.jpeg,.png"
+                                class="form-input-pill border-brand-green border">
+                            @error('fotografia')
+                                <p class="text-red-600 text-xs font-bold mt-1">{{ $message }}</p>
+                            @enderror
                         </div>
 
                     </div>
 
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-6 pt-2">
                         <div>
-                            <label class="form-label-bold text-brand-green uppercase">Género</label>
+                            <label class="form-label-bold text-brand-green uppercase">
+                                Género <span class="text-red-500">*</span>
+                            </label>
                             <div class="flex gap-6 mt-1 text-slate-900">
                                 <label
                                     class="flex items-center gap-2.5 cursor-pointer group text-sm font-bold bg-slate-50 px-4 py-2.5 rounded-lg border border-brand-green w-1/2 justify-center transition-all">
-                                    <input type="radio" name="genero" value="M" class="w-4 h-4 accent-brand-green">
+                                    <input type="radio" name="genero" value="M" class="w-4 h-4 accent-brand-green"
+                                        {{ old('genero') === 'M' ? 'checked' : '' }}>
                                     <span>Masculino</span>
                                 </label>
                                 <label
                                     class="flex items-center gap-2.5 cursor-pointer group text-sm font-bold bg-slate-50 px-4 py-2.5 rounded-lg border border-brand-green w-1/2 justify-center transition-all">
-                                    <input type="radio" name="genero" value="F" class="w-4 h-4 accent-brand-green">
+                                    <input type="radio" name="genero" value="F" class="w-4 h-4 accent-brand-green"
+                                        {{ old('genero') === 'F' ? 'checked' : '' }}>
                                     <span>Femenino</span>
                                 </label>
                             </div>
+                            @error('genero')
+                                <p class="text-red-600 text-xs font-bold mt-1">{{ $message }}</p>
+                            @enderror
                         </div>
 
                         <div>
-                            <label class="form-label-bold text-brand-green uppercase">Entidad
-                                Bancaria</label>
+                            <label class="form-label-bold text-brand-green uppercase">
+                                Entidad Bancaria <span class="text-red-500">*</span>
+                            </label>
                             <select name="id_institucion_bancaria" id="select-banco"
-                                class="form-select-pill border-brand-green border">
+                                class="form-select-pill border-brand-green border @error('id_institucion_bancaria') border-red-500 @enderror">
                                 <option value="">Seleccione banco</option>
                                 @foreach($bancos as $banco)
-                                    <option value="{{ $banco->id_institucion_bancaria }}">
+                                    <option value="{{ $banco->id_institucion_bancaria }}" {{ old('id_institucion_bancaria') == $banco->id_institucion_bancaria ? 'selected' : '' }}>
                                         {{ $banco->nombre }}
                                     </option>
                                 @endforeach
                             </select>
+                            @error('id_institucion_bancaria')
+                                <p class="text-red-600 text-xs font-bold mt-1">{{ $message }}</p>
+                            @enderror
                         </div>
 
                         <div>
-                            <label class="form-label-bold text-brand-green uppercase">Número
-                                de Cuenta</label>
-                            <input type="text" name="numero_cuenta_bancaria"
-                                class="form-input-pill border-brand-green border" placeholder="1234567890">
+                            <label class="form-label-bold text-brand-green uppercase">
+                                Número de Cuenta <span class="text-red-500">*</span>
+                            </label>
+                            <input type="text" name="numero_cuenta_bancaria" value="{{ old('numero_cuenta_bancaria') }}"
+                                required
+                                class="form-input-pill border-brand-green border @error('numero_cuenta_bancaria') border-red-500 @enderror"
+                                placeholder="1234567890">
+                            @error('numero_cuenta_bancaria')
+                                <p class="text-red-600 text-xs font-bold mt-1">{{ $message }}</p>
+                            @enderror
                         </div>
                     </div>
                 </div>
 
+                {{-- ==================== SECCIÓN 2: FORMACIÓN ACADÉMICA ==================== --}}
                 <div class="space-y-6">
                     <div class="flex items-center space-x-3 rounded-lg p-3">
                         <div class="w-1 h-6 bg-brand-gold rounded"></div>
@@ -234,43 +306,62 @@
 
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                         <div>
-                            <label class="form-label-bold text-brand-green uppercase">Profesión
-                                / Ocupación</label>
+                            <label class="form-label-bold text-brand-green uppercase">
+                                Profesión / Ocupación <span class="text-red-500">*</span>
+                            </label>
                             <select name="id_profesion" id="select-profesion"
-                                class="form-select-pill border-brand-green border">
+                                class="form-select-pill border-brand-green border @error('id_profesion') border-red-500 @enderror">
                                 <option value="">Seleccione Profesión</option>
                                 @foreach($profesiones as $prof)
-                                    <option value="{{ $prof->id_profesion }}">{{ $prof->nombre }}</option>
+                                    <option value="{{ $prof->id_profesion }}" {{ old('id_profesion') == $prof->id_profesion ? 'selected' : '' }}>
+                                        {{ $prof->nombre }}
+                                    </option>
                                 @endforeach
                             </select>
+                            @error('id_profesion')
+                                <p class="text-red-600 text-xs font-bold mt-1">{{ $message }}</p>
+                            @enderror
                         </div>
 
                         <div>
-                            <label class="form-label-bold text-brand-green uppercase">Grado
-                                Académico</label>
+                            <label class="form-label-bold text-brand-green uppercase">
+                                Grado Académico <span class="text-red-500">*</span>
+                            </label>
                             <select name="id_grado_academico" id="select-grado"
-                                class="form-select-pill border-brand-green border">
+                                class="form-select-pill border-brand-green border @error('id_grado_academico') border-red-500 @enderror">
                                 <option value="">Seleccione Grado</option>
                                 @foreach($grados as $grado)
-                                    <option value="{{ $grado->id_grado_academico }}">{{ $grado->nombre }}</option>
+                                    <option value="{{ $grado->id_grado_academico }}" {{ old('id_grado_academico') == $grado->id_grado_academico ? 'selected' : '' }}>
+                                        {{ $grado->nombre }}
+                                    </option>
                                 @endforeach
                             </select>
+                            @error('id_grado_academico')
+                                <p class="text-red-600 text-xs font-bold mt-1">{{ $message }}</p>
+                            @enderror
                         </div>
 
                         <div>
-                            <label class="form-label-bold text-brand-green uppercase">Institución
-                                de Egreso</label>
+                            <label class="form-label-bold text-brand-green uppercase">
+                                Institución de Egreso <span class="text-red-500">*</span>
+                            </label>
                             <select name="id_institucion_egreso" id="select-institucion"
-                                class="form-select-pill border-brand-green border">
+                                class="form-select-pill border-brand-green border @error('id_institucion_egreso') border-red-500 @enderror">
                                 <option value="">Seleccione Institución</option>
                                 @foreach($instituciones as $inst)
-                                    <option value="{{ $inst->id_institucion_egreso }}">{{ $inst->nombre }}</option>
+                                    <option value="{{ $inst->id_institucion_egreso }}" {{ old('id_institucion_egreso') == $inst->id_institucion_egreso ? 'selected' : '' }}>
+                                        {{ $inst->nombre }}
+                                    </option>
                                 @endforeach
                             </select>
+                            @error('id_institucion_egreso')
+                                <p class="text-red-600 text-xs font-bold mt-1">{{ $message }}</p>
+                            @enderror
                         </div>
                     </div>
                 </div>
 
+                {{-- ==================== SECCIÓN 3: CONTACTO Y ADICIONALES ==================== --}}
                 <div class="space-y-6">
                     <div class="flex items-center space-x-3 rounded-lg p-3">
                         <div class="w-1 h-6 bg-brand-gold rounded"></div>
@@ -281,28 +372,41 @@
 
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                         <div>
-                            <label class="form-label-bold text-brand-green uppercase">Teléfono
-                                Móvil</label>
+                            <label class="form-label-bold text-brand-green uppercase">
+                                Teléfono Móvil <span class="text-red-500">*</span>
+                            </label>
                             <div class="flex gap-2">
                                 <select id="select-codigo-manual" name="codigo_pais_movil"
-                                    class="form-select-pill border-brand-green border w-1/2 text-center px-1">
-                                    <option value="+591">🇧🇴 +591</option>
-                                    <option value="+54">🇦🇷 +54</option>
-                                    <option value="+56">🇨🇱 +56</option>
-                                    <option value="+51">🇵🇪 +51</option>
-                                    <option value="+57">🇨🇴 +57</option>
-                                    <option value="+1">🇺🇸 +1</option>
-                                    <option value="+34">🇪🇸 +34</option>
+                                    class="form-select-pill border-brand-green border w-1/2 text-center px-1 @error('codigo_pais_movil') border-red-500 @enderror">
+                                    @foreach(['+591' => '🇧🇴', '+54' => '🇦🇷', '+56' => '🇨🇱', '+51' => '🇵🇪', '+57' => '🇨🇴', '+1' => '🇺🇸', '+34' => '🇪🇸'] as $codigo => $bandera)
+                                        <option value="{{ $codigo }}" {{ old('codigo_pais_movil', '+591') === $codigo ? 'selected' : '' }}>
+                                            {{ $bandera }} {{ $codigo }}
+                                        </option>
+                                    @endforeach
                                 </select>
                                 <input type="text" id="input-numero-movil" name="numero_movil"
-                                    class="form-input-pill border-brand-green border w-2/3" placeholder="70000000">
+                                    value="{{ old('numero_movil') }}" required inputmode="numeric"
+                                    class="form-input-pill border-brand-green border w-2/3 @error('numero_movil') border-red-500 @enderror"
+                                    placeholder="70000000">
                             </div>
+                            @error('codigo_pais_movil')
+                                <p class="text-red-600 text-xs font-bold mt-1">{{ $message }}</p>
+                            @enderror
+                            @error('numero_movil')
+                                <p class="text-red-600 text-xs font-bold mt-1">{{ $message }}</p>
+                            @enderror
                         </div>
                         <div>
-                            <label class="form-label-bold text-brand-green uppercase">Correo
-                                Electrónico</label>
-                            <input type="email" name="correo_electronico"
-                                class="form-input-pill border-brand-green border" placeholder="correo@ejemplo.com">
+                            <label class="form-label-bold text-brand-green uppercase">
+                                Correo Electrónico <span class="text-red-500">*</span>
+                            </label>
+                            <input type="email" name="correo_electronico" value="{{ old('correo_electronico') }}"
+                                required
+                                class="form-input-pill border-brand-green border @error('correo_electronico') border-red-500 @enderror"
+                                placeholder="correo@ejemplo.com">
+                            @error('correo_electronico')
+                                <p class="text-red-600 text-xs font-bold mt-1">{{ $message }}</p>
+                            @enderror
                         </div>
                     </div>
 
@@ -312,7 +416,10 @@
                                 gustaría impartir o impartió</label>
                             <textarea name="programas_dar"
                                 class="w-full px-4 py-3 rounded-lg border border-brand-green focus:border-brand-green focus:ring-4 focus:ring-brand-green/10 outline-none transition duration-200 bg-slate-50 text-slate-900 font-medium h-28 resize-none"
-                                placeholder="Mencione los programas"></textarea>
+                                placeholder="Mencione los programas">{{ old('programas_dar') }}</textarea>
+                            @error('programas_dar')
+                                <p class="text-red-600 text-xs font-bold mt-1">{{ $message }}</p>
+                            @enderror
                         </div>
                         <div class="flex flex-col justify-center">
                             <label class="form-label-bold text-brand-green uppercase mb-3">¿Emite Factura?</label>
@@ -320,19 +427,28 @@
                                 <label
                                     class="flex-1 flex items-center justify-center gap-3 p-3 rounded-lg border border-brand-green bg-slate-50 cursor-pointer">
                                     <input type="radio" name="emite_factura" value="1"
-                                        class="w-5 h-5 accent-brand-green">
+                                        class="w-5 h-5 accent-brand-green" {{ old('emite_factura', '0') === '1' ? 'checked' : '' }}>
                                     <span class="text-brand-green font-bold">SÍ</span>
                                 </label>
                                 <label
                                     class="flex-1 flex items-center justify-center gap-3 p-3 rounded-lg border border-brand-green bg-slate-50 cursor-pointer">
                                     <input type="radio" name="emite_factura" value="0"
-                                        class="w-5 h-5 accent-brand-green" checked>
+                                        class="w-5 h-5 accent-brand-green" {{ old('emite_factura', '0') === '0' ? 'checked' : '' }}>
                                     <span class="text-brand-green font-bold">NO</span>
                                 </label>
                             </div>
+                            @error('emite_factura')
+                                <p class="text-red-600 text-xs font-bold mt-1">{{ $message }}</p>
+                            @enderror
                         </div>
                     </div>
                 </div>
+
+                @error('error')
+                    <div class="p-4 bg-red-50 border border-red-400 rounded-xl text-red-700 text-sm font-bold text-center">
+                        {{ $message }}
+                    </div>
+                @enderror
 
                 <div class="flex justify-center pt-6 pb-4">
                     <button type="submit" class="btn-gold">
@@ -355,20 +471,6 @@
             const extensionOtroInput = document.getElementById('input-extension-otro');
             const codigoManual = document.getElementById('select-codigo-manual');
             const numeroMovilInput = document.getElementById('input-numero-movil');
-            const telefonoHidden = document.getElementById('telefono_movil_hidden');
-
-            const actualizarTelefonoCompleto = () => {
-                const codigo = codigoManual.value;
-                const numero = numeroMovilInput.value.trim();
-                if (numero !== "") {
-                    telefonoHidden.value = `${codigo} ${numero}`;
-                } else {
-                    telefonoHidden.value = "";
-                }
-            };
-
-            codigoManual.addEventListener('change', actualizarTelefonoCompleto);
-            numeroMovilInput.addEventListener('input', actualizarTelefonoCompleto);
 
             extensionSelect.addEventListener('change', function () {
                 if (this.value === 'OTRO') {
@@ -388,7 +490,6 @@
             paisSelect.addEventListener('change', async (e) => {
                 const paisId = e.target.value;
 
-                // Limpiar selects dependientes
                 deptoSelect.innerHTML = '<option value="">Seleccione Departamento</option>';
                 ciudadSelect.innerHTML = '<option value="">Seleccione un depto primero</option>';
 
@@ -400,7 +501,6 @@
                 deptoSelect.innerHTML = '<option value="">Cargando departamentos...</option>';
 
                 try {
-                    // Obtener departamentos desde la API
                     const response = await fetch(`/api/paises/${paisId}/departamentos`);
                     const departamentos = await response.json();
 
@@ -433,7 +533,6 @@
                 ciudadSelect.innerHTML = '<option value="">Cargando ciudades...</option>';
 
                 try {
-                    // Obtener ciudades desde la API
                     const response = await fetch(`/api/departamentos/${deptoId}/ciudades`);
                     const ciudades = await response.json();
 
@@ -451,34 +550,16 @@
                     ciudadSelect.innerHTML = '<option value="">Error al cargar ciudades</option>';
                 }
             });
-
-            actualizarTelefonoCompleto();
         });
 
         // Inicializar Select2
         $(document).ready(function () {
-            $('#select-profesion').select2({
-                placeholder: "Seleccione Profesión",
-                allowClear: true,
-                width: '100%'
-            });
-
-            $('#select-grado').select2({
-                placeholder: "Seleccione Grado",
-                allowClear: true,
-                width: '100%'
-            });
-
-            $('#select-institucion').select2({
-                placeholder: "Seleccione Institución",
-                allowClear: true,
-                width: '100%'
-            });
-
-            $('#select-banco').select2({
-                placeholder: "Seleccione banco",
-                allowClear: true,
-                width: '100%'
+            $('#select-profesion, #select-grado, #select-institucion, #select-banco').each(function () {
+                $(this).select2({
+                    placeholder: $(this).find('option:first').text(),
+                    allowClear: true,
+                    width: '100%'
+                });
             });
         });
     </script>
