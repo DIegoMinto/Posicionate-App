@@ -44,23 +44,51 @@
     <h1>Lista de Estudiantes {{ isset($curso) ? '- ' . $curso->nombre : '' }}</h1>
     <p>Generado: {{ now()->format('d/m/Y H:i') }}</p>
 
+    @php
+        $columnas = $columnas ?? [
+            'ci',
+            'extension_ci',
+            'nombre',
+            'apellido_p',
+            'apellido_m',
+            'telefono',
+            'correo',
+            'asesor',
+            'fecha',
+            'estado',
+            'estadia'
+        ];
+    @endphp
+
     <table>
         <thead>
             <tr>
                 <th>N°</th>
                 @if(!isset($curso))
-                <th>Curso</th>@endif
-                <th>CI</th>
-                <th>Ext</th>
-                <th>Nombre</th>
-                <th>Ap. Paterno</th>
-                <th>Ap. Materno</th>
-                <th>Teléfono</th>
-                <th>Correo</th>
-                <th>Asesor</th>
-                <th>Fecha Registro</th>
-                <th>Estado</th>
-                <th>Estadía</th>
+                    <th>Curso</th>
+                @endif
+                @if(in_array('ci', $columnas))
+                <th>CI</th> @endif
+                @if(in_array('extension_ci', $columnas))
+                <th>Ext</th> @endif
+                @if(in_array('nombre', $columnas))
+                <th>Nombre</th> @endif
+                @if(in_array('apellido_p', $columnas))
+                <th>Ap. Paterno</th> @endif
+                @if(in_array('apellido_m', $columnas))
+                <th>Ap. Materno</th> @endif
+                @if(in_array('telefono', $columnas))
+                <th>Teléfono</th> @endif
+                @if(in_array('correo', $columnas))
+                <th>Correo</th> @endif
+                @if(in_array('asesor', $columnas))
+                <th>Asesor</th> @endif
+                @if(in_array('fecha', $columnas))
+                <th>Fecha Registro</th> @endif
+                @if(in_array('estado', $columnas))
+                <th>Estado</th> @endif
+                @if(in_array('estadia', $columnas))
+                <th>Estadía</th> @endif
             </tr>
         </thead>
         <tbody>
@@ -68,23 +96,35 @@
                 <tr>
                     <td>{{ $index + 1 }}</td>
                     @if(!isset($curso))
-                    <td>{{ $e->curso_nombre }}</td>@endif
-                    <td>{{ $e->ci }}</td>
-                    <td>{{ $e->extension_ci }}</td>
-                    <td>{{ $e->nombre }}</td>
-                    <td>{{ $e->apellido_p }}</td>
-                    <td>{{ $e->apellido_m }}</td>
-                    <td>{{ $e->telefono_movil ?? '-' }}</td>
-                    <td>{{ $e->correo_electronico ?? '-' }}</td>
-                    <td>{{ $e->asesor_nombre }} {{ $e->asesor_apellido }}</td>
-                    <td>{{ \Carbon\Carbon::parse($e->fecha_inscripcion)->format('d/m/Y H:i') }}</td>
-                    <td>{{ $e->estado }}</td>
-                    <td>
-                        <span style="font-weight: bold; text-transform: uppercase;">
-                            {{ $e->estadia ?? 'activo' }}
-                        </span>
-                    </td>
-
+                        <td>{{ $e->curso_nombre }}</td>
+                    @endif
+                    @if(in_array('ci', $columnas))
+                    <td>{{ $e->ci }}</td> @endif
+                    @if(in_array('extension_ci', $columnas))
+                    <td>{{ $e->extension_ci }}</td> @endif
+                    @if(in_array('nombre', $columnas))
+                    <td>{{ $e->nombre }}</td> @endif
+                    @if(in_array('apellido_p', $columnas))
+                    <td>{{ $e->apellido_p }}</td> @endif
+                    @if(in_array('apellido_m', $columnas))
+                    <td>{{ $e->apellido_m }}</td> @endif
+                    @if(in_array('telefono', $columnas))
+                    <td>{{ $e->telefono_movil ?? '-' }}</td> @endif
+                    @if(in_array('correo', $columnas))
+                    <td>{{ $e->correo_electronico ?? '-' }}</td> @endif
+                    @if(in_array('asesor', $columnas))
+                    <td>{{ $e->asesor_nombre }} {{ $e->asesor_apellido }}</td> @endif
+                    @if(in_array('fecha', $columnas))
+                    <td>{{ \Carbon\Carbon::parse($e->fecha_inscripcion)->format('d/m/Y H:i') }}</td> @endif
+                    @if(in_array('estado', $columnas))
+                    <td>{{ $e->estado }}</td> @endif
+                    @if(in_array('estadia', $columnas))
+                        <td>
+                            <span style="font-weight: bold; text-transform: uppercase;">
+                                {{ $e->estadia }}
+                            </span>
+                        </td>
+                    @endif
                 </tr>
             @empty
                 <tr>

@@ -8,7 +8,7 @@ use Symfony\Component\HttpFoundation\Response;
 
 class CheckRoleOrCargo
 {
-    public function handle(Request $request, Closure $next, string $params): Response
+    public function handle(Request $request, Closure $next, ...$params): Response
     {
         $user = $request->user();
 
@@ -16,23 +16,27 @@ class CheckRoleOrCargo
             return redirect()->route('login');
         }
 
-        if ($user->rol === 'super_admin' || (method_exists($user, 'hasRole') && $user->hasRole('super_admin'))) {
+        if (method_exists($user, 'hasRole') && $user->hasRole('super_admin')) {
             return $next($request);
         }
+
+        $fullExpression = implode(',', $params);
 
         $rolesAllowed = [];
         $cargosAllowed = [];
 
-        $segments = explode('|', $params);
+        $segments = explode('|', $fullExpression);
         foreach ($segments as $segment) {
             $segment = trim($segment);
+
             if (str_starts_with($segment, 'roles=')) {
                 $rolesStr = str_replace('roles=', '', $segment);
-                $rolesAllowed = array_map('trim', explode('+', $rolesStr));
+                $rolesAllowed = array_filter(array_map('trim', preg_split('/[+,]/', $rolesStr)));
             }
+
             if (str_starts_with($segment, 'cargos=')) {
                 $cargosStr = str_replace('cargos=', '', $segment);
-                $cargosAllowed = array_map('trim', explode('+', $cargosStr));
+                $cargosAllowed = array_filter(array_map('trim', preg_split('/[+,]/', $cargosStr)));
             }
         }
 
@@ -43,6 +47,13 @@ class CheckRoleOrCargo
         if (!empty($cargosAllowed) && $user->hasAnyCargo($cargosAllowed)) {
             return $next($request);
         }
+
+        dd([
+            'usuario_id' => $user->id_personal,
+            'cargos_en_BD' => $user->cargos->pluck('nombre')->toArray(),
+            'cargos_permitidos' => $cargosAllowed,
+            'evaluacion' => $user->hasAnyCargo($cargosAllowed),
+        ]);
 
         abort(403, 'No tienes el rol ni el cargo requerido para acceder.');
     }

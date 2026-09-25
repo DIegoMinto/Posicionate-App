@@ -54,19 +54,22 @@
 
                 {{-- FILTRO POR ESTADÍA --}}
                 <select name="estadia" onchange="this.form.submit()"
-                    class="bg-white text-black text-[10px] font-bold px-3 py-1.5 rounded-md">
+    class="bg-white text-black text-[10px] font-bold px-3 py-1.5 rounded-md">
 
-                    <option value="">ESTADÍA: TODAS</option>
-                    <option value="activo" {{ request('estadia') == 'activo' ? 'selected' : '' }}>
-                        ACTIVO
-                    </option>
-                    <option value="abandono" {{ request('estadia') == 'abandono' ? 'selected' : '' }}>
-                        ABANDONO
-                    </option>
-                    <option value="retirado" {{ request('estadia') == 'retirado' ? 'selected' : '' }}>
-                        RETIRADO
-                    </option>
-                </select>
+    <option value="">ESTADÍA: TODAS</option>
+    <option value="pendiente" {{ request('estadia') == 'pendiente' ? 'selected' : '' }}>
+        PENDIENTE
+    </option>
+    <option value="activo" {{ request('estadia') == 'activo' ? 'selected' : '' }}>
+        ACTIVO
+    </option>
+    <option value="abandono" {{ request('estadia') == 'abandono' ? 'selected' : '' }}>
+        ABANDONO
+    </option>
+    <option value="retirado" {{ request('estadia') == 'retirado' ? 'selected' : '' }}>
+        RETIRADO
+    </option>
+</select>
 
                 <div>
                     <div class="font-sans text-[12px]">Fecha inicio</div>
@@ -112,17 +115,81 @@
             </x-slot>
 
             @if($usuario->hasRole('super_admin') || $usuario->hasAnyCargo(['coordinador_marketing', 'asistente_academico', 'coordinador_academico']))
-                <div class="flex gap-2">
-                    <a href="{{ route('curso.estudiantes.export.pdf', array_merge(['id' => $curso->id_curso], request()->query())) }}"
-                        class="bg-red-700 text-white text-[10px] font-bold px-3 py-1.5 rounded-md hover:bg-red-700 transition">
-                        Exportar PDF
-                    </a>
-                    <a href="{{ route('curso.estudiantes.export.excel', array_merge(['id' => $curso->id_curso], request()->query())) }}"
-                        class="bg-brand-green text-white text-[10px] font-bold px-3 py-1.5 rounded-md hover:bg-green-800 transition">
-                        Exportar Excel
-                    </a>
+    <div class="flex gap-2">
+
+        {{-- Botón que abre el modal en vez del link directo --}}
+        <div x-data="{ openExportPdf: false }">
+            <button type="button" @click="openExportPdf = true"
+                class="bg-red-700 text-white text-[10px] font-bold px-3 py-1.5 rounded-md hover:bg-red-800 transition cursor-pointer">
+                Exportar PDF
+            </button>
+
+            <div x-show="openExportPdf" x-cloak
+                class="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 backdrop-blur-sm">
+
+                <div class="bg-white p-6 rounded-sm shadow-2xl w-96 text-left border-t-4 border-red-600 font-sans"
+                    @click.away="openExportPdf = false">
+
+                    <h3 class="text-red-600 uppercase mb-4 font-bold text-sm">
+                        Elegir columnas a exportar
+                    </h3>
+
+                    <form method="GET" action="{{ route('curso.estudiantes.export.pdf', $curso->id_curso) }}">
+
+                        {{-- Mantener los filtros que ya estaban aplicados --}}
+                        @foreach(request()->query() as $key => $value)
+                            @if($key !== 'columns')
+                                <input type="hidden" name="{{ $key }}" value="{{ $value }}">
+                            @endif
+                        @endforeach
+
+                        @php
+                            $columnasDisponibles = [
+                                'ci' => 'CI',
+                                'extension_ci' => 'Ext',
+                                'nombre' => 'Nombre',
+                                'apellido_p' => 'Apellido Paterno',
+                                'apellido_m' => 'Apellido Materno',
+                                'telefono' => 'Teléfono',
+                                'correo' => 'Correo',
+                                'asesor' => 'Asesor',
+                                'fecha' => 'Fecha de Registro',
+                                'estado' => 'Estado',
+                                'estadia' => 'Estadía',
+                            ];
+                        @endphp
+
+                        <div class="grid grid-cols-2 gap-2 mb-4 max-h-64 overflow-y-auto">
+                            @foreach($columnasDisponibles as $valor => $etiqueta)
+                                <label class="flex items-center gap-2 text-[11px] text-gray-700 cursor-pointer">
+                                    <input type="checkbox" name="columns[]" value="{{ $valor }}" checked
+                                        class="rounded border-gray-300 text-red-600 focus:ring-red-500">
+                                    {{ $etiqueta }}
+                                </label>
+                            @endforeach
+                        </div>
+
+                        <div class="flex justify-end gap-3">
+                            <button type="button" @click="openExportPdf = false"
+                                class="text-[9px] font-sans cursor-pointer uppercase hover:text-red-600 transition-colors">
+                                Cancelar
+                            </button>
+                            <button type="submit"
+                                class="bg-red-600 text-white px-4 py-2 rounded-sm text-[9px] font-sans uppercase cursor-pointer hover:bg-red-700 transition-colors">
+                                Exportar
+                            </button>
+                        </div>
+                    </form>
                 </div>
-            @endif
+            </div>
+        </div>
+
+        <a href="{{ route('curso.estudiantes.export.excel', array_merge(['id' => $curso->id_curso], request()->query())) }}"
+            class="bg-brand-green text-white text-[10px] font-bold px-3 py-1.5 rounded-md hover:bg-green-800 transition">
+            Exportar Excel
+        </a>
+    </div>
+@endif
         </x-page-header>
 
         <div class="p-6">
@@ -209,31 +276,33 @@
                                     </td>
 
                                     @if(auth()->user()->hasAnyRole(['super_admin', 'admin']) || auth()->user()->hasAnyCargo(['supervisor_academico', 'coordinador_academico', 'asistente_academico', 'coordinador_marketing']))
-                                                        <td class="py-3 px-4 text-center">
-                                                            <form action="{{ route('students.updateEstadia', $e->id_estudiante) }}"
-                                                                method="POST" class="inline-block">
-                                                                @csrf
-                                                                @method('PATCH')
-                                                                <input type="hidden" name="id_curso" value="{{ $curso->id_curso }}">
+    <td class="py-3 px-4 text-center">
+        @if($e->estado === 'pre_inscrito')
+            <span class="px-2 py-0.5 rounded-full text-[9px] font-black uppercase bg-gray-200 text-gray-600">
+                Pendiente
+            </span>
+        @else
+            <form action="{{ route('students.updateEstadia', $e->id_estudiante) }}" method="POST" class="inline-block">
+                @csrf
+                @method('PATCH')
+                <input type="hidden" name="id_curso" value="{{ $curso->id_curso }}">
 
-                                                                <select name="estadia" onchange="this.form.submit()" class="px-2 py-0.5 rounded-full text-[9px] font-black uppercase border-0 cursor-pointer focus:ring-1 focus:ring-gray-400 font-poppins
-                                        {{ ($e->estadia ?? 'activo') === 'activo' ? 'bg-green-100 text-green-700' : '' }}
-                                        {{ ($e->estadia ?? 'activo') === 'abandono' ? 'bg-yellow-100 text-yellow-700' : '' }}
-                                        {{ ($e->estadia ?? 'activo') === 'retirado' ? 'bg-red-100 text-red-700' : '' }}">
+                <select name="estadia" onchange="this.form.submit()" class="px-2 py-0.5 rounded-full text-[9px] font-black uppercase border-0 cursor-pointer focus:ring-1 focus:ring-gray-400 font-poppins
+                    {{ $e->estadia === 'activo' ? 'bg-green-100 text-green-700' : '' }}
+                    {{ $e->estadia === 'abandono' ? 'bg-yellow-100 text-yellow-700' : '' }}
+                    {{ $e->estadia === 'retirado' ? 'bg-red-100 text-red-700' : '' }}">
 
-                                                                    <option value="activo" {{ ($e->estadia ?? 'activo') === 'activo' ? 'selected' : '' }}
-                                                                        class="bg-white text-gray-800 font-sans font-normal normal-case">Activo
-                                                                    </option>
-                                                                    <option value="abandono" {{ ($e->estadia ?? 'activo') === 'abandono' ? 'selected' : '' }}
-                                                                        class="bg-white text-gray-800 font-sans font-normal normal-case">
-                                                                        Abandono</option>
-                                                                    <option value="retirado" {{ ($e->estadia ?? 'activo') === 'retirado' ? 'selected' : '' }}
-                                                                        class="bg-white text-gray-800 font-sans font-normal normal-case">
-                                                                        Retirado</option>
-                                                                </select>
-                                                            </form>
-                                                        </td>
-                                    @endif
+                    <option value="activo" {{ $e->estadia === 'activo' ? 'selected' : '' }}
+                        class="bg-white text-gray-800 font-sans font-normal normal-case">Activo</option>
+                    <option value="abandono" {{ $e->estadia === 'abandono' ? 'selected' : '' }}
+                        class="bg-white text-gray-800 font-sans font-normal normal-case">Abandono</option>
+                    <option value="retirado" {{ $e->estadia === 'retirado' ? 'selected' : '' }}
+                        class="bg-white text-gray-800 font-sans font-normal normal-case">Retirado</option>
+                </select>
+            </form>
+        @endif
+    </td>
+@endif
 
                                     <td class="px-4 text-right sticky right-0 bg-white min-w-[150px]">
                                         <div class="flex justify-center items-center gap-2">

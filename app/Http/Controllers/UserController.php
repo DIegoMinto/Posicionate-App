@@ -57,7 +57,6 @@ class UserController extends Controller
 
     public function store_user(Request $request)
     {
-        // CORREGIDO: Homogenización de validación de SuperAdmin
         if (auth()->user()->rol !== 'super_admin') {
             abort(403, 'No autorizado');
         }

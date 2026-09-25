@@ -221,8 +221,8 @@ class DashboardController extends Controller
         $query = DB::table('curso_estudiante')
             ->join('estudiante', 'curso_estudiante.id_estudiante', '=', 'estudiante.id_estudiante')
             ->join('curso', 'curso_estudiante.id_curso', '=', 'curso.id_curso')
-            ->join('personal', 'curso_estudiante.id_personal', '=', 'personal.id_personal')
-            ->join('persona', 'personal.id_persona', '=', 'persona.id_persona')
+            ->leftJoin('personal', 'curso_estudiante.id_personal', '=', 'personal.id_personal')
+            ->leftJoin('persona', 'personal.id_persona', '=', 'persona.id_persona')
             ->select(
                 'estudiante.*',
                 'curso.nombre as curso_nombre',
@@ -238,7 +238,13 @@ class DashboardController extends Controller
         }
 
         $puedeVerTodos = $usuario->hasAnyRole(['admin', 'super_admin'])
-            || $usuario->hasAnyCargo(['coordinador_marketing']);
+            || $usuario->hasAnyCargo([
+                'coordinador_marketing',
+                'contador',
+                'asistente_contable',
+                'supervisor_academico',
+                'coordinador_academico'
+            ]);
 
         if (!$puedeVerTodos) {
             $query->where('curso_estudiante.id_personal', $usuario->id_personal);
@@ -270,6 +276,7 @@ class DashboardController extends Controller
         if ($request->filled('fecha_fin')) {
             $query->whereDate('curso_estudiante.created_at', '<=', $request->fecha_fin);
         }
+
         if ($request->filled('id_curso')) {
             $query->where('curso_estudiante.id_curso', $request->id_curso);
         }

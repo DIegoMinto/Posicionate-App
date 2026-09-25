@@ -100,7 +100,7 @@
                             </a>
 
                             @if(
-                                    $usuario->hasAnyCargo(['gerente_marketing', 'asistente_academico', 'coordinador_academico', 'supervisor_academico'])
+                                    $usuario->hasAnyCargo(['gerente_marketing', 'asistente_academico', 'coordinador_academico', 'supervisor_academico', 'contador', 'asistente_contable'])
                                 )
                                 <a href="{{ route('teachers.index') }}"
                                     class="btn-sidebar-sub group {{ request()->routeIs('teachers.index') ? 'is-active' : '' }}">

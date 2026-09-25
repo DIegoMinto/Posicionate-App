@@ -64,6 +64,7 @@ class InscripcionController extends Controller
             'id_estudiante' => $estudiante->id_estudiante,
             'id_personal' => $validated['id_personal'],
             'estado' => 'pre_inscrito',
+            'estadia' => 'pendiente',
             'created_at' => now(),
             'updated_at' => now(),
         ]);
@@ -118,6 +119,19 @@ class InscripcionController extends Controller
             'estadia' => 'required|in:activo,abandono,retirado',
         ]);
 
+        $inscripcion = DB::table('curso_estudiante')
+            ->where('id_estudiante', $id_estudiante)
+            ->where('id_curso', $request->id_curso)
+            ->first();
+
+        if (!$inscripcion) {
+            return back()->with('error', 'Inscripción no encontrada.');
+        }
+
+        if ($inscripcion->estado === 'pre_inscrito') {
+            return back()->with('error', 'La estadía de un estudiante pre inscrito no se puede modificar manualmente.');
+        }
+
         DB::table('curso_estudiante')
             ->where('id_estudiante', $id_estudiante)
             ->where('id_curso', $request->id_curso)
@@ -132,7 +146,25 @@ class InscripcionController extends Controller
         $usuario = auth()->user();
         $estudiantes = $this->buildStudentsQuery($request, $usuario, $id)->get();
 
-        $pdf = Pdf::loadView('exports.students_pdf', compact('estudiantes', 'curso'))
+        $columnasDisponibles = [
+            'ci',
+            'extension_ci',
+            'nombre',
+            'apellido_p',
+            'apellido_m',
+            'telefono',
+            'correo',
+            'asesor',
+            'fecha',
+            'estado',
+            'estadia'
+        ];
+
+        $columnas = $request->filled('columns')
+            ? array_intersect($columnasDisponibles, $request->columns)
+            : $columnasDisponibles;
+
+        $pdf = Pdf::loadView('exports.students_pdf', compact('estudiantes', 'curso', 'columnas'))
             ->setPaper('a4', 'landscape');
 
         return $pdf->download('estudiantes_curso_' . $id . '_' . now()->format('Ymd_His') . '.pdf');
@@ -153,8 +185,8 @@ class InscripcionController extends Controller
         $query = DB::table('curso_estudiante')
             ->join('estudiante', 'curso_estudiante.id_estudiante', '=', 'estudiante.id_estudiante')
             ->join('curso', 'curso_estudiante.id_curso', '=', 'curso.id_curso')
-            ->join('personal', 'curso_estudiante.id_personal', '=', 'personal.id_personal')
-            ->join('persona', 'personal.id_persona', '=', 'persona.id_persona')
+            ->leftJoin('personal', 'curso_estudiante.id_personal', '=', 'personal.id_personal')
+            ->leftJoin('persona', 'personal.id_persona', '=', 'persona.id_persona')
             ->select(
                 'estudiante.*',
                 'curso.nombre as curso_nombre',
@@ -171,7 +203,13 @@ class InscripcionController extends Controller
         }
 
         $puedeVerTodos = $usuario->hasAnyRole(['admin', 'super_admin'])
-            || $usuario->hasAnyCargo(['coordinador_marketing']);
+            || $usuario->hasAnyCargo([
+                'coordinador_marketing',
+                'contador',
+                'asistente_contable',
+                'supervisor_academico',
+                'coordinador_academico'
+            ]);
 
         if (!$puedeVerTodos) {
             $query->where('curso_estudiante.id_personal', $usuario->id_personal);
@@ -252,6 +290,7 @@ class InscripcionController extends Controller
                     'id_planes_pago' => $request->id_plan,
                     'id_descuento' => $id_descuento,
                     'estado' => 'inscrito',
+                    'estadia' => 'activo',
                 ]);
 
                 $curso = Curso::findOrFail($request->id_curso);
@@ -527,7 +566,8 @@ class InscripcionController extends Controller
             'id_estudiante' => $request->id_estudiante,
             'id_curso' => $request->id_curso,
             'id_personal' => $request->id_personal,
-            'estado' => 'pre_inscrito'
+            'estado' => 'pre_inscrito',
+            'estadia' => 'pendiente',
         ]);
 
         return back()->with('success', 'Estudiante añadido correctamente');
