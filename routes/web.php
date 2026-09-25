@@ -248,6 +248,18 @@ Route::middleware(['auth', 'vigente'])->group(function () {
             Route::get('/areas/crear', 'create')->name('areas.create');
             Route::post('/areas', 'store')->name('areas.store');
         });
-    });
 
+        Route::patch('/estudiantes/{id_estudiante}/moodle-habilitar', [InscripcionController::class, 'habilitarMoodle'])
+            ->name('estudiantes.moodle.habilitar')
+            ->middleware(['auth', 'role:super_admin']);
+    });
+    Route::get('/run-moodle-backfill/{token}', function ($token) {
+        if ($token !== env('MOODLE_BACKFILL_TOKEN')) {
+            abort(404);
+        }
+
+        \Illuminate\Support\Facades\Artisan::call('moodle:generar-credenciales');
+
+        return '<pre>' . \Illuminate\Support\Facades\Artisan::output() . '</pre>';
+    });
 });

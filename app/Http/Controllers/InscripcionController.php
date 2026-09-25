@@ -59,6 +59,18 @@ class InscripcionController extends Controller
 
         $estudiante = Estudiante::create($request->all());
 
+        $estudiante->moodle_usuario = $this->generarUsuarioMoodle(
+            $estudiante->nombre,
+            $estudiante->apellido_p,
+            $estudiante->apellido_m
+        );
+        $estudiante->moodle_password = $this->generarPasswordMoodle(
+            $estudiante->ci,
+            $estudiante->extension_ci
+        );
+        $estudiante->moodle_habilitado = 'pendiente';
+        $estudiante = Estudiante::create($request->all());
+
         \DB::table('curso_estudiante')->insert([
             'id_curso' => $validated['id_curso'],
             'id_estudiante' => $estudiante->id_estudiante,
@@ -246,6 +258,19 @@ class InscripcionController extends Controller
             $query->where('curso_estudiante.estadia', $request->estadia);
         }
 
+        if ($request->filled('estadia')) {
+            $query->where('curso_estudiante.estadia', $request->estadia);
+        }
+
+        if ($request->filled('moodle_habilitado')) {
+            if ($request->moodle_habilitado === 'na') {
+                $query->whereNull('estudiante.moodle_usuario');
+            } else {
+                $query->whereNotNull('estudiante.moodle_usuario')
+                    ->where('estudiante.moodle_habilitado', $request->moodle_habilitado);
+            }
+        }
+
         return $query->orderBy('curso_estudiante.created_at', 'desc');
     }
 
@@ -292,6 +317,21 @@ class InscripcionController extends Controller
                     'estado' => 'inscrito',
                     'estadia' => 'activo',
                 ]);
+
+                $estudianteMoodle = \App\Models\Estudiante::findOrFail($id_estudiante);
+                if (!$estudianteMoodle->moodle_usuario) {
+                    $estudianteMoodle->moodle_usuario = $this->generarUsuarioMoodle(
+                        $estudianteMoodle->nombre,
+                        $estudianteMoodle->apellido_p,
+                        $estudianteMoodle->apellido_m
+                    );
+                    $estudianteMoodle->moodle_password = $this->generarPasswordMoodle(
+                        $estudianteMoodle->ci,
+                        $estudianteMoodle->extension_ci
+                    );
+                    $estudianteMoodle->moodle_habilitado = 'pendiente';
+                    $estudianteMoodle->save();
+                }
 
                 $curso = Curso::findOrFail($request->id_curso);
                 $fechaInscripcion = $curso->fecha_inicio
@@ -729,6 +769,66 @@ class InscripcionController extends Controller
         $pdf->setPaper('letter', 'portrait');
 
         return $pdf->stream('plan-pagos-' . $estudiante->ci . '.pdf');
+    }
+
+    private function limpiarTexto(string $texto): string
+    {
+        $texto = \Illuminate\Support\Str::ascii($texto);
+        $texto = preg_replace('/[^A-Za-z]/', '', $texto);
+        return mb_strtolower($texto);
+    }
+
+    private function generarUsuarioMoodle(string $nombre, ?string $apellidoP, ?string $apellidoM): string
+    {
+        $primerNombre = trim(explode(' ', trim($nombre))[0] ?? '');
+
+        $inicial = mb_substr($this->limpiarTexto($primerNombre), 0, 1);
+        $ap1 = $this->limpiarTexto($apellidoP ?? '');
+        $ap2 = $this->limpiarTexto($apellidoM ?? '');
+
+        $base = $inicial . $ap1 . $ap2;
+
+        $usuario = $base;
+        $i = 1;
+        while (\App\Models\Estudiante::where('moodle_usuario', $usuario)->exists()) {
+            $usuario = $base . $i;
+            $i++;
+        }
+
+        return $usuario;
+    }
+
+    private function generarPasswordMoodle(string $ci, string $extensionCi): string
+    {
+        $ciLimpio = preg_replace('/[^0-9]/', '', $ci);
+        $ext = trim($extensionCi);
+
+        $extFormateada = mb_strtoupper(mb_substr($ext, 0, 1)) . mb_strtolower(mb_substr($ext, 1));
+
+        return "{$ciLimpio}.{$extFormateada}";
+    }
+
+    public function habilitarMoodle(Request $request, $id_estudiante)
+    {
+        $usuario = auth()->user();
+
+        if (!$usuario->hasRole('super_admin')) {
+            abort(403);
+        }
+
+        $request->validate([
+            'password_confirm' => 'required|string',
+        ]);
+
+        if (!\Hash::check($request->password_confirm, $usuario->password)) {
+            return back()->with('error', 'Contraseña incorrecta.');
+        }
+
+        $estudiante = Estudiante::findOrFail($id_estudiante);
+        $estudiante->moodle_habilitado = 'habilitado';
+        $estudiante->save();
+
+        return back()->with('success', 'Usuario de Moodle habilitado correctamente.');
     }
 
 }

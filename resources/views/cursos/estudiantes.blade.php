@@ -52,6 +52,21 @@
                     </option>
                 </select>
 
+                <select name="moodle_habilitado" onchange="this.form.submit()"
+    class="bg-white text-black text-[10px] font-bold px-3 py-1.5 rounded-md">
+
+    <option value="">MOODLE: TODOS</option>
+    <option value="na" {{ request('moodle_habilitado') == 'na' ? 'selected' : '' }}>
+        N/A
+    </option>
+    <option value="pendiente" {{ request('moodle_habilitado') == 'pendiente' ? 'selected' : '' }}>
+        PENDIENTE
+    </option>
+    <option value="habilitado" {{ request('moodle_habilitado') == 'habilitado' ? 'selected' : '' }}>
+        HABILITADO
+    </option>
+</select>
+
                 {{-- FILTRO POR ESTADÍA --}}
                 <select name="estadia" onchange="this.form.submit()"
     class="bg-white text-black text-[10px] font-bold px-3 py-1.5 rounded-md">
@@ -98,6 +113,7 @@
                     value="{{ request('fecha_inicio') }}"> @endif
                     @if(request('fecha_fin')) <input type="hidden" name="fecha_fin" value="{{ request('fecha_fin') }}">
                     @endif
+                    @if(request('moodle_habilitado')) <input type="hidden" name="moodle_habilitado" value="{{ request('moodle_habilitado') }}"> @endif
 
                     <input type="text" name="search" value="{{ request('search') }}"
                         placeholder="Buscar por nombre o CI..."
@@ -217,9 +233,13 @@
                                 <th class="py-3 px-4 whitespace-nowrap">Asesor</th>
                                 <th class="py-3 px-4 whitespace-nowrap">Fecha de Registro</th>
                                 <th class="py-3 px-4 text-center whitespace-nowrap">Estado</th>
+                                
                                 @if(auth()->user()->hasAnyRole(['super_admin', 'admin']) || auth()->user()->hasAnyCargo(['supervisor_academico', 'coordinador_academico', 'asistente_academico', 'coordinador_marketing']))
                                     <th class="py-3 px-4 text-center">Estadía</th>
                                 @endif
+                                <th class="py-3 px-4 text-center whitespace-nowrap">Moodle</th>
+                                <th class="py-3 px-4 whitespace-nowrap">Usuario Moodle</th>
+                                <th class="py-3 px-4 whitespace-nowrap">Contraseña Moodle</th>
                                 <th class="py-3 px-4 text-center sticky right-0 bg-brand-green">Operaciones</th>
                             </tr>
                         </thead>
@@ -303,6 +323,88 @@
         @endif
     </td>
 @endif
+<td class="py-3 px-4 text-center whitespace-nowrap">
+    @if(!$e->moodle_usuario)
+        <span class="px-2 py-0.5 rounded-full text-[9px] font-black uppercase bg-gray-200 text-gray-500">
+            N/A
+        </span>
+    @elseif($e->moodle_habilitado === 'habilitado')
+        <span class="px-2 py-0.5 rounded-full text-[9px] font-black uppercase bg-green-100 text-green-700">
+            Habilitado
+        </span>
+    @elseif($usuario->hasRole('super_admin'))
+        <div x-data="{ openMoodle: false }">
+            <button @click="openMoodle = true"
+                class="px-2 py-0.5 rounded-full text-[9px] font-black uppercase bg-yellow-100 text-yellow-700 hover:bg-yellow-200 transition cursor-pointer">
+                Pendiente
+            </button>
+
+            <div x-show="openMoodle" x-cloak
+                class="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 backdrop-blur-sm">
+
+                <div class="bg-white p-6 rounded-sm shadow-2xl w-80 text-left border-t-4 border-brand-green font-sans"
+                    @click.away="openMoodle = false">
+
+                    <h3 class="text-brand-green uppercase mb-2 font-bold">
+                        Habilitar Moodle
+                    </h3>
+
+                    <p class="text-[10px] mb-4 text-gray-600">
+                        Vas a habilitar a:<br>
+                        <span class="text-black font-bold uppercase">
+                            {{ $e->nombre }} {{ $e->apellido_p }}
+                        </span>
+                    </p>
+
+                    <p class="text-[10px] mb-1 text-gray-600">
+                        Usuario: <span class="font-mono text-black">{{ $e->moodle_usuario }}</span>
+                    </p>
+                    <p class="text-[10px] mb-4 text-gray-600">
+                        Contraseña: <span class="font-mono text-black">{{ $e->moodle_password }}</span>
+                    </p>
+
+                    <form action="{{ route('estudiantes.moodle.habilitar', $e->id_estudiante) }}" method="POST">
+                        @csrf
+                        @method('PATCH')
+
+                        <input type="password" name="password_confirm" required
+                            class="w-full border border-gray-200 p-2 text-xs mb-4 focus:outline-none focus:border-brand-green bg-gray-50"
+                            placeholder="Tu contraseña">
+
+                        <div class="flex justify-end gap-3">
+                            <button type="button" @click="openMoodle = false"
+                                class="text-[9px] font-sans cursor-pointer uppercase hover:text-red-600 transition-colors">
+                                Cancelar
+                            </button>
+
+                            <button type="submit"
+                                class="bg-brand-green text-white px-4 py-2 rounded-sm text-[9px] font-sans uppercase cursor-pointer hover:bg-green-800 transition-colors">
+                                Habilitar
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    @else
+        <span class="px-2 py-0.5 rounded-full text-[9px] font-black uppercase bg-yellow-100 text-yellow-700">
+            Pendiente
+        </span>
+    @endif
+</td>
+<td class="py-3 px-4 font-sans whitespace-nowrap">
+    {{ $e->moodle_usuario ?? '-' }}
+</td>
+
+<td class="py-3 px-4 font-sans whitespace-nowrap">
+    @if(!$e->moodle_password)
+        -
+    @elseif($usuario->hasRole('super_admin'))
+        {{ $e->moodle_password }}
+    @else
+        ••••••••
+    @endif
+</td>
 
                                     <td class="px-4 text-right sticky right-0 bg-white min-w-[150px]">
                                         <div class="flex justify-center items-center gap-2">
