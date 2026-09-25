@@ -253,13 +253,5 @@ Route::middleware(['auth', 'vigente'])->group(function () {
             ->name('estudiantes.moodle.habilitar')
             ->middleware(['auth', 'role:super_admin']);
     });
-    Route::get('/run-moodle-backfill/{token}', function ($token) {
-        if ($token !== env('MOODLE_BACKFILL_TOKEN')) {
-            abort(404);
-        }
 
-        \Illuminate\Support\Facades\Artisan::call('moodle:generar-credenciales');
-
-        return '<pre>' . \Illuminate\Support\Facades\Artisan::output() . '</pre>';
-    });
 });
