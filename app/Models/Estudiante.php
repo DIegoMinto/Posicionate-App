@@ -25,6 +25,7 @@ class Estudiante extends Model
         'telefono_movil',
         'correo_electronico',
         'genero',
+        'estado_civil',
 
         'id_departamento',
         'ciudad_residencia',

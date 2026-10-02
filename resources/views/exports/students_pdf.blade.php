@@ -41,24 +41,15 @@
 </head>
 
 <body>
+    @php
+        use App\Support\StudentExportColumns as Cols;
+
+        $labels = Cols::labels();
+        $columnas = $columnas ?? array_keys($labels);
+    @endphp
+
     <h1>Lista de Estudiantes {{ isset($curso) ? '- ' . $curso->nombre : '' }}</h1>
     <p>Generado: {{ now()->format('d/m/Y H:i') }}</p>
-
-    @php
-        $columnas = $columnas ?? [
-            'ci',
-            'extension_ci',
-            'nombre',
-            'apellido_p',
-            'apellido_m',
-            'telefono',
-            'correo',
-            'asesor',
-            'fecha',
-            'estado',
-            'estadia'
-        ];
-    @endphp
 
     <table>
         <thead>
@@ -67,28 +58,9 @@
                 @if(!isset($curso))
                     <th>Curso</th>
                 @endif
-                @if(in_array('ci', $columnas))
-                <th>CI</th> @endif
-                @if(in_array('extension_ci', $columnas))
-                <th>Ext</th> @endif
-                @if(in_array('nombre', $columnas))
-                <th>Nombre</th> @endif
-                @if(in_array('apellido_p', $columnas))
-                <th>Ap. Paterno</th> @endif
-                @if(in_array('apellido_m', $columnas))
-                <th>Ap. Materno</th> @endif
-                @if(in_array('telefono', $columnas))
-                <th>Teléfono</th> @endif
-                @if(in_array('correo', $columnas))
-                <th>Correo</th> @endif
-                @if(in_array('asesor', $columnas))
-                <th>Asesor</th> @endif
-                @if(in_array('fecha', $columnas))
-                <th>Fecha Registro</th> @endif
-                @if(in_array('estado', $columnas))
-                <th>Estado</th> @endif
-                @if(in_array('estadia', $columnas))
-                <th>Estadía</th> @endif
+                @foreach($columnas as $c)
+                    <th>{{ $labels[$c] }}</th>
+                @endforeach
             </tr>
         </thead>
         <tbody>
@@ -98,37 +70,23 @@
                     @if(!isset($curso))
                         <td>{{ $e->curso_nombre }}</td>
                     @endif
-                    @if(in_array('ci', $columnas))
-                    <td>{{ $e->ci }}</td> @endif
-                    @if(in_array('extension_ci', $columnas))
-                    <td>{{ $e->extension_ci }}</td> @endif
-                    @if(in_array('nombre', $columnas))
-                    <td>{{ $e->nombre }}</td> @endif
-                    @if(in_array('apellido_p', $columnas))
-                    <td>{{ $e->apellido_p }}</td> @endif
-                    @if(in_array('apellido_m', $columnas))
-                    <td>{{ $e->apellido_m }}</td> @endif
-                    @if(in_array('telefono', $columnas))
-                    <td>{{ $e->telefono_movil ?? '-' }}</td> @endif
-                    @if(in_array('correo', $columnas))
-                    <td>{{ $e->correo_electronico ?? '-' }}</td> @endif
-                    @if(in_array('asesor', $columnas))
-                    <td>{{ $e->asesor_nombre }} {{ $e->asesor_apellido }}</td> @endif
-                    @if(in_array('fecha', $columnas))
-                    <td>{{ \Carbon\Carbon::parse($e->fecha_inscripcion)->format('d/m/Y H:i') }}</td> @endif
-                    @if(in_array('estado', $columnas))
-                    <td>{{ $e->estado }}</td> @endif
-                    @if(in_array('estadia', $columnas))
+                    @foreach($columnas as $c)
                         <td>
-                            <span style="font-weight: bold; text-transform: uppercase;">
-                                {{ $e->estadia }}
-                            </span>
+                            @if($c === 'estadia')
+                                <span style="font-weight: bold; text-transform: uppercase;">
+                                    {{ Cols::value($e, $c, $index) }}
+                                </span>
+                            @else
+                                {{ Cols::value($e, $c, $index) }}
+                            @endif
                         </td>
-                    @endif
+                    @endforeach
                 </tr>
             @empty
                 <tr>
-                    <td colspan="12">No hay estudiantes registrados.</td>
+                    <td colspan="{{ count($columnas) + 1 + (isset($curso) ? 0 : 1) }}">
+                        No hay estudiantes registrados.
+                    </td>
                 </tr>
             @endforelse
         </tbody>

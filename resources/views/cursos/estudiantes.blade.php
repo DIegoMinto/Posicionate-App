@@ -159,21 +159,7 @@
                             @endif
                         @endforeach
 
-                        @php
-                            $columnasDisponibles = [
-                                'ci' => 'CI',
-                                'extension_ci' => 'Ext',
-                                'nombre' => 'Nombre',
-                                'apellido_p' => 'Apellido Paterno',
-                                'apellido_m' => 'Apellido Materno',
-                                'telefono' => 'Teléfono',
-                                'correo' => 'Correo',
-                                'asesor' => 'Asesor',
-                                'fecha' => 'Fecha de Registro',
-                                'estado' => 'Estado',
-                                'estadia' => 'Estadía',
-                            ];
-                        @endphp
+                        @php $columnasDisponibles = \App\Support\StudentExportColumns::labels(); @endphp
 
                         <div class="grid grid-cols-2 gap-2 mb-4 max-h-64 overflow-y-auto">
                             @foreach($columnasDisponibles as $valor => $etiqueta)

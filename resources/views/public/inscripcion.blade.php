@@ -256,7 +256,7 @@
 
                             <div>
                                 <label class="form-label-bold-2">
-                                    País de Nacimiento
+                                    País
                                 </label>
 
                                 <select name="id_pais" id="select-pais" class="form-select-pill-2">
@@ -276,7 +276,7 @@
 
                             <div>
                                 <label class="form-label-bold-2">
-                                    Departamento de Nacimiento
+                                    Departamento
                                 </label>
 
                                 <select name="id_departamento" id="select-departamento" class="form-select-pill-2">
@@ -290,7 +290,7 @@
 
                             <div>
                                 <label class="form-label-bold-2">
-                                    Ciudad de Nacimiento
+                                    Lugar de Nacimiento
                                 </label>
 
                                 <input type="text" name="ciudad_residencia" value="{{ old('ciudad_residencia') }}"
@@ -308,6 +308,25 @@
 
                                 <input type="text" name="domicilio" value="{{ old('domicilio') }}"
                                     class="form-input-pill-2">
+                            </div>
+
+                            <div>
+                                <label class="form-label-bold-2">
+                                    Estado Civil
+                                </label>
+
+                                <select name="estado_civil" class="form-select-pill-2" required>
+                                    <option value="" disabled {{ old('estado_civil') ? '' : 'selected' }}>
+                                        Seleccione
+                                    </option>
+                                    <option value="soltero" {{ old('estado_civil') == 'soltero' ? 'selected' : '' }}>
+                                        Soltero/a</option>
+                                    <option value="casado" {{ old('estado_civil') == 'casado' ? 'selected' : '' }}>
+                                        Casado/a</option>
+                                    <option value="divorciado" {{ old('estado_civil') == 'divorciado' ? 'selected' : '' }}>Divorciado/a</option>
+                                    <option value="viudo" {{ old('estado_civil') == 'viudo' ? 'selected' : '' }}>Viudo/a
+                                    </option>
+                                </select>
                             </div>
 
                             <div>

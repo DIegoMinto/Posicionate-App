@@ -20,6 +20,7 @@ use Barryvdh\DomPDF\Facade\Pdf;
 use App\Models\Inscripcion;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Exports\StudentsExport;
+use App\Support\StudentExportColumns;
 
 
 class InscripcionController extends Controller
@@ -55,6 +56,7 @@ class InscripcionController extends Controller
             'correo_electronico' => 'required|email|unique:estudiante,correo_electronico',
             'id_curso' => 'required',
             'id_personal' => 'required',
+            'estado_civil' => 'nullable|in:soltero,casado,divorciado,viudo,union_libre',
         ]);
 
         $estudiante = Estudiante::create($request->all());
@@ -154,26 +156,15 @@ class InscripcionController extends Controller
 
     public function exportPdf(Request $request, $id)
     {
+
         $curso = Curso::findOrFail($id);
         $usuario = auth()->user();
         $estudiantes = $this->buildStudentsQuery($request, $usuario, $id)->get();
 
-        $columnasDisponibles = [
-            'ci',
-            'extension_ci',
-            'nombre',
-            'apellido_p',
-            'apellido_m',
-            'telefono',
-            'correo',
-            'asesor',
-            'fecha',
-            'estado',
-            'estadia'
-        ];
+        $columnasDisponibles = array_keys(StudentExportColumns::labels());
 
         $columnas = $request->filled('columns')
-            ? array_intersect($columnasDisponibles, $request->columns)
+            ? array_values(array_intersect($columnasDisponibles, $request->columns))
             : $columnasDisponibles;
 
         $pdf = Pdf::loadView('exports.students_pdf', compact('estudiantes', 'curso', 'columnas'))
@@ -208,6 +199,13 @@ class InscripcionController extends Controller
                 'curso_estudiante.created_at as fecha_inscripcion',
                 'persona.nombre as asesor_nombre',
                 'persona.apellido_p as asesor_apellido'
+            )->selectSub(
+                DB::table('pagos_estudiante')
+                    ->select('monto_pagado')
+                    ->whereColumn('pagos_estudiante.id_curso_estudiante', 'curso_estudiante.id')
+                    ->orderBy('id_pagos_estudiante')
+                    ->limit(1),
+                'cuota_inicial'
             );
 
         if ($idCurso) {

@@ -62,6 +62,7 @@ class EstudianteController extends Controller
                 'id_institucion_egreso' => 'required',
                 'id_grado_academico' => 'required',
                 'id_profesion' => 'required',
+                'estado_civil' => 'nullable|in:soltero,casado,divorciado,viudo,union_libre',
             ]);
 
             $extensionFinal = $request->extension_ci === 'OTRO'
