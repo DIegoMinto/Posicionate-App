@@ -72,6 +72,9 @@ Route::middleware(['auth', 'vigente'])->group(function () {
 
     Route::get('/programs', [DashboardController::class, 'programs'])->name('programs.index');
 
+    Route::get('/estudiantes/buscar', [DashboardController::class, 'buscarEstudiantes'])
+        ->name('estudiantes.buscar');
+
     Route::get('/planes-pago/{id}/detalles', [PlanController::class, 'showInstallments'])->name('plans.installments');
 
     // RUTAS RECIBOS Y PAGOS PÚBLICOS

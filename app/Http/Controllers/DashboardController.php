@@ -334,7 +334,7 @@ class DashboardController extends Controller
     {
         $usuario = auth()->user()->load('persona');
 
-        $query = \App\Models\Curso::with(['institucion', 'sede'])
+        $query = \App\Models\Curso::with(['institucion', 'sede', 'docente'])
 
             ->withCount([
 
@@ -389,9 +389,27 @@ class DashboardController extends Controller
             'usuario',
             'cursos',
             'sedes',
-            'instituciones',
-            'allEstudiantes'
+            'instituciones'
         ));
+    }
+
+    public function buscarEstudiantes(Request $request)
+    {
+        $q = trim($request->q ?? '');
+
+        $estudiantes = \App\Models\Estudiante::select('id_estudiante', 'nombre', 'apellido_p', 'ci')
+            ->when($q, function ($query) use ($q) {
+                $query->where(function ($w) use ($q) {
+                    $w->where('nombre', 'LIKE', "%{$q}%")
+                        ->orWhere('apellido_p', 'LIKE', "%{$q}%")
+                        ->orWhere('ci', 'LIKE', "%{$q}%");
+                });
+            })
+            ->orderBy('nombre')
+            ->limit(20)
+            ->get();
+
+        return response()->json($estudiantes);
     }
 
     public function programsEdit($id)

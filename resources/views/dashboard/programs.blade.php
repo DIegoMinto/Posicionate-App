@@ -222,93 +222,18 @@
                                                 </a>
                                             @endif
 
-                                            <div x-data="{ openModal: false }">
-
-                                                <button @click="openModal = true"
-                                                    class="group relative flex items-center justify-center cursor-pointer"
-                                                    title="Añadir Estudiante">
-                                                    <svg xmlns="http://www.w3.org/2000/svg" class="w-12 h-12 p-2 text-brand-green" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
-                                                        <path stroke-linecap="round" stroke-linejoin="round" d="M15 19.128a9.38 9.38 0 002.625.372 9.337 9.337 0 004.121-.952 4.125 4.125 0 00-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 018.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0111.964-3.07M12 6.375a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zm8.25 2.25a2.625 2.625 0 11-5.25 0 2.625 2.625 0 015.25 0z" />
-                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M19 3v4M17 5h4" />
-                                                    </svg>
-                                                    <span class="absolute -top-8 scale-0 transition-all rounded bg-gray-800 p-1 text-[10px] text-white group-hover:scale-100">
-                                                        Añadir Estudiante
-                                                    </span>
-                                                </button>
-
-                                                <div x-show="openModal"
-                                                    class="fixed inset-0 z-[999] flex items-center justify-center bg-black/50 backdrop-blur-sm"
-                                                    x-cloak>
-
-                                                    <div class="bg-white w-[600px] max-h-[80vh] overflow-y-auto rounded-sm shadow-2xl"
-                                                        @click.away="openModal = false">
-
-                                                        <h2 class="font-sans font-bold mb-4 uppercase text-brand-green bg-brand-green text-white p-6">
-                                                            Seleccionar Estudiante
-                                                        </h2>
-
-                                                        <div x-data="{
-                                                                search: '',
-                                                                estudiantes: @js($allEstudiantes)
-                                                            }" class="p-6">
-
-                                                            <input type="text" x-model="search" placeholder="Buscar por nombre o CI..."
-                                                                class="w-full border p-2 text-sm mb-4 rounded-sm focus:outline-none">
-
-                                                            <div class="space-y-2 max-h-[400px] overflow-y-auto">
-
-                                                                <template x-for="est in estudiantes.filter(e =>
-                                                                    (e.nombre + ' ' + e.apellido_p).toLowerCase().includes(search.toLowerCase()) ||
-                                                                    ((e.ci ?? '').toLowerCase().includes(search.toLowerCase()))
-                                                                )" :key="est.id_estudiante">
-
-                                                                    <div class="flex justify-between items-center border p-2 rounded-sm">
-
-                                                                        <div>
-                                                                            <div class="font-sans font-bold text-left" x-text="est.nombre + ' ' + est.apellido_p"></div>
-                                                                            <div class="font-sans text-brand-green text-left">
-                                                                                CI: <span x-text="est.ci"></span>
-                                                                            </div>
-                                                                        </div>
-
-                                                                        <form method="POST" action="{{ route('curso.agregar.estudiante') }}">
-                                                                            @csrf
-                                                                            <input type="hidden" name="id_estudiante" :value="est.id_estudiante">
-                                                                            <input type="hidden" name="id_curso" value="{{ $curso->id_curso }}">
-                                                                            <input type="hidden" name="id_personal" value="{{ $usuario->id_personal }}">
-
-                                                                            <button type="submit" class="btn-gold px-3 py-2 text-[10px]">
-                                                                                Añadir
-                                                                            </button>
-                                                                        </form>
-
-                                                                    </div>
-
-                                                                </template>
-
-                                                                <div class="text-right mt-4 p-2">
-                                                                    <button @click="openModal = false"
-                                                                        class="text-xs text-red-600 font-bold font-sans uppercase cursor-pointer">
-                                                                        Cerrar
-                                                                    </button>
-                                                                </div>
-
-                                                                <div x-show="estudiantes.filter(e =>
-                                                                        (e.nombre + ' ' + e.apellido_p).toLowerCase().includes(search.toLowerCase()) ||
-                                                                        ((e.ci ?? '').toLowerCase().includes(search.toLowerCase()))
-                                                                    ).length === 0"
-                                                                    class="text-center text-gray-400 text-xs py-4 italic">
-                                                                    No se encontraron estudiantes
-                                                                </div>
-
-                                                            </div>
-
-                                                        </div>
-
-                                                    </div>
-                                                </div>
-
-                                            </div>
+                                            <button type="button"
+                                                @click="$dispatch('abrir-estudiantes', { id: {{ $curso->id_curso }} })"
+                                                class="group relative flex items-center justify-center cursor-pointer"
+                                                title="Añadir Estudiante">
+                                                <svg xmlns="http://www.w3.org/2000/svg" class="w-12 h-12 p-2 text-brand-green" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 19.128a9.38 9.38 0 002.625.372 9.337 9.337 0 004.121-.952 4.125 4.125 0 00-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 018.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0111.964-3.07M12 6.375a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zm8.25 2.25a2.625 2.625 0 11-5.25 0 2.625 2.625 0 015.25 0z" />
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M19 3v4M17 5h4" />
+                                                </svg>
+                                                <span class="absolute -top-8 scale-0 transition-all rounded bg-gray-800 p-1 text-[10px] text-white group-hover:scale-100">
+                                                    Añadir Estudiante
+                                                </span>
+                                            </button>
 
                                             <a href="{{ route('curso.estudiantes', $curso->id_curso) }}"
                                                 class="group relative flex items-center justify-center" title="Añadir Clase">
@@ -554,6 +479,78 @@
 
             </div>
         </div>
+
+        <div x-data="{
+        open: false,
+        idCurso: null,
+        search: '',
+        resultados: [],
+        cargando: false,
+        timer: null,
+        abrir(d) {
+            this.idCurso = d.id;
+            this.search = '';
+            this.open = true;
+            this.buscar();
+        },
+        buscar() {
+            clearTimeout(this.timer);
+            this.timer = setTimeout(async () => {
+                this.cargando = true;
+                const r = await fetch('{{ route('estudiantes.buscar') }}?q=' + encodeURIComponent(this.search), {
+                    headers: { 'Accept': 'application/json' }
+                });
+                this.resultados = await r.json();
+                this.cargando = false;
+            }, 300);
+        }
+    }"
+    @abrir-estudiantes.window="abrir($event.detail)"
+    x-show="open" x-cloak
+    class="fixed inset-0 z-[999] flex items-center justify-center bg-black/50 backdrop-blur-sm">
+
+    <div class="bg-white w-[600px] max-h-[80vh] overflow-y-auto rounded-sm shadow-2xl" @click.away="open = false">
+
+        <h2 class="font-sans font-bold uppercase bg-brand-green text-white p-6">
+            Seleccionar Estudiante
+        </h2>
+
+        <div class="p-6">
+            <input type="text" x-model="search" @input="buscar()"
+                placeholder="Buscar por nombre o CI..."
+                class="w-full border p-2 text-sm mb-4 rounded-sm focus:outline-none">
+
+            <div class="space-y-2 max-h-[400px] overflow-y-auto">
+                <template x-for="est in resultados" :key="est.id_estudiante">
+                    <div class="flex justify-between items-center border p-2 rounded-sm">
+                        <div>
+                            <div class="font-sans font-bold text-left" x-text="est.nombre + ' ' + est.apellido_p"></div>
+                            <div class="font-sans text-brand-green text-left">CI: <span x-text="est.ci"></span></div>
+                        </div>
+
+                        <form method="POST" action="{{ route('curso.agregar.estudiante') }}">
+                            @csrf
+                            <input type="hidden" name="id_estudiante" :value="est.id_estudiante">
+                            <input type="hidden" name="id_curso" :value="idCurso">
+                            <input type="hidden" name="id_personal" value="{{ $usuario->id_personal }}">
+                            <button type="submit" class="btn-gold px-3 py-2 text-[10px]">Añadir</button>
+                        </form>
+                    </div>
+                </template>
+
+                <div x-show="cargando" class="text-center text-gray-400 text-xs py-4 italic">Buscando...</div>
+                <div x-show="!cargando && resultados.length === 0" class="text-center text-gray-400 text-xs py-4 italic">
+                    No se encontraron estudiantes
+                </div>
+
+                <div class="text-right mt-4 p-2">
+                    <button type="button" @click="open = false"
+                        class="text-xs text-red-600 font-bold font-sans uppercase cursor-pointer">Cerrar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 
     </x-layout-dashboard>
 </body>
