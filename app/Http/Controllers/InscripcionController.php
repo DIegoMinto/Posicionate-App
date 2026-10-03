@@ -59,29 +59,33 @@ class InscripcionController extends Controller
             'estado_civil' => 'nullable|in:soltero,casado,divorciado,viudo,union_libre',
         ]);
 
-        $estudiante = Estudiante::create($request->all());
+        $estudiante = DB::transaction(function () use ($request, $validated) {
+            $estudiante = Estudiante::create($request->all());
 
-        $estudiante->moodle_usuario = $this->generarUsuarioMoodle(
-            $estudiante->nombre,
-            $estudiante->apellido_p,
-            $estudiante->apellido_m
-        );
-        $estudiante->moodle_password = $this->generarPasswordMoodle(
-            $estudiante->ci,
-            $estudiante->extension_ci
-        );
-        $estudiante->moodle_habilitado = 'pendiente';
-        $estudiante = Estudiante::create($request->all());
+            $estudiante->moodle_usuario = $this->generarUsuarioMoodle(
+                $estudiante->nombre,
+                $estudiante->apellido_p,
+                $estudiante->apellido_m
+            );
+            $estudiante->moodle_password = $this->generarPasswordMoodle(
+                $estudiante->ci,
+                $estudiante->extension_ci
+            );
+            $estudiante->moodle_habilitado = 'pendiente';
+            $estudiante->save();   // <- faltaba esto
 
-        \DB::table('curso_estudiante')->insert([
-            'id_curso' => $validated['id_curso'],
-            'id_estudiante' => $estudiante->id_estudiante,
-            'id_personal' => $validated['id_personal'],
-            'estado' => 'pre_inscrito',
-            'estadia' => 'pendiente',
-            'created_at' => now(),
-            'updated_at' => now(),
-        ]);
+            DB::table('curso_estudiante')->insert([
+                'id_curso' => $validated['id_curso'],
+                'id_estudiante' => $estudiante->id_estudiante,
+                'id_personal' => $validated['id_personal'],
+                'estado' => 'pre_inscrito',
+                'estadia' => 'pendiente',
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+
+            return $estudiante;
+        });
 
         $this->enviarASheets($estudiante, $validated);
 
