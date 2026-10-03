@@ -62,18 +62,6 @@ class InscripcionController extends Controller
         $estudiante = DB::transaction(function () use ($request, $validated) {
             $estudiante = Estudiante::create($request->all());
 
-            $estudiante->moodle_usuario = $this->generarUsuarioMoodle(
-                $estudiante->nombre,
-                $estudiante->apellido_p,
-                $estudiante->apellido_m
-            );
-            $estudiante->moodle_password = $this->generarPasswordMoodle(
-                $estudiante->ci,
-                $estudiante->extension_ci
-            );
-            $estudiante->moodle_habilitado = 'pendiente';
-            $estudiante->save();   // <- faltaba esto
-
             DB::table('curso_estudiante')->insert([
                 'id_curso' => $validated['id_curso'],
                 'id_estudiante' => $estudiante->id_estudiante,
