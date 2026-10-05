@@ -39,7 +39,8 @@ class StatiticController extends Controller
             ->select(
                 'curso_estudiante.id_personal',
                 'curso_estudiante.id_curso',
-                DB::raw('COUNT(*) as total')
+                DB::raw('COUNT(*) as total'),
+                DB::raw('MAX(COALESCE(primer_pago.fecha_primer_pago, curso_estudiante.created_at)) as ultima_fecha')
             )
             ->where('curso_estudiante.estado', 'inscrito')
             ->when($usarRango, function ($q) use ($fecha_inicio, $fecha_fin) {
@@ -93,6 +94,9 @@ class StatiticController extends Controller
                 'puntaje_diplomados' => 0,
                 'puntaje_cursos' => 0,
                 'puntaje' => 0,
+                'puntaje_exacto' => 0,
+                'puntaje_decimal' => 0,
+                'fecha_llegada' => null,
                 'cursos' => []
             ];
 
@@ -109,6 +113,14 @@ class StatiticController extends Controller
 
                 $count = $match ? $match->total : 0;
 
+                $tipo = strtolower($curso->tipo);
+
+                if ($count > 0 && in_array($tipo, ['diplomado', 'curso']) && $match->ultima_fecha) {
+                    if (!$fila['fecha_llegada'] || $match->ultima_fecha > $fila['fecha_llegada']) {
+                        $fila['fecha_llegada'] = $match->ultima_fecha;
+                    }
+                }
+
                 $fila['cursos'][$curso->id_curso] = $count;
                 $fila['total_inscritos'] += $count;
                 $totalesCursos[$curso->id_curso] += $count;
@@ -123,14 +135,23 @@ class StatiticController extends Controller
             $fila['puntaje_diplomados'] = $inscritosDiplomados;
             $fila['puntaje_cursos'] = $inscritosCursosRegulares;
             $fila['puntaje'] = $inscritosDiplomados + intdiv($inscritosCursosRegulares, 3);
+            $fila['puntaje_exacto'] = ($inscritosDiplomados * 3) + $inscritosCursosRegulares;
+            $fila['puntaje_decimal'] = round($fila['puntaje_exacto'] / 3, 2);
 
             $data[] = $fila;
         }
 
         usort($data, function ($a, $b) use ($orden) {
-            return $orden === 'asc'
-                ? $a['puntaje'] <=> $b['puntaje']
-                : $b['puntaje'] <=> $a['puntaje'];
+            $cmp = $a['puntaje_exacto'] <=> $b['puntaje_exacto'];
+
+            if ($cmp !== 0) {
+                return $orden === 'asc' ? $cmp : -$cmp;
+            }
+
+            $fa = $a['fecha_llegada'] ?? '9999-12-31';
+            $fb = $b['fecha_llegada'] ?? '9999-12-31';
+
+            return strcmp($fa, $fb);
         });
 
         $totalInscritosGeneral = array_sum(array_column($data, 'total_inscritos'));

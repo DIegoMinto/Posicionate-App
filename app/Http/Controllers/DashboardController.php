@@ -23,58 +23,36 @@ class DashboardController extends Controller
     {
         $usuario = auth()->user()->load('persona');
 
-        $queryPersonalesBase = Personal::with([
+        $primerPagoSql = '(
+        SELECT id_curso_estudiante, MIN(fecha_pagada) as fecha_primer_pago
+        FROM pagos_estudiante
+        WHERE fecha_pagada IS NOT NULL
+        GROUP BY id_curso_estudiante
+    ) as primer_pago';
+
+        $personalesGeneral = Personal::with([
             'persona',
-            'cursoEstudiantes' => function ($q) {
-                $q->where('estado', 'inscrito')->with('curso');
-            }
-        ]);
-
-        $personalesGeneral = $queryPersonalesBase->get();
-
-        $rankingGeneral = $personalesGeneral->map(function ($personal) {
-            $inscritosDiplomados = 0;
-            $inscritosCursosRegulares = 0;
-
-            foreach ($personal->cursoEstudiantes as $inscripcion) {
-                if ($inscripcion->curso) {
-                    $tipo = strtolower($inscripcion->curso->tipo);
-                    if ($tipo === 'diplomado') {
-                        $inscritosDiplomados++;
-                    } elseif ($tipo === 'curso') {
-                        $inscritosCursosRegulares++;
-                    }
-                }
-            }
-
-            $puntosPorCursos = intdiv($inscritosCursosRegulares, 3);
-            $residuoCursos = $inscritosCursosRegulares % 3;
-
-            $personal->total_puntaje = $inscritosDiplomados + $puntosPorCursos;
-            $personal->exponente_cursos = $residuoCursos;
-
-            return $personal;
-        })
-            ->sort(function ($a, $b) {
-                if ($b->total_puntaje === $a->total_puntaje) {
-                    return $b->exponente_cursos <=> $a->exponente_cursos;
-                }
-                return $b->total_puntaje <=> $a->total_puntaje;
-            })
-            ->take(3)
-            ->values();
-
-        $queryPersonalesMensual = Personal::with([
-            'persona',
-            'cursoEstudiantes' => function ($q) {
-                $q->select('curso_estudiante.*')
+            'cursoEstudiantes' => function ($q) use ($primerPagoSql) {
+                $q->select('curso_estudiante.*', 'primer_pago.fecha_primer_pago')
                     ->leftJoin(
-                        DB::raw('(
-                        SELECT id_curso_estudiante, MIN(fecha_pagada) as fecha_primer_pago
-                        FROM pagos_estudiante
-                        WHERE fecha_pagada IS NOT NULL
-                        GROUP BY id_curso_estudiante
-                    ) as primer_pago'),
+                        DB::raw($primerPagoSql),
+                        'primer_pago.id_curso_estudiante',
+                        '=',
+                        'curso_estudiante.id'
+                    )
+                    ->where('curso_estudiante.estado', 'inscrito')
+                    ->with('curso');
+            }
+        ])->get();
+
+        $rankingGeneral = $this->armarRanking($personalesGeneral);
+
+        $personalesMensual = Personal::with([
+            'persona',
+            'cursoEstudiantes' => function ($q) use ($primerPagoSql) {
+                $q->select('curso_estudiante.*', 'primer_pago.fecha_primer_pago')
+                    ->leftJoin(
+                        DB::raw($primerPagoSql),
                         'primer_pago.id_curso_estudiante',
                         '=',
                         'curso_estudiante.id'
@@ -90,40 +68,9 @@ class DashboardController extends Controller
                     )
                     ->with('curso');
             }
-        ]);
+        ])->get();
 
-        $personalesMensual = $queryPersonalesMensual->get();
-
-        $rankingMensual = $personalesMensual->map(function ($personal) {
-            $inscritosDiplomadosMes = 0;
-            $inscritosCursosRegularesMes = 0;
-
-            foreach ($personal->cursoEstudiantes as $inscripcion) {
-                if ($inscripcion->curso) {
-                    $tipo = strtolower($inscripcion->curso->tipo);
-                    if ($tipo === 'diplomado') {
-                        $inscritosDiplomadosMes++;
-                    } elseif ($tipo === 'curso') {
-                        $inscritosCursosRegularesMes++;
-                    }
-                }
-            }
-
-            $puntosPorCursosMes = intdiv($inscritosCursosRegularesMes, 3);
-            $residuoCursosMes = $inscritosCursosRegularesMes % 3;
-            $personal->total_puntaje = $inscritosDiplomadosMes + $puntosPorCursosMes;
-            $personal->exponente_cursos = $residuoCursosMes;
-
-            return $personal;
-        })
-            ->sort(function ($a, $b) {
-                if ($b->total_puntaje === $a->total_puntaje) {
-                    return $b->exponente_cursos <=> $a->exponente_cursos;
-                }
-                return $b->total_puntaje <=> $a->total_puntaje;
-            })
-            ->take(3)
-            ->values();
+        $rankingMensual = $this->armarRanking($personalesMensual);
 
         return view(
             'dashboard.index',
@@ -133,6 +80,54 @@ class DashboardController extends Controller
                 'rankingMensual'
             )
         );
+    }
+
+    private function armarRanking($personales)
+    {
+        return $personales->map(function ($personal) {
+            $diplomados = 0;
+            $cursos = 0;
+            $fechaLlegada = null;
+
+            foreach ($personal->cursoEstudiantes as $inscripcion) {
+                if (!$inscripcion->curso) {
+                    continue;
+                }
+
+                $tipo = strtolower($inscripcion->curso->tipo);
+
+                if (!in_array($tipo, ['diplomado', 'curso'])) {
+                    continue;
+                }
+
+                if ($tipo === 'diplomado') {
+                    $diplomados++;
+                } else {
+                    $cursos++;
+                }
+
+                $fecha = Carbon::parse($inscripcion->fecha_primer_pago ?? $inscripcion->created_at)->timestamp;
+
+                if ($fechaLlegada === null || $fecha > $fechaLlegada) {
+                    $fechaLlegada = $fecha;
+                }
+            }
+            $personal->puntaje_exacto = ($diplomados * 3) + $cursos;
+            $personal->total_puntaje = $diplomados + intdiv($cursos, 3);   // entero
+            $personal->exponente_cursos = $cursos % 3;                      // 0, 1 o 2
+
+            $personal->fecha_llegada = $fechaLlegada ?? PHP_INT_MAX;
+
+            return $personal;
+        })
+            ->sort(function ($a, $b) {
+                if ($a->puntaje_exacto !== $b->puntaje_exacto) {
+                    return $b->puntaje_exacto <=> $a->puntaje_exacto;
+                }
+                return $a->fecha_llegada <=> $b->fecha_llegada;
+            })
+            ->take(3)
+            ->values();
     }
 
     public function eventosCalendario()

@@ -108,6 +108,106 @@ class InscripcionController extends Controller
         }
     }
 
+    public function cambiarFechaPago(Request $request, $id)
+    {
+        $usuario = auth()->user();
+
+        $autorizado = $usuario->hasAnyCargo(['contador', 'asistente_contable'])
+            || $usuario->hasRole('super_admin');
+
+        if (!$autorizado) {
+            abort(403, 'Solo el área contable puede modificar la fecha de pago.');
+        }
+
+        $request->validate([
+            'fecha_pagada' => 'required|date|before_or_equal:today',
+            'password_contabilidad' => 'required|string',
+        ]);
+
+        if (!$this->verificarPasswordContabilidad($request->password_contabilidad)) {
+            return back()->with('error', 'La contraseña de validación para el área de Contabilidad es incorrecta.');
+        }
+
+        $pago = PagoEstudiante::findOrFail($id);
+
+        if ($pago->monto_pagado <= 0) {
+            return back()->with('error', 'Este concepto aún no tiene un pago registrado.');
+        }
+
+        DB::transaction(function () use ($pago, $request) {
+            $pago->fecha_pagada = $request->fecha_pagada;
+            $pago->save();
+
+            // Si es el PAGO INICIAL (raíz) de un plan CONTADO, se reprograman las cuotas
+            if ($pago->detalle === 'PAGO INICIAL' && is_null($pago->id_pago_original)) {
+                $this->recalcularFechasContado($pago);
+            }
+        });
+
+        return back()->with('success', 'Fecha de pago actualizada correctamente.');
+    }
+
+    private function verificarPasswordContabilidad(string $password): bool
+    {
+        $config = \App\Models\ContrasenaArea::whereHas('area', function ($q) {
+            $q->where('nombre', 'ILIKE', '%contabilidad%');
+        })
+            ->latest()
+            ->first();
+
+        if (!$config) {
+            return false;
+        }
+
+        try {
+            $decodificada = \Illuminate\Support\Facades\Crypt::decryptString($config->contrasena_encriptada);
+            return $password === $decodificada;
+        } catch (\Illuminate\Contracts\Encryption\DecryptException $e) {
+            return \Hash::check($password, $config->contrasena_encriptada);
+        }
+    }
+
+    private function recalcularFechasContado(PagoEstudiante $raiz): void
+    {
+        $inscripcion = \App\Models\CursoEstudiante::findOrFail($raiz->id_curso_estudiante);
+        $plan = \App\Models\PlanesPago::find($inscripcion->id_planes_pago);
+
+        if (!$plan || $plan->tipo_plan !== 'CONTADO' || !$raiz->fecha_pagada) {
+            return;
+        }
+
+        $fechaBase = Carbon::parse($raiz->fecha_pagada);
+
+        $pendientes = PagoEstudiante::where('id_curso_estudiante', $raiz->id_curso_estudiante)
+            ->whereNull('id_pago_original')
+            ->whereNotIn('detalle', ['TITULACION', 'PAGO DE MATRÍCULA', 'PAGO INICIAL'])
+            ->where('estado', '!=', 'pagado')
+            ->orderBy('id_pagos_estudiante')
+            ->get();
+
+        $ultimaFechaRegular = $fechaBase;
+        $indice = 2;
+
+        foreach ($pendientes as $cuota) {
+            $fechaProgramada = $fechaBase->copy()->addDays(($indice - 1) * 30);
+            $cuota->fecha_programada = $fechaProgramada->format('Y-m-d');
+            $cuota->save();
+            $ultimaFechaRegular = $fechaProgramada;
+            $indice++;
+        }
+
+        $titulacion = PagoEstudiante::where('id_curso_estudiante', $raiz->id_curso_estudiante)
+            ->whereNull('id_pago_original')
+            ->where('detalle', 'TITULACION')
+            ->where('estado', '!=', 'pagado')
+            ->first();
+
+        if ($titulacion) {
+            $titulacion->fecha_programada = $ultimaFechaRegular->copy()->addDays(15)->format('Y-m-d');
+            $titulacion->save();
+        }
+    }
+
     public function list(Request $request, $id)
     {
         $curso = Curso::findOrFail($id);

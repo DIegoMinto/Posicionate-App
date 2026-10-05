@@ -158,7 +158,7 @@ Route::middleware(['auth', 'vigente'])->group(function () {
     Route::put('/personal/{id}', [UserController::class, 'update'])->name('personal.update');
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
-    // RUTAS ACADÉMICOS 
+    // RUTAS ACADÉMICOS Y CONTABILIDAD
 
     Route::middleware('role_or_cargo:roles=super_admin+admin|cargos=supervisor_academico+coordinador_academico+asistente_academico+contador+asistente_contable')->group(function () {
         Route::get('/programs/create', [DashboardController::class, 'programsCreate'])->name('programs.create');
@@ -213,11 +213,13 @@ Route::middleware(['auth', 'vigente'])->group(function () {
         Route::get('/plans/{id}/edit', [PlanController::class, 'edit'])->name('plans.edit');
         Route::put('/plans/{id}', [PlanController::class, 'update'])->name('plans.update');
 
+
         // RUTAS PAGOS DE ESTUDIANTES
 
         Route::get('/pagos/{id}/edit', [InscripcionController::class, 'editPago'])->name('pagos.edit');
         Route::put('/pagos/{id}', [InscripcionController::class, 'updatePago'])->name('pagos.update');
         Route::post('/pagos/{id}/validar', [InscripcionController::class, 'validarPago'])->name('pagos.validar');
+        Route::put('/pagos/{id}/fecha', [InscripcionController::class, 'cambiarFechaPago'])->name('pagos.fecha');
 
     });
 

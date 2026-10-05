@@ -159,6 +159,7 @@
 
                                                             <td class="py-3 px-4 text-center">
                                                                 <div class="flex items-center justify-center gap-2" x-data="{
+                                                                openFecha{{ $mov->id_pagos_estudiante }}: false,
     openVerify{{ $mov->id_pagos_estudiante }}: false,
     openRecibo{{ $mov->id_pagos_estudiante }}: false,
     reciboHtml{{ $mov->id_pagos_estudiante }}: '',
@@ -226,7 +227,65 @@
 
                 </div>
             </div>
-        @endif
+        @endif@if(($usuario->hasAnyCargo(['contador', 'asistente_contable']) || $usuario->rol === 'super_admin') && $mov->monto_pagado > 0)
+
+    <button type="button" @click="openFecha{{ $mov->id_pagos_estudiante }} = true"
+        title="Cambiar fecha de pago" class="cursor-pointer">
+        <svg xmlns="http://www.w3.org/2000/svg"
+            class="w-5 h-5 text-brand-green hover:text-brand-gold transition-colors"
+            fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round"
+                d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+        </svg>
+    </button>
+
+    <div x-show="openFecha{{ $mov->id_pagos_estudiante }}"
+        class="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 backdrop-blur-sm"
+        x-cloak x-transition>
+
+        <div class="bg-white p-6 rounded-sm shadow-2xl w-85 text-left border-t-4 border-brand-green"
+            @click.away="openFecha{{ $mov->id_pagos_estudiante }} = false">
+
+            <h3 class="text-[11px] font-black text-brand-green uppercase mb-2">
+                Cambiar Fecha de Pago
+            </h3>
+
+            <p class="text-[10px] mb-4 text-gray-600">
+                Pago de <span class="font-bold text-black">{{ number_format($mov->monto_pagado, 2) }} Bs</span>.
+                Fecha actual:
+                <strong>{{ $mov->fecha_pagada ? \Carbon\Carbon::parse($mov->fecha_pagada)->format('d/m/Y') : '-' }}</strong>
+            </p>
+
+            <form action="{{ route('pagos.fecha', $mov->id_pagos_estudiante) }}" method="POST">
+                @csrf
+                @method('PUT')
+
+                <label class="block text-[9px] font-bold text-gray-500 uppercase mb-1">Nueva fecha</label>
+                <input type="date" name="fecha_pagada" required
+                    max="{{ now()->format('Y-m-d') }}"
+                    value="{{ $mov->fecha_pagada ? \Carbon\Carbon::parse($mov->fecha_pagada)->format('Y-m-d') : '' }}"
+                    class="w-full border-2 border-brand-gold p-2 text-xs mb-3 focus:outline-none bg-gray-50">
+
+                <label class="block text-[9px] font-bold text-gray-500 uppercase mb-1">Clave de Contabilidad</label>
+                <input type="password" name="password_contabilidad" required
+                    class="w-full border-2 border-brand-gold p-2 text-xs mb-4 focus:outline-none bg-gray-50 placeholder:normal-case"
+                    placeholder="Contraseña de Contabilidad">
+
+                <div class="flex justify-end gap-3">
+                    <button type="button"
+                        @click="openFecha{{ $mov->id_pagos_estudiante }} = false"
+                        class="text-[9px] font-bold text-gray-400 uppercase cursor-pointer">
+                        Cancelar
+                    </button>
+                    <button type="submit"
+                        class="bg-brand-green text-white px-4 py-2 rounded-sm text-[9px] font-black uppercase cursor-pointer hover:bg-opacity-90">
+                        Guardar Fecha
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+@endif
 
                                                                     @if($usuario->hasAnyCargo(['asistente_contable', 'gerente_marketing']) || $usuario->rol === 'super_admin')
 
