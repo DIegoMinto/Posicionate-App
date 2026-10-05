@@ -227,7 +227,9 @@
 
                 </div>
             </div>
-        @endif@if(($usuario->hasAnyCargo(['contador', 'asistente_contable']) || $usuario->rol === 'super_admin') && $mov->monto_pagado > 0)
+        @endif
+        
+        @if(($usuario->hasAnyCargo(['contador', 'asistente_contable']) || $usuario->rol === 'super_admin') && $mov->monto_pagado > 0)
 
     <button type="button" @click="openFecha{{ $mov->id_pagos_estudiante }} = true"
         title="Cambiar fecha de pago" class="cursor-pointer">
