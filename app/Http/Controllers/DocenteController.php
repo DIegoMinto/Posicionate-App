@@ -66,130 +66,219 @@ class DocenteController extends Controller
         return view('personas.register_teacher', compact('paises', 'grados', 'profesiones', 'instituciones', 'bancos'));
     }
 
+
     public function store(Request $request)
     {
-        $data = [];
-
         $validated = $request->validate([
             'nombre' => 'required|string|max:100',
             'apellido_p' => 'required|string|max:100',
             'apellido_m' => 'nullable|string|max:100',
+
             'fecha_nacimiento' => 'required|date|before:-18 years',
+
             'ci' => 'required|numeric|digits_between:5,10|unique:docente,ci',
             'extension_ci' => 'required|string|max:10',
+
             'correo_electronico' => 'required|email|unique:docente,correo_electronico',
-            'id_pais' => 'required',
-            'id_departamento' => 'required',
-            'id_ciudad' => 'required',
+
+            'id_pais' => 'required|exists:pais,id_pais',
+            'id_departamento' => 'required|exists:departamento,id_departamento',
+
+            'lugar_nacimiento' => 'required|string|max:150',
             'domicilio' => 'nullable|string|max:255',
+
             'genero' => 'required|in:M,F',
+
             'id_institucion_bancaria' => 'required',
             'numero_cuenta_bancaria' => 'required|string|max:30',
+
             'id_profesion' => 'required',
             'id_grado_academico' => 'required',
             'id_institucion_egreso' => 'required',
+
             'codigo_pais_movil' => 'required|string|max:5',
             'numero_movil' => 'required|numeric|digits_between:6,15',
+
+            'programas_dar' => 'nullable|string',
             'emite_factura' => 'required|in:0,1',
+
+            // El currículum es opcional.
             'curriculum' => 'nullable|file|mimes:pdf|max:10240',
-            'fotocarnet' => 'required|file|mimes:pdf,jpg,jpeg,png',
+
+            // El carnet escaneado sigue siendo obligatorio.
+            'fotocarnet' => 'required|file|mimes:pdf,jpg,jpeg,png|max:10240',
+
+            // La fotografía es opcional.
             'fotografia' => 'nullable|image|mimes:jpg,jpeg,png|max:10240',
         ], [
-            // Mensajes en español, específicos por regla
             'required' => 'Este campo es obligatorio.',
+            'exists' => 'La opción seleccionada no es válida.',
+
             'nombre.required' => 'Ingresa tu nombre.',
             'apellido_p.required' => 'Ingresa tu primer apellido.',
+
+            'fecha_nacimiento.required' => 'Ingresa tu fecha de nacimiento.',
             'fecha_nacimiento.before' => 'Debes tener al menos 18 años.',
+
+            'ci.required' => 'Ingresa tu carnet de identidad.',
             'ci.numeric' => 'El carnet debe contener solo números.',
-            'ci.unique' => 'Este número de carnet ya está registrado.',
             'ci.digits_between' => 'El carnet debe tener entre 5 y 10 dígitos.',
+            'ci.unique' => 'Este número de carnet ya está registrado.',
+
+            'extension_ci.required' => 'Selecciona la extensión del carnet.',
+
+            'correo_electronico.required' => 'Ingresa tu correo electrónico.',
             'correo_electronico.email' => 'Escribe un correo electrónico válido.',
             'correo_electronico.unique' => 'Este correo ya está registrado.',
+
+            'id_pais.required' => 'Selecciona un país.',
+            'id_departamento.required' => 'Selecciona un departamento.',
+
+            'lugar_nacimiento.required' => 'Ingresa tu lugar de nacimiento.',
+
+            'genero.required' => 'Selecciona tu género.',
+
+            'id_institucion_bancaria.required' => 'Selecciona una entidad bancaria.',
+            'numero_cuenta_bancaria.required' => 'Ingresa tu número de cuenta.',
+
+            'id_profesion.required' => 'Selecciona tu profesión u ocupación.',
+            'id_grado_academico.required' => 'Selecciona tu grado académico.',
+            'id_institucion_egreso.required' => 'Selecciona tu institución de egreso.',
+
+            'codigo_pais_movil.required' => 'Selecciona el código de país.',
+            'numero_movil.required' => 'Ingresa tu número de celular.',
             'numero_movil.numeric' => 'El número de celular debe contener solo dígitos.',
-            'curriculum.required' => 'Debes adjuntar tu Curriculum Vitae en PDF.',
-            'curriculum.mimes' => 'El Curriculum debe ser un archivo PDF.',
+            'numero_movil.digits_between' => 'El celular debe tener entre 6 y 15 dígitos.',
+
+            'emite_factura.required' => 'Indica si emites factura.',
+
+            'curriculum.mimes' => 'El currículum debe ser un archivo PDF.',
+            'curriculum.max' => 'El currículum no puede superar los 10 MB.',
+
             'fotocarnet.required' => 'Debes adjuntar una foto o PDF de tu carnet.',
             'fotocarnet.mimes' => 'El carnet debe ser PDF, JPG o PNG.',
-            'fotografia.image' => 'La fotografía debe ser JPG o PNG.',
+            'fotocarnet.max' => 'El archivo del carnet no puede superar los 10 MB.',
+
+            'fotografia.image' => 'La fotografía debe ser una imagen válida.',
+            'fotografia.mimes' => 'La fotografía debe ser JPG o PNG.',
+            'fotografia.max' => 'La fotografía no puede superar los 10 MB.',
         ]);
 
+        $data = [];
+
         try {
-            $extensionFinal = strtoupper(trim($request->extension_ci));
+            $extensionFinal = strtoupper(trim($validated['extension_ci']));
 
-            $data = $request->except(['_token', 'id_pais', 'id_departamento', 'codigo_pais_movil', 'numero_movil']);
+            $data = $request->except([
+                '_token',
+                'id_pais',
+                'id_departamento',
+                'id_ciudad',
+                'codigo_pais_movil',
+                'numero_movil',
+                'curriculum',
+                'fotocarnet',
+                'fotografia',
+            ]);
+
             $data['extension_ci'] = $extensionFinal;
-            $data['telefono_movil'] = trim($request->codigo_pais_movil . ' ' . $request->numero_movil);
-            $data['emite_factura'] = ($request->emite_factura == '1') ? 'SI' : 'NO';
 
-            $idArchivo = $request->ci . '_' . $extensionFinal;
-            $cloudinary = new Cloudinary([
+            $data['telefono_movil'] = trim(
+                $validated['codigo_pais_movil'] . ' ' . $validated['numero_movil']
+            );
+
+            $data['emite_factura'] =
+                $validated['emite_factura'] === '1' ? 'SI' : 'NO';
+
+            $idArchivo = $validated['ci'] . '_' . $extensionFinal;
+
+            $cloudinary = new \Cloudinary\Cloudinary([
                 'cloud' => [
                     'cloud_name' => env('CLOUDINARY_CLOUD_NAME'),
                     'api_key' => env('CLOUDINARY_API_KEY'),
                     'api_secret' => env('CLOUDINARY_API_SECRET'),
                 ],
-                'url' => ['secure' => true]
+                'url' => [
+                    'secure' => true,
+                ],
             ]);
 
             if ($request->hasFile('curriculum')) {
-                $upload = retry(4, fn() => $cloudinary->uploadApi()->upload(
-                    $request->file('curriculum')->getRealPath(),
-                    [
-                        'folder' => 'curriculums',
-                        'resource_type' => 'auto',
-                        'public_id' => "CV_$idArchivo",
-                        'access_mode' => 'public',
-                    ]
-                ), 500);
+                $upload = retry(
+                    4,
+                    fn() =>
+                    $cloudinary->uploadApi()->upload(
+                        $request->file('curriculum')->getRealPath(),
+                        [
+                            'folder' => 'curriculums',
+                            'resource_type' => 'raw',
+                            'public_id' => "CV_$idArchivo",
+                        ]
+                    ),
+                    500
+                );
 
                 $data['curriculum'] = $upload['secure_url'];
             }
 
-            if ($request->hasFile('fotocarnet')) {
-                $upload = retry(4, fn() => $cloudinary->uploadApi()->upload(
+            $uploadCarnet = retry(
+                4,
+                fn() =>
+                $cloudinary->uploadApi()->upload(
                     $request->file('fotocarnet')->getRealPath(),
                     [
                         'folder' => 'carnets',
                         'resource_type' => 'auto',
                         'public_id' => "CARNET_$idArchivo",
-                        'access_mode' => 'public',
                     ]
-                ), 500);
+                ),
+                500
+            );
 
-                $data['fotocarnet'] = $upload['secure_url'];
-            }
-
+            $data['fotocarnet'] = $uploadCarnet['secure_url'];
             if ($request->hasFile('fotografia')) {
-                $upload = retry(4, fn() => $cloudinary->uploadApi()->upload(
-                    $request->file('fotografia')->getRealPath(),
-                    [
-                        'folder' => 'fotografias',
-                        'resource_type' => 'image',
-                        'public_id' => "FOTO_$idArchivo",
-                        'access_mode' => 'public',
-                    ]
-                ), 500);
+                $uploadFoto = retry(
+                    4,
+                    fn() =>
+                    $cloudinary->uploadApi()->upload(
+                        $request->file('fotografia')->getRealPath(),
+                        [
+                            'folder' => 'fotografias',
+                            'resource_type' => 'image',
+                            'public_id' => "FOTO_$idArchivo",
+                        ]
+                    ),
+                    500
+                );
 
-                $data['fotografia'] = $upload['secure_url'];
+                $data['fotografia'] = $uploadFoto['secure_url'];
             }
 
             Docente::create($data);
 
-            return redirect()->route('docentes.create')
-                ->with('success', "¡Docente " . $request->nombre . " registrado con éxito!");
+            return redirect()
+                ->route('docentes.create')
+                ->with('success', "¡Docente {$validated['nombre']} registrado con éxito!");
 
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             \Log::error('Error al registrar docente', [
                 'mensaje' => $e->getMessage(),
                 'linea' => $e->getLine(),
-                'datos' => $data,
+                'archivo' => $e->getFile(),
             ]);
 
             return back()
-                ->withErrors(['error' => 'Ocurrió un error al subir los archivos. Por favor intenta nuevamente en unos segundos.'])
-                ->withInput();
+                ->withErrors([
+                    'error' => 'No se pudo registrar al docente. Revisa los datos e inténtalo nuevamente.',
+                ])
+                ->withInput($request->except([
+                    'curriculum',
+                    'fotocarnet',
+                    'fotografia',
+                ]));
         }
     }
+
 
     public function show(Docente $docente)
     {
