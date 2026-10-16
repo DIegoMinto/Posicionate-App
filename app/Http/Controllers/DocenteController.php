@@ -91,9 +91,9 @@ class DocenteController extends Controller
             'codigo_pais_movil' => 'required|string|max:5',
             'numero_movil' => 'required|numeric|digits_between:6,15',
             'emite_factura' => 'required|in:0,1',
-            'curriculum' => 'required|file|mimes:pdf',
+            'curriculum' => 'nullable|file|mimes:pdf|max:10240',
             'fotocarnet' => 'required|file|mimes:pdf,jpg,jpeg,png',
-            'fotografia' => 'nullable|file|extensions:jpg,jpeg,png',
+            'fotografia' => 'nullable|image|mimes:jpg,jpeg,png|max:10240',
         ], [
             // Mensajes en español, específicos por regla
             'required' => 'Este campo es obligatorio.',

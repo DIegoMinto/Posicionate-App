@@ -49,14 +49,56 @@ class InscripcionController extends Controller
 
     public function store(Request $request)
     {
+
         $validated = $request->validate([
-            'ci' => 'required|unique:estudiante,ci',
+            'ci' => 'required|string|unique:estudiante,ci',
             'nombre' => 'required|string|max:100',
             'apellido_p' => 'required|string|max:100',
+            'apellido_m' => 'nullable|string|max:100',
+            'fecha_nacimiento' => 'required|date',
+            'extension_ci' => 'required|string',
+            'ciudad_residencia' => 'required|string|max:150',
+            'domicilio' => 'nullable|string|max:255',
+            'estado_civil' => 'required|in:soltero,casado,divorciado,viudo,union_libre',
+            'genero' => 'nullable|in:M,F',
+
+            'id_profesion' => 'required|integer',
+            'id_grado_academico' => 'required|integer',
+            'id_institucion_egreso' => 'required|integer',
+
+            'telefono_movil' => 'nullable|string|max:30',
             'correo_electronico' => 'required|email|unique:estudiante,correo_electronico',
-            'id_curso' => 'required',
-            'id_personal' => 'required',
-            'estado_civil' => 'nullable|in:soltero,casado,divorciado,viudo,union_libre',
+
+            'id_curso' => 'required|integer',
+            'id_personal' => 'required|integer',
+        ], [
+            'required' => 'El campo :attribute es obligatorio.',
+            'string' => 'El campo :attribute debe contener texto válido.',
+            'integer' => 'Selecciona una opción válida para :attribute.',
+            'date' => 'Ingresa una fecha de nacimiento válida.',
+            'email' => 'Ingresa una dirección de correo electrónico válida.',
+            'max.string' => 'El campo :attribute no debe superar los :max caracteres.',
+            'in' => 'La opción seleccionada para :attribute no es válida.',
+
+            'ci.unique' => 'Este carnet de identidad ya está registrado. Verifica el número ingresado.',
+            'correo_electronico.unique' => 'Este correo electrónico ya está registrado. Intenta con otro correo.',
+
+        ], [
+            'ci' => 'el carnet de identidad',
+            'nombre' => 'el nombre',
+            'apellido_p' => 'el primer apellido',
+            'apellido_m' => 'el segundo apellido',
+            'fecha_nacimiento' => 'la fecha de nacimiento',
+            'extension_ci' => 'la extensión del carnet',
+            'ciudad_residencia' => 'el lugar de nacimiento',
+            'domicilio' => 'el domicilio actual',
+            'estado_civil' => 'el estado civil',
+            'genero' => 'el género',
+            'id_profesion' => 'la profesión',
+            'id_grado_academico' => 'el grado académico',
+            'id_institucion_egreso' => 'la institución de egreso',
+            'telefono_movil' => 'el teléfono móvil',
+            'correo_electronico' => 'el correo electrónico',
         ]);
 
         $estudiante = DB::transaction(function () use ($request, $validated) {

@@ -144,7 +144,7 @@
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                         <div>
                             <label class="form-label-bold text-brand-green uppercase">
-                                País de Residencia <span class="text-red-500">*</span>
+                                País<span class="text-red-500">*</span>
                             </label>
                             <select name="id_pais" id="select-pais"
                                 class="form-select-pill border-brand-green border @error('id_pais') border-red-500 @enderror">
@@ -161,7 +161,7 @@
                         </div>
                         <div>
                             <label class="form-label-bold text-brand-green uppercase">
-                                Departamento de Residencia <span class="text-red-500">*</span>
+                                Departamento <span class="text-red-500">*</span>
                             </label>
                             <select name="id_departamento" id="select-departamento"
                                 class="form-select-pill border-brand-green border @error('id_departamento') border-red-500 @enderror">
@@ -171,18 +171,27 @@
                                 <p class="text-red-600 text-xs font-bold mt-1">{{ $message }}</p>
                             @enderror
                         </div>
-                        <div>
-                            <label class="form-label-bold text-brand-green uppercase">
-                                Ciudad de Residencia <span class="text-red-500">*</span>
-                            </label>
-                            <select name="id_ciudad" id="select-ciudad"
-                                class="form-select-pill border-brand-green border @error('id_ciudad') border-red-500 @enderror">
-                                <option value="">Seleccione un depto primero</option>
-                            </select>
-                            @error('id_ciudad')
-                                <p class="text-red-600 text-xs font-bold mt-1">{{ $message }}</p>
-                            @enderror
-                        </div>
+
+<div>
+    <label for="lugar_nacimiento" class="form-label-bold text-brand-green uppercase">
+        LUGAR DE NACIMIENTO <span class="text-red-500">*</span>
+    </label>
+
+    <input
+        type="text"
+        name="lugar_nacimiento"
+        id="lugar_nacimiento"
+        value="{{ old('lugar_nacimiento') }}"
+        placeholder="Ej. Sucre, Chuquisaca"
+        class="form-input-pill border-brand-green border @error('lugar_nacimiento') border-red-500 @enderror"
+        required
+    >
+
+    @error('lugar_nacimiento')
+        <p class="text-red-600 text-xs font-bold mt-1">{{ $message }}</p>
+    @enderror
+</div>
+
                     </div>
 
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -237,6 +246,26 @@
                         </div>
 
                     </div>
+                    
+<div class="mt-4 flex items-start gap-2 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3">
+    <svg class="w-5 h-5 text-amber-600 shrink-0 mt-0.5"
+        fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M12 9v2m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z" />
+    </svg>
+
+    <div>
+        <p class="text-xs font-bold text-amber-800 uppercase">
+            Importante: requisitos de los archivos
+        </p>
+        <p class="text-xs text-slate-700 mt-1 leading-relaxed">
+            Todos los archivos adjuntos deben tener un tamaño máximo de
+            <strong>10 MB por archivo</strong> y respetar los formatos solicitados
+            en cada campo (PDF, JPG o PNG, según corresponda).
+        </p>
+    </div>
+</div>
+
 
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-6 pt-2">
                         <div>
