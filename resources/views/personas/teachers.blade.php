@@ -15,15 +15,18 @@
 
             <form action="{{ route('teachers.index') }}" method="GET" class="flex items-center gap-3">
 
+
                 <select name="area" onchange="this.form.submit()"
                     class="bg-white text-black text-[10px] font-bold px-3 py-1.5 rounded-md uppercase">
                     <option value="">ÁREA: TODAS</option>
-                    @foreach($areas as $area)
-                        <option value="{{ $area }}" {{ request('area') == $area ? 'selected' : '' }}>
-                            {{ strtoupper($area) }}
+
+                    @foreach ($areas as $area)
+                        <option value="{{ $area->id_area_docente }}" {{ request('area') == $area->id_area_docente ? 'selected' : '' }}>
+                            {{ strtoupper($area->nombre) }}
                         </option>
                     @endforeach
                 </select>
+
 
                 <select name="emite_factura" onchange="this.form.submit()"
                     class="bg-white text-black text-[10px] font-bold px-3 py-1.5 rounded-md uppercase">
@@ -156,11 +159,20 @@ try {
                                         </td>
                                         <td class="py-3 px-4">{{ $d->grado->nombre ?? 'S/G' }}</td>
                                         <td class="py-3 px-4">{{ $d->profesion->nombre ?? 'No def.' }}</td>
+
                                         <td class="py-3 px-4">
-                                            <span>
-                                                {{ $d->area ?? 'Sin Área' }}
-                                            </span>
+                                            <div class="flex flex-wrap gap-1">
+                                                @forelse ($d->areasDocente as $area)
+                                                    <span
+                                                        class="inline-block rounded bg-brand-green/10 px-2 py-1 text-[10px] font-semibold text-brand-green">
+                                                        {{ $area->nombre }}
+                                                    </span>
+                                                @empty
+                                                    <span class="text-gray-400">Sin área</span>
+                                                @endforelse
+                                            </div>
                                         </td>
+
                                         <td class="py-3 px-4 whitespace-nowrap">{{ $d->telefono_movil ?? '-' }}</td>
                                         <td class="py-3 px-4 lowercase whitespace-nowrap">
                                             {{ $d->correo_electronico ?? '-' }}

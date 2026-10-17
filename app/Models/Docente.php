@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class Docente extends Model
 {
@@ -63,5 +64,15 @@ class Docente extends Model
     public function cursos()
     {
         return $this->hasMany(Curso::class, 'id_docente', 'id_docente');
+    }
+
+    public function areasDocente(): BelongsToMany
+    {
+        return $this->belongsToMany(
+            AreaDocente::class,
+            'docente_area_docente',
+            'id_docente',
+            'id_area_docente'
+        )->withTimestamps();
     }
 }

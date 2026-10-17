@@ -69,11 +69,9 @@
         </label>
     @endforeach
 </div>
-@if(!$esSuperAdmin && isset($personal))
     @foreach($personal->cargos as $cargo)
         <input type="hidden" name="cargos[]" value="{{ $cargo->id_cargo }}">
     @endforeach
-@endif
 </div>
 
                         <div>

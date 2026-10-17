@@ -111,19 +111,57 @@
                                     class="font-sans font-bold text-brand-green text-sm uppercase border-b border-gray-100">
                                     Académicos y Ubicación</h3>
 
-                                <div>
-                                    <label class="form-label-bold font-sans text-brand-green">Área</label>
-                                    <select name="area" class="form-select-pill border-2 border-brand-gold">
-                                        <option value="">Sin Definir</option>
-                                        <option value="ingenieria" {{ $docente->area == 'ingenieria' ? 'selected' : '' }}>
-                                            Ingeniería</option>
-                                        <option value="derecho" {{ $docente->area == 'derecho' ? 'selected' : '' }}>
-                                            Derecho</option>
-                                        <option value="economia" {{ $docente->area == 'economia' ? 'selected' : '' }}>
-                                            Economía
-                                        </option>
-                                    </select>
-                                </div>
+                                
+<div>
+    <label
+        for="areas_docente"
+        class="form-label-bold font-sans text-brand-green"
+    >
+        Áreas de especialización
+    </label>
+
+    <select
+        id="areas_docente"
+        name="areas_docente[]"
+        multiple
+        required
+        class="form-select-pill border-2 border-brand-gold w-full"
+    >
+        @foreach ($areasDocente as $area)
+            <option
+                value="{{ $area->id_area_docente }}"
+                {{ in_array(
+                    $area->id_area_docente,
+                    old(
+                        'areas_docente',
+                        $docente->areasDocente
+                            ->pluck('id_area_docente')
+                            ->all()
+                    )
+                ) ? 'selected' : '' }}
+            >
+                {{ $area->nombre }}
+            </option>
+        @endforeach
+    </select>
+
+    <p class="text-xs text-gray-500 mt-1">
+        Mantén Ctrl presionado para elegir varias áreas.
+    </p>
+
+    @error('areas_docente')
+        <p class="text-red-600 text-xs font-bold mt-1">
+            {{ $message }}
+        </p>
+    @enderror
+
+    @error('areas_docente.*')
+        <p class="text-red-600 text-xs font-bold mt-1">
+            {{ $message }}
+        </p>
+    @enderror
+</div>
+
 
                                 <div>
                                     <label class=" form-label-bold font-sans text-brand-green">Título / Grado

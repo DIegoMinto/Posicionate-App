@@ -450,6 +450,108 @@
 
                     </div>
 
+    
+<div class="md:col-span-3">
+    <div class="mb-3">
+        <label class="form-label-bold text-brand-green">
+            Áreas de especialización
+            <span class="text-red-500">*</span>
+        </label>
+
+        <p class="mt-1 text-sm text-gray-500">
+            Selecciona las áreas en las que el docente tiene experiencia.
+            Puedes elegir más de una.
+        </p>
+    </div>
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+        @foreach ($areasDocente as $area)
+            <label
+                for="area_docente_{{ $area->id_area_docente }}"
+                class="flex items-start gap-3 rounded-xl border border-gray-200
+                       bg-white p-4 cursor-pointer transition-all duration-200
+                       hover:border-brand-green hover:bg-gray-50
+                       has-[:checked]:border-brand-green
+                       has-[:checked]:bg-brand-green/5"
+            >
+                <input
+                    type="checkbox"
+                    id="area_docente_{{ $area->id_area_docente }}"
+                    name="areas_docente[]"
+                    value="{{ $area->id_area_docente }}"
+                    class="mt-0.5 h-4 w-4 shrink-0 rounded
+                           border-gray-300 accent-brand-green
+                           focus:ring-brand-green"
+                    {{ in_array(
+                        $area->id_area_docente,
+                        old('areas_docente', [])
+                    ) ? 'checked' : '' }}
+                >
+
+                <span class="text-sm font-medium text-gray-700 leading-5">
+                    {{ $area->nombre }}
+                </span>
+            </label>
+        @endforeach
+    </div>
+
+    <div class="mt-3 flex items-center justify-between gap-3">
+        <p class="text-xs text-gray-500">
+            Marca todas las áreas que correspondan.
+        </p>
+
+        <span
+            id="contador-areas-docente"
+            class="shrink-0 rounded-full bg-brand-green/10
+                   px-3 py-1 text-xs font-semibold text-brand-green"
+        >
+            0 seleccionadas
+        </span>
+    </div>
+
+    @error('areas_docente')
+        <p class="mt-2 text-sm font-medium text-red-600">
+            {{ $message }}
+        </p>
+    @enderror
+
+    @error('areas_docente.*')
+        <p class="mt-2 text-sm font-medium text-red-600">
+            {{ $message }}
+        </p>
+    @enderror
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const checkboxes = document.querySelectorAll(
+            'input[name="areas_docente[]"]'
+        );
+
+        const contador = document.getElementById(
+            'contador-areas-docente'
+        );
+
+        function actualizarContador() {
+            const seleccionadas = document.querySelectorAll(
+                'input[name="areas_docente[]"]:checked'
+            ).length;
+
+            contador.textContent =
+                `${seleccionadas} ${seleccionadas === 1
+                    ? 'seleccionada'
+                    : 'seleccionadas'}`;
+        }
+
+        checkboxes.forEach(function (checkbox) {
+            checkbox.addEventListener('change', actualizarContador);
+        });
+
+        actualizarContador();
+    });
+</script>
+
+
                 </section>
 
                 {{-- SECCIÓN 3: CONTACTO Y ADICIONALES --}}
@@ -699,22 +801,18 @@
 
                 cargarDepartamentos(paisId);
             });
-
-            // Recuperar país y departamento si hubo errores de validación
-            const paisAnterior = @json(old('id_pais'));
+           const paisAnterior = @json(old('id_pais'));
             const departamentoAnterior = deptoSelect.dataset.old;
 
             if (paisAnterior && paisSelect.value) {
                 cargarDepartamentos(paisSelect.value, departamentoAnterior);
             }
 
-            // Limitar el número móvil a dígitos
             numeroMovilInput.addEventListener('input', () => {
                 numeroMovilInput.value = numeroMovilInput.value.replace(/\D/g, '');
             });
         });
 
-        // Select2
         $(document).ready(function () {
             $('#select-profesion, #select-grado, #select-institucion, #select-banco').select2({
                 placeholder: 'Seleccione una opción',
@@ -723,6 +821,5 @@
             });
         });
     </script>
-
 </body>
 </html>

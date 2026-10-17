@@ -9,32 +9,52 @@ use App\Models\GradoAcademico;
 use App\Models\Profesion;
 use App\Models\InstitucionEgreso;
 use App\Models\InstitucionBancaria;
+use App\Models\AreaDocente;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Hash;
 use Cloudinary\Cloudinary;
+use Illuminate\Support\Facades\DB;
 
 class DocenteController extends Controller
 {
 
+
     public function teachers(Request $request)
     {
-        $query = Docente::with(['grado', 'profesion', 'ciudad', 'institucion', 'institucion_bancaria']);
+        $query = Docente::with([
+            'grado',
+            'profesion',
+            'ciudad',
+            'institucion',
+            'institucion_bancaria',
+            'areasDocente',
+        ]);
 
         if ($request->filled('search')) {
-            $query->where(function ($q) use ($request) {
-                $q->where('nombre', 'ILIKE', "%{$request->search}%")
-                    ->orWhere('apellido_p', 'ILIKE', "%{$request->search}%")
-                    ->orWhere('apellido_m', 'ILIKE', "%{$request->search}%")
-                    ->orWhere('ci', 'LIKE', "%{$request->search}%");
+            $busqueda = $request->search;
+
+            $query->where(function ($q) use ($busqueda) {
+                $q->where('nombre', 'ILIKE', "%{$busqueda}%")
+                    ->orWhere('apellido_p', 'ILIKE', "%{$busqueda}%")
+                    ->orWhere('apellido_m', 'ILIKE', "%{$busqueda}%")
+                    ->orWhere('ci', 'LIKE', "%{$busqueda}%");
             });
         }
 
         if ($request->filled('area')) {
-            $query->where('area', $request->area);
+            $query->whereHas('areasDocente', function ($q) use ($request) {
+                $q->where(
+                    'area_docente.id_area_docente',
+                    $request->area
+                );
+            });
         }
 
         if ($request->filled('emite_factura')) {
-            $query->where('emite_factura', $request->emite_factura);
+            $query->where(
+                'emite_factura',
+                $request->emite_factura
+            );
         }
 
         if ($request->filled('id_ciudad')) {
@@ -45,14 +65,18 @@ class DocenteController extends Controller
             ->orderBy('docente.created_at', 'desc')
             ->paginate(10)
             ->withQueryString();
-        ;
 
-        $areas = Docente::select('area')->whereNotNull('area')->distinct()->pluck('area');
+        $areas = AreaDocente::orderBy('nombre')->get();
         $ciudades = \App\Models\Ciudad::all();
 
         $usuario = auth()->user()->load('persona');
 
-        return view('personas.teachers', compact('docentes', 'usuario', 'areas', 'ciudades'));
+        return view('personas.teachers', compact(
+            'docentes',
+            'usuario',
+            'areas',
+            'ciudades'
+        ));
     }
 
     public function create()
@@ -63,7 +87,16 @@ class DocenteController extends Controller
         $instituciones = InstitucionEgreso::all();
         $bancos = InstitucionBancaria::all();
 
-        return view('personas.register_teacher', compact('paises', 'grados', 'profesiones', 'instituciones', 'bancos'));
+        $areasDocente = AreaDocente::orderBy('nombre')->get();
+
+        return view('personas.register_teacher', compact(
+            'paises',
+            'grados',
+            'profesiones',
+            'instituciones',
+            'bancos',
+            'areasDocente'
+        ));
     }
 
 
@@ -110,6 +143,9 @@ class DocenteController extends Controller
 
             // La fotografía es opcional.
             'fotografia' => 'nullable|image|mimes:jpg,jpeg,png|max:10240',
+
+            'areas_docente' => 'required|array|min:1',
+            'areas_docente.*' => 'required|integer|distinct|exists:area_docente,id_area_docente',
         ], [
             'required' => 'Este campo es obligatorio.',
             'exists' => 'La opción seleccionada no es válida.',
@@ -176,6 +212,7 @@ class DocenteController extends Controller
                 'id_ciudad',
                 'codigo_pais_movil',
                 'numero_movil',
+                'areas_docente',
                 'curriculum',
                 'fotocarnet',
                 'fotografia',
@@ -254,7 +291,13 @@ class DocenteController extends Controller
                 $data['fotografia'] = $uploadFoto['secure_url'];
             }
 
-            Docente::create($data);
+            DB::transaction(function () use ($data, $validated) {
+                $docente = Docente::create($data);
+
+                $docente->areasDocente()->sync(
+                    $validated['areas_docente']
+                );
+            });
 
             return redirect()
                 ->route('docentes.create')
@@ -282,11 +325,21 @@ class DocenteController extends Controller
 
     public function show(Docente $docente)
     {
-        $docente->load(['grado', 'profesion', 'ciudad', 'institucion', 'institucion_bancaria']);
+        $docente->load([
+            'grado',
+            'profesion',
+            'ciudad',
+            'institucion',
+            'institucion_bancaria',
+            'areasDocente',
+        ]);
 
         $usuario = auth()->user();
 
-        return view('personas.show_doc', compact('docente', 'usuario'));
+        return view('personas.show_doc', compact(
+            'docente',
+            'usuario'
+        ));
     }
 
     public function edit(Docente $docente)
@@ -295,12 +348,16 @@ class DocenteController extends Controller
             abort(403, 'No autorizado');
         }
 
+        $docente->load('areasDocente');
+
         $paises = Pais::all();
         $profesiones = Profesion::all();
         $instituciones = InstitucionEgreso::all();
         $grados = GradoAcademico::all();
         $bancos = InstitucionBancaria::all();
         $ciudades = \App\Models\Ciudad::all();
+
+        $areasDocente = AreaDocente::orderBy('nombre')->get();
 
         $usuario = auth()->user()->load('persona');
 
@@ -312,6 +369,7 @@ class DocenteController extends Controller
             'grados',
             'bancos',
             'ciudades',
+            'areasDocente',
             'usuario'
         ));
     }
@@ -341,6 +399,8 @@ class DocenteController extends Controller
                 'curriculum' => 'nullable|file|mimes:pdf,doc,docx|max:10240',
                 'fotocarnet' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:5120',
                 'fotografia' => 'nullable|image|max:5120',
+                'areas_docente' => 'required|array|min:1',
+                'areas_docente.*' => 'required|integer|distinct|exists:area_docente,id_area_docente',
             ]);
 
             // 2. Extraer solo los campos que van a la BD (excluyendo archivos e inputs auxiliares)
@@ -353,7 +413,8 @@ class DocenteController extends Controller
                 'numero_movil',
                 'curriculum',
                 'fotocarnet',
-                'fotografia'
+                'fotografia',
+                'areas_docente',
             ]);
 
             // 3. Formatear valores
@@ -400,7 +461,13 @@ class DocenteController extends Controller
             }
 
             // 6. Actualizar registro
-            $docente->update($data);
+            DB::transaction(function () use ($docente, $data, $validated) {
+                $docente->update($data);
+
+                $docente->areasDocente()->sync(
+                    $validated['areas_docente']
+                );
+            });
 
             return redirect()->route('teachers.index')->with('success', "Docente " . $request->nombre . " actualizado correctamente.");
 

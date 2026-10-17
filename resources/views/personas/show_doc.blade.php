@@ -62,8 +62,8 @@
                     </div>
                     <div class="text-xl ml-3 pt-4">
                         <div>
-                            {{ $docente->ciudad->nombre ?? 'Sin ciudad' }} -
-                            {{ optional($docente->ciudad->departamento)->nombre ?? 'Sin departamento' }}
+                            {{ $docente->ciudad?->nombre ?? 'Sin ciudad' }} -
+                            {{ $docente->ciudad?->departamento?->nombre ?? 'Sin departamento' }}
                         </div>
                         <div>
                             {{ $docente->domicilio ?? 'Sin domicilio registrado' }}
