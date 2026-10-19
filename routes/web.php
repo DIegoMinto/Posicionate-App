@@ -122,6 +122,10 @@ Route::middleware(['auth', 'vigente'])->group(function () {
         Route::middleware('role_or_cargo:roles=super_admin+admin|cargos=recursos_humanos+asistente_rrhh')->group(function () {
             Route::get('/staff', [DashboardController::class, 'staff'])->name('staff');
         });
+        Route::patch(
+            '/personal/{personal}/numero-institucional',
+            [UserController::class, 'actualizarNumeroInstitucional']
+        )->name('personal.numero-institucional.update');
     });
 
     // RUTAS DE EXPORTACIÓN (Restringidas)

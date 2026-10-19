@@ -17,11 +17,12 @@ class Personal extends Authenticatable
     protected $fillable = [
         'id_persona',
         'codigo_personal',
+        'id_numero_institucional',
         'user',
         'password',
         'id_sede',
         'es_vigente',
-        'instance_name'
+        'instance_name',
     ];
 
     protected $hidden = [
@@ -52,7 +53,6 @@ class Personal extends Authenticatable
         );
     }
 
-    // RELACIÓN DE ROLES (Tabla pivot: personal_rol)
     public function roles(): BelongsToMany
     {
         return $this->belongsToMany(
@@ -80,7 +80,6 @@ class Personal extends Authenticatable
         return $this->roles->pluck('nombre_visible')->implode(', ');
     }
 
-    // RELACIÓN DE CARGOS (Tabla pivot: personal_cargo)
     public function cargos(): BelongsToMany
     {
         return $this->belongsToMany(
@@ -111,6 +110,15 @@ class Personal extends Authenticatable
     public function getCargoNombreAttribute()
     {
         return $this->cargos->pluck('nombre_visible')->implode(', ');
+    }
+
+    public function numeroInstitucional(): BelongsTo
+    {
+        return $this->belongsTo(
+            NumeroInstitucional::class,
+            'id_numero_institucional',
+            'id_numero_institucional'
+        );
     }
 
     public $timestamps = true;

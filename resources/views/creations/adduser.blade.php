@@ -58,20 +58,22 @@
                         </div>
 
                         <div>
-    <label class="form-label-bold !text-brand-green">Cargos Institucionales</label>
-<div class="flex flex-col gap-1 p-2 rounded-md border-2 border-brand-gold {{ !$esSuperAdmin ? 'bg-gray-100' : '' }}">
+<label class="form-label-bold !text-brand-green">Cargos Institucionales</label>
+
+<div class="flex flex-col gap-1 p-2 rounded-md border-2 border-brand-gold">
     @foreach($cargos as $cargo)
         <label class="text-xs flex items-center gap-2">
-            <input type="checkbox" name="cargos[]" value="{{ $cargo->id_cargo }}"
-                {{ (isset($personal) && $personal->cargos->contains('id_cargo', $cargo->id_cargo)) ? 'checked' : '' }}
-                {{ !$esSuperAdmin ? 'disabled' : '' }}>
+            <input
+                type="checkbox"
+                name="cargos[]"
+                value="{{ $cargo->id_cargo }}"
+                {{ isset($personal) && $personal->cargos->contains('id_cargo', $cargo->id_cargo) ? 'checked' : '' }}
+            >
             {{ $cargo->nombre_visible }}
         </label>
     @endforeach
 </div>
-    @foreach($personal->cargos as $cargo)
-        <input type="hidden" name="cargos[]" value="{{ $cargo->id_cargo }}">
-    @endforeach
+
 </div>
 
                         <div>

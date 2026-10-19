@@ -15,7 +15,7 @@ use App\Exports\StudentsExport;
 use App\Models\Cargo;
 use App\Models\EventoCalendario;
 use Illuminate\Support\Carbon;
-
+use App\Models\NumeroInstitucional;
 
 class DashboardController extends Controller
 {
@@ -168,18 +168,6 @@ class DashboardController extends Controller
         return response()->json(['ok' => true, 'evento' => $evento]);
     }
 
-    private function colorPorTipo(string $tipo): array
-    {
-        return match (strtolower($tipo)) {
-            'diplomado' => ['#8b5cf6', '#7c3aed'],
-            'curso' => ['#1e3a8a', '#1e40af'],
-            'webinar' => ['#CCB463', '#b8a24f'],
-            'evento' => ['#059669', '#047857'],
-            default => ['#6b7280', '#4b5563'],
-        };
-    }
-
-
     public function students(Request $request)
     {
         $usuario = auth()->user();
@@ -283,11 +271,23 @@ class DashboardController extends Controller
         return $query->orderBy('curso_estudiante.created_at', 'desc');
     }
 
+    public function destroy($id)
+    {
+        $persona = \App\Models\Persona::findOrFail($id);
+
+        $persona->delete();
+
+        return redirect()
+            ->route('personas.index')
+            ->with('success', 'Persona eliminada correctamente.');
+    }
+
     public function creations()
     {
         $usuario = auth()->user()->load('persona');
         return view('dashboard.creations', compact('usuario'));
     }
+
 
     public function staff(Request $request)
     {
@@ -297,33 +297,61 @@ class DashboardController extends Controller
 
         $areas = Cargo::pluck('nombre')->unique();
 
-        $query = Personal::with('persona', 'sede', 'cargos');
+        $numerosInstitucionales = NumeroInstitucional::where('activo', true)
+            ->with('personal')
+            ->orderBy('numero')
+            ->get();
+
+        $query = Personal::with([
+            'persona',
+            'sede',
+            'cargos',
+            'numeroInstitucional',
+        ]);
 
         if ($request->filled('id_sede')) {
             $query->where('id_sede', $request->id_sede);
         }
+
         if ($request->filled('cargo')) {
             $query->whereHas('cargos', function ($q) use ($request) {
                 $q->where('cargos.id_cargo', $request->cargo);
             });
         }
+
         if ($request->filled('estado')) {
             $query->where('es_vigente', $request->estado);
         }
+
         if ($request->filled('search')) {
             $search = $request->search;
+
             $query->whereHas('persona', function ($q) use ($search) {
-                $q->whereRaw("unaccent(nombre) ILIKE unaccent(?)", ["%$search%"])
-                    ->orWhereRaw("unaccent(apellido_p) ILIKE unaccent(?)", ["%$search%"])
-                    ->orWhereRaw("unaccent(apellido_m) ILIKE unaccent(?)", ["%$search%"]);
+                $q->whereRaw(
+                    "unaccent(nombre) ILIKE unaccent(?)",
+                    ["%$search%"]
+                )->orWhereRaw(
+                        "unaccent(apellido_p) ILIKE unaccent(?)",
+                        ["%$search%"]
+                    )->orWhereRaw(
+                        "unaccent(apellido_m) ILIKE unaccent(?)",
+                        ["%$search%"]
+                    );
             });
         }
 
         $personales = $query->paginate(10)->withQueryString();
 
-        // Agregar $areas al compact
-        return view('dashboard.staff', compact('usuario', 'personales', 'sedes', 'cargos', 'areas'));
+        return view('dashboard.staff', compact(
+            'usuario',
+            'personales',
+            'sedes',
+            'cargos',
+            'areas',
+            'numerosInstitucionales'
+        ));
     }
+
 
     public function programs(Request $request)
     {

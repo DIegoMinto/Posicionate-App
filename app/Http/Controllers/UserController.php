@@ -57,10 +57,6 @@ class UserController extends Controller
 
     public function store_user(Request $request)
     {
-        if (auth()->user()->rol !== 'super_admin') {
-            abort(403, 'No autorizado');
-        }
-
         $request->validate([
             'id_persona' => 'required|exists:persona,id_persona',
             'user' => 'required|unique:personal,user',
@@ -111,6 +107,38 @@ class UserController extends Controller
 
         return redirect()->route('people.staff')->with('success', 'Personal eliminado correctamente');
     }
+
+
+    public function actualizarNumeroInstitucional(
+        Request $request,
+        Personal $personal
+    ) {
+        $validated = $request->validate([
+            'id_numero_institucional' => [
+                'nullable',
+                'integer',
+                Rule::exists(
+                    'numero_institucional',
+                    'id_numero_institucional'
+                )->where('activo', true),
+                Rule::unique(
+                    'personal',
+                    'id_numero_institucional'
+                )->ignore($personal->id_personal, 'id_personal'),
+            ],
+        ]);
+
+        $personal->update([
+            'id_numero_institucional' =>
+                $validated['id_numero_institucional'] ?? null,
+        ]);
+
+        return back()->with(
+            'success',
+            'Número institucional actualizado correctamente.'
+        );
+    }
+
 
     public function toggle(Request $request, $id)
     {

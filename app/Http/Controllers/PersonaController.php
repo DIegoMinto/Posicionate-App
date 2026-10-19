@@ -130,4 +130,29 @@ class PersonaController extends Controller
             ]);
         }
     }
+
+
+    public function destroy(Request $request, $id)
+    {
+        $request->validate([
+            'password_confirm' => ['required', 'current_password'],
+        ]);
+
+        $persona = Persona::findOrFail($id);
+
+        try {
+            $persona->delete();
+
+            return redirect()->back()->with(
+                'success',
+                'Persona eliminada correctamente.'
+            );
+        } catch (\Illuminate\Database\QueryException $e) {
+            return redirect()->back()->with(
+                'error',
+                'No se puede eliminar esta persona porque tiene registros relacionados.'
+            );
+        }
+    }
+
 }
