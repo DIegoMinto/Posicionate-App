@@ -104,7 +104,35 @@
                             </a>
                         </div>
                     </div>
+                    <div class="card w-64 p-4 border-2 border-brand-gold relative">
+                        <div
+                            class="border border-brand-gold rounded-md p-6 flex flex-col items-center text-center h-full justify-between">
 
+                            <div class="mb-4 h-16 flex items-center justify-center w-full">
+                                <div
+                                    class="bg-brand-green/10 p-2 rounded-full flex items-center justify-center w-14 h-14">
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                        stroke-width="2" stroke="currentColor" class="w-8 h-8 text-brand-gold">
+                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                            d="M2.25 6.75c0 8.284 6.716 15 15 15h2.25a2.25 2.25 0 0 0 2.25-2.25v-1.372c0-1.016-.684-1.9-1.667-2.154l-4.423-.?" />
+                                    </svg>
+                                </div>
+                            </div>
+
+                            <div class="mb-6">
+                                <h2 class="text-white text-xl font-bold leading-tight">
+                                    Gestionar
+                                </h2>
+                                <p class="text-brand-gold font-black text-2xl">
+                                    Números Institucionales
+                                </p>
+                            </div>
+
+                            <a href="" class="btn-gold uppercase text-xs font-bold py-2 px-6 rounded-md w-full">
+                                Acceder
+                            </a>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>

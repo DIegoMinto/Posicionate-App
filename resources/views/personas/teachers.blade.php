@@ -135,7 +135,6 @@ try {
                                     <th class="py-3 px-4 whitespace-nowrap">Apellidos</th>
                                     <th class="py-3 px-4 whitespace-nowrap">Título/Grado</th>
                                     <th class="py-3 px-4 whitespace-nowrap">Profesión</th>
-                                    <th class="py-3 px-4 whitespace-nowrap">Área</th>
                                     <th class="py-3 px-4 whitespace-nowrap">Teléfono</th>
                                     <th class="py-3 px-4 whitespace-nowrap">Correo</th>
                                     <th class="py-3 px-4 whitespace-nowrap">Factura</th>
@@ -160,18 +159,6 @@ try {
                                         <td class="py-3 px-4">{{ $d->grado->nombre ?? 'S/G' }}</td>
                                         <td class="py-3 px-4">{{ $d->profesion->nombre ?? 'No def.' }}</td>
 
-                                        <td class="py-3 px-4">
-                                            <div class="flex flex-wrap gap-1">
-                                                @forelse ($d->areasDocente as $area)
-                                                    <span
-                                                        class="inline-block rounded bg-brand-green/10 px-2 py-1 text-[10px] font-semibold text-brand-green">
-                                                        {{ $area->nombre }}
-                                                    </span>
-                                                @empty
-                                                    <span class="text-gray-400">Sin área</span>
-                                                @endforelse
-                                            </div>
-                                        </td>
 
                                         <td class="py-3 px-4 whitespace-nowrap">{{ $d->telefono_movil ?? '-' }}</td>
                                         <td class="py-3 px-4 lowercase whitespace-nowrap">

@@ -103,6 +103,23 @@
 
             </div>
 
+            <div class="bg-gray-50 rounded-lg border p-4 mt-6">
+                <h3 class="font-bold text-brand-green mb-3">
+                    Áreas de Especialización
+                </h3>
+
+                @forelse($docente->areasDocente as $area)
+                    <span
+                        class="inline-flex items-center bg-brand-green text-white px-3 py-1.5 rounded-full text-xs font-semibold mr-2 mb-2">
+                        {{ $area->nombre }}
+                    </span>
+                @empty
+                    <p class="text-gray-500 text-sm">
+                        Este docente aún no tiene áreas de especialización asignadas.
+                    </p>
+                @endforelse
+            </div>
+
             <div class="bg-gray-50 rounded-lg border col-span-1 md:col-span-2 lg:col-span-2 p-4 mt-6">
                 <h3 class="font-bold text-brand-green mb-3">Documentación Adjunta</h3>
                 <div class="flex flex-wrap gap-4">
