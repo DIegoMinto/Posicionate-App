@@ -171,7 +171,7 @@
             <p><strong>Teléfono:</strong> {{ $estudiante->telefono_movil ?? '-' }}</p>
 
             @php
-                $total = $pagos->sum('monto_pagar');
+                $total = $pagos->whereNull('id_pago_original')->sum('monto_pagar');
                 $pagado = $pagos->sum('monto_pagado');
                 $pendiente = $total - $pagado;
             @endphp
@@ -205,7 +205,8 @@
                         $estaCompleto = $pago->estado === 'pagado';
                     @endphp
                     <tr>
-                        <td>{{ $index + 1 }}</td>
+                        @php $n = 0; @endphp
+                        <td>{{ $pago->id_pago_original ? '' : ++$n }}</td>
                         <td>
                             @if($pago->fecha_pagada)
                                 {{ \Carbon\Carbon::parse($pago->fecha_pagada)->format('d/m/Y') }}

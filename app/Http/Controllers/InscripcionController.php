@@ -875,7 +875,6 @@ class InscripcionController extends Controller
         return view('pagos.recibo-modal', $data);
     }
 
-    // El que ya tenías, ahora solo arma el PDF con la data del método de arriba
     public function reciboPago($id)
     {
         $data = $this->datosRecibo($id);
@@ -893,16 +892,25 @@ class InscripcionController extends Controller
         $estudiante = $inscripcion->estudiante;
         $curso = $inscripcion->curso;
 
-        $pagos = PagoEstudiante::where('id_curso_estudiante', $inscripcion->id)
+        $todos = PagoEstudiante::where('id_curso_estudiante', $inscripcion->id)
             ->orderBy('id_pagos_estudiante')
             ->get();
+
+        $pagos = $todos->whereNull('id_pago_original')
+            ->flatMap(function ($raiz) use ($todos) {
+                $divisiones = $todos
+                    ->where('id_pago_original', $raiz->id_pagos_estudiante)
+                    ->values();
+
+                return collect([$raiz])->merge($divisiones);
+            })
+            ->values();
 
         $pdf = Pdf::loadView('pagos.pdf-plan-pagos', compact('curso', 'estudiante', 'inscripcion', 'pagos'));
         $pdf->setPaper('letter', 'portrait');
 
         return $pdf->stream('plan-pagos-' . $estudiante->ci . '.pdf');
     }
-
     private function limpiarTexto(string $texto): string
     {
         $texto = \Illuminate\Support\Str::ascii($texto);

@@ -29,10 +29,10 @@
                     <p><strong>Teléfono:</strong> {{ $estudiante->telefono_movil ?? '-' }}</p>
 
                     @php
-                        $total = $pagos->sum('monto_pagar');
-                        $pagado = $pagos->sum('monto_pagado');
-                        $pendiente = $total - $pagado;
-                    @endphp
+    $total = $pagos->whereNull('id_pago_original')->sum('monto_pagar');
+    $pagado = $pagos->sum('monto_pagado');
+    $pendiente = $total - $pagado;
+@endphp
 
                     <p><strong>Saldo Total Adeudado:</strong> {{ number_format($total, 2) }} Bs</p>
                     <p><strong>Modalidad de Pago:</strong> {{ $inscripcion->plan->nombre ?? '-' }}</p>
