@@ -1,4 +1,4 @@
-FROM php:8.4-fpm
+FROM php:8.4.27-fpm
 
 # 1. Instalar dependencias del sistema y herramientas de compilación
 RUN apt-get update && apt-get install -y \
@@ -18,10 +18,13 @@ RUN apt-get update && apt-get install -y \
     && docker-php-ext-enable redis \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
-# 2. Configuración de subida en PHP
-RUN echo "upload_max_filesize = 32M" > /usr/local/etc/php/conf.d/uploads.ini \
-    && echo "post_max_size = 32M" >> /usr/local/etc/php/conf.d/uploads.ini \
-    && echo "memory_limit = 256M" >> /usr/local/etc/php/conf.d/uploads.ini
+# 2. Configuración de PHP y seguridad
+RUN printf '%s\n' \
+    'upload_max_filesize = 32M' \
+    'post_max_size = 32M' \
+    'memory_limit = 256M' \
+    'session.upload_progress.enabled = Off' \
+    > /usr/local/etc/php/conf.d/uploads.ini
 
 # 3. Copiar Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
