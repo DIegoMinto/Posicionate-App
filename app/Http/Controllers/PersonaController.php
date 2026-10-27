@@ -34,7 +34,7 @@ class PersonaController extends Controller
             $request->validate([
                 'nombre' => 'required|string|max:100',
                 'apellido_p' => 'required|string|max:100',
-                'ci' => 'required|unique:persona,ci', // Quitamos 'numeric' porque ahora concatenas la extensión
+                'ci' => 'required|unique:persona,ci',
                 'correo_electronico' => 'required|email|unique:persona,correo_electronico',
                 'id_ciudad' => 'required',
                 'id_institucion_egreso' => 'required',

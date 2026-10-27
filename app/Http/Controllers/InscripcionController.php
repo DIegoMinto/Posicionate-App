@@ -17,10 +17,11 @@ use App\Models\Pais;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
 use Barryvdh\DomPDF\Facade\Pdf;
-use App\Models\Inscripcion;
+use App\Models\RegistroRetiroAbandono;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Exports\StudentsExport;
 use App\Support\StudentExportColumns;
+use Cloudinary\Cloudinary;
 
 
 class InscripcionController extends Controller
@@ -572,13 +573,22 @@ class InscripcionController extends Controller
             ];
         })->values();
 
+        $documentoRetiroAbandono = \App\Models\RegistroRetiroAbandono::where(
+            'id_curso_estudiante',
+            $inscripcion->id
+        )
+            ->whereNotNull('pdf_url')
+            ->orderByDesc('id')
+            ->first();
+
         return view('students.facturacion', compact(
             'usuario',
             'estudiante',
             'curso',
             'pagos',
             'inscripcion',
-            'grupos'
+            'grupos',
+            'documentoRetiroAbandono'
         ));
     }
 
@@ -971,4 +981,177 @@ class InscripcionController extends Controller
         return back()->with('success', 'Usuario de Moodle habilitado correctamente.');
     }
 
+    public function formularioRetiroAbandono(Request $request, $id_estudiante)
+    {
+        $idCurso = $request->query('id_curso');
+
+        abort_unless($idCurso, 404, 'No se especificó el curso.');
+
+        $inscripcion = \App\Models\CursoEstudiante::with([
+            'estudiante',
+            'curso'
+        ])
+            ->where('id_estudiante', $id_estudiante)
+            ->where('id_curso', $idCurso)
+            ->firstOrFail();
+
+        $estudiante = $inscripcion->estudiante;
+        $curso = $inscripcion->curso;
+
+        $pagos = PagoEstudiante::where(
+            'id_curso_estudiante',
+            $inscripcion->id
+        )->orderBy('id_pagos_estudiante')->get();
+
+        $pagosRaiz = $pagos->whereNull('id_pago_original');
+
+        $montoTotal = (float) $pagosRaiz->sum('monto_pagar');
+
+        $montoPagado = (float) $pagosRaiz->sum(function ($pago) use ($pagos) {
+            $divisiones = $pagos->where(
+                'id_pago_original',
+                $pago->id_pagos_estudiante
+            );
+
+            return (float) $pago->monto_pagado
+                + (float) $divisiones->sum('monto_pagado');
+        });
+
+        $saldoPendiente = max(0, $montoTotal - $montoPagado);
+
+        $usuario = auth()->user();
+
+        return view('students.retiro-abandono', compact(
+            'usuario',
+            'inscripcion',
+            'estudiante',
+            'curso',
+            'montoTotal',
+            'montoPagado',
+            'saldoPendiente'
+        ));
+    }
+
+    public function guardarRetiroAbandono(Request $request, $id_estudiante)
+    {
+        $validated = $request->validate([
+            'id_curso' => 'required|integer|exists:curso,id_curso',
+            'tipo' => 'required|in:retiro,abandono',
+            'fecha_registro' => 'required|date',
+            'modulos_cursados' => 'nullable|string|max:3000',
+            'detalle' => 'required|string|max:5000',
+        ]);
+
+        $inscripcion = \App\Models\CursoEstudiante::with([
+            'estudiante',
+            'curso'
+        ])
+            ->where('id_estudiante', $id_estudiante)
+            ->where('id_curso', $validated['id_curso'])
+            ->firstOrFail();
+
+        $estudiante = $inscripcion->estudiante;
+        $curso = $inscripcion->curso;
+
+        $registro = DB::transaction(function () use ($validated, $inscripcion, $estudiante, $curso) {
+            $pagos = PagoEstudiante::where(
+                'id_curso_estudiante',
+                $inscripcion->id
+            )
+                ->orderBy('id_pagos_estudiante')
+                ->lockForUpdate()
+                ->get();
+
+            $raices = $pagos->whereNull('id_pago_original');
+
+            $montoTotal = (float) $raices->sum('monto_pagar');
+
+            $montoPagado = (float) $raices->sum(
+                function ($pago) use ($pagos) {
+                    $divisiones = $pagos->where(
+                        'id_pago_original',
+                        $pago->id_pagos_estudiante
+                    );
+
+                    return (float) $pago->monto_pagado
+                        + (float) $divisiones->sum('monto_pagado');
+                }
+            );
+
+            $nombre = trim(implode(' ', array_filter([
+                $estudiante->nombre,
+                $estudiante->apellido_p,
+                $estudiante->apellido_m,
+            ], fn($valor) => filled($valor))));
+
+            return RegistroRetiroAbandono::create([
+                'id_curso_estudiante' => $inscripcion->id,
+                'tipo' => $validated['tipo'],
+                'fecha_registro' => $validated['fecha_registro'],
+                'modulos_cursados' => $validated['modulos_cursados'] ?? null,
+                'detalle' => $validated['detalle'],
+                'nombre_estudiante' => $nombre,
+                'ci_estudiante' => $estudiante->ci,
+                'telefono_estudiante' => $estudiante->telefono_movil,
+                'nombre_curso' => $curso->nombre,
+                'monto_total' => $montoTotal,
+                'monto_pagado' => $montoPagado,
+                'saldo_pendiente' => max(0, $montoTotal - $montoPagado),
+                'id_usuario' => auth()->id(),
+            ]);
+        });
+
+        return redirect()->route(
+            'students.retiro-abandono.pdf',
+            $registro->id
+        );
+    }
+
+    public function pdfRetiroAbandono($id)
+    {
+        $registro = RegistroRetiroAbandono::findOrFail($id);
+
+        $pdf = Pdf::loadView('students.pdf-retiro-abandono', [
+            'registro' => $registro,
+        ]);
+
+        $cloudinary = new Cloudinary([
+            'cloud' => [
+                'cloud_name' => env('CLOUDINARY_CLOUD_NAME'),
+                'api_key' => env('CLOUDINARY_API_KEY'),
+                'api_secret' => env('CLOUDINARY_API_SECRET'),
+            ],
+            'url' => [
+                'secure' => true,
+            ],
+        ]);
+
+        $resultado = $cloudinary->uploadApi()->upload(
+            'data:application/pdf;base64,' . base64_encode($pdf->output()),
+            [
+                'folder' => 'retiros-abandonos',
+                'public_id' => 'retiro-abandono-' . $registro->id . '.pdf',
+                'resource_type' => 'raw',
+                'overwrite' => true,
+            ]
+        );
+
+        $url = $resultado['secure_url'] ?? $resultado['url'] ?? null;
+        $publicId = $resultado['public_id'] ?? null;
+
+        if (!$url) {
+            \Log::error('Cloudinary no devolvió una URL para el PDF de retiro/abandono', [
+                'registro_id' => $registro->id,
+                'resultado' => $resultado,
+            ]);
+
+            abort(500, 'Cloudinary no devolvió la URL del documento.');
+        }
+
+        $registro->pdf_url = $url;
+        $registro->pdf_public_id = $publicId;
+        $registro->save();
+
+        return redirect()->away($url);
+    }
 }

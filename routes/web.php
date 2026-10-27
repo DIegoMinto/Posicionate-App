@@ -225,6 +225,14 @@ Route::middleware(['auth', 'vigente'])->group(function () {
         Route::post('/pagos/{id}/validar', [InscripcionController::class, 'validarPago'])->name('pagos.validar');
         Route::put('/pagos/{id}/fecha', [InscripcionController::class, 'cambiarFechaPago'])->name('pagos.fecha');
 
+        // RUTAS DE ABANDONOS
+
+        Route::get('/estudiantes/{id_estudiante}/retiro-abandono', [InscripcionController::class, 'formularioRetiroAbandono'])->name('students.retiro-abandono.form');
+
+        Route::post('/estudiantes/{id_estudiante}/retiro-abandono', [InscripcionController::class, 'guardarRetiroAbandono'])->name('students.retiro-abandono.store');
+
+        Route::get('/retiro-abandono/{id}/pdf', [InscripcionController::class, 'pdfRetiroAbandono'])->name('students.retiro-abandono.pdf');
+
     });
 
     // RUTAS DE CREACIONES Y CONFIGURACIÓN GLOBAL (Solo Super Admin)
