@@ -767,28 +767,78 @@ class InscripcionController extends Controller
     public function agregarEstudiante(Request $request)
     {
         $request->validate([
-            'id_estudiante' => 'required|exists:estudiante,id_estudiante',
-            'id_curso' => 'required|exists:curso,id_curso',
-            'id_personal' => 'required'
+            'id_estudiante' => 'nullable|required_without:id_personal|integer|exists:estudiante,id_estudiante',
+            'id_personal' => 'nullable|required_without:id_estudiante|integer|exists:personal,id_personal',
+            'id_curso' => 'required|integer|exists:curso,id_curso',
         ]);
 
-        $exists = \App\Models\CursoEstudiante::where('id_estudiante', $request->id_estudiante)
+        $estudiante = null;
+
+        if ($request->filled('id_estudiante')) {
+            $estudiante = \App\Models\Estudiante::findOrFail(
+                $request->id_estudiante
+            );
+        } else {
+            $personal = \App\Models\Personal::with('persona')
+                ->findOrFail($request->id_personal);
+
+            $persona = $personal->persona;
+
+            if (!$persona || !$persona->ci) {
+                return back()->with(
+                    'error',
+                    'El personal seleccionado no tiene CI registrado y no puede vincularse automáticamente.'
+                );
+            }
+
+            $estudiante = \App\Models\Estudiante::where('ci', $persona->ci)
+                ->first();
+
+            if (!$estudiante) {
+                $estudiante = \App\Models\Estudiante::create([
+                    'ci' => $persona->ci,
+                    'extension_ci' => $persona->extension_ci,
+                    'nombre' => $persona->nombre,
+                    'apellido_p' => $persona->apellido_p,
+                    'apellido_m' => $persona->apellido_m,
+                    'fecha_nacimiento' => $persona->fecha_nacimiento,
+                    'domicilio' => $persona->domicilio,
+                    'telefono_movil' => $persona->telefono_movil,
+                    'correo_electronico' => $persona->correo_electronico,
+                    'genero' => $persona->genero,
+                    'id_grado_academico' => $persona->id_grado_academico,
+                    'id_profesion' => $persona->id_profesion,
+                    'id_institucion_egreso' => $persona->id_institucion_egreso,
+                ]);
+            }
+        }
+
+        $existe = \App\Models\CursoEstudiante::where(
+            'id_estudiante',
+            $estudiante->id_estudiante
+        )
             ->where('id_curso', $request->id_curso)
             ->exists();
 
-        if ($exists) {
-            return back()->with('error', 'El estudiante ya está en este curso');
+        if ($existe) {
+            return back()->with(
+                'error',
+                'Esta persona ya está inscrita en el curso.'
+            );
         }
 
         \App\Models\CursoEstudiante::create([
-            'id_estudiante' => $request->id_estudiante,
+            'id_estudiante' => $estudiante->id_estudiante,
             'id_curso' => $request->id_curso,
-            'id_personal' => $request->id_personal,
+            'id_personal' => auth()->user()->id_personal,
             'estado' => 'pre_inscrito',
             'estadia' => 'pendiente',
         ]);
 
-        return back()->with('success', 'Estudiante añadido correctamente');
+        return back()->with(
+            'success',
+            'La persona fue añadida correctamente al curso.'
+        );
     }
 
     public function validarPago(Request $request, $id)

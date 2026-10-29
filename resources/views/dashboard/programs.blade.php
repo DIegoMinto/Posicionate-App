@@ -521,22 +521,31 @@
                 class="w-full border p-2 text-sm mb-4 rounded-sm focus:outline-none">
 
             <div class="space-y-2 max-h-[400px] overflow-y-auto">
-                <template x-for="est in resultados" :key="est.id_estudiante">
-                    <div class="flex justify-between items-center border p-2 rounded-sm">
-                        <div>
-                            <div class="font-sans font-bold text-left" x-text="est.nombre + ' ' + est.apellido_p"></div>
-                            <div class="font-sans text-brand-green text-left">CI: <span x-text="est.ci"></span></div>
-                        </div>
+                <template x-for="per in resultados" :key="per.tipo + '-' + per.id">
+    <div class="flex justify-between items-center border p-2 rounded-sm">
+        <div>
+            <div class="font-sans font-bold text-left"
+                x-text="[per.nombre, per.apellido_p, per.apellido_m].filter(Boolean).join(' ')">
+            </div>
+            <span
+                class="text-[10px] uppercase font-bold"
+                :class="per.tipo === 'Personal' ? 'text-brand-gold' : 'text-brand-green'"
+                x-text="per.tipo">
+            </span>
+        </div>
 
-                        <form method="POST" action="{{ route('curso.agregar.estudiante') }}">
-                            @csrf
-                            <input type="hidden" name="id_estudiante" :value="est.id_estudiante">
-                            <input type="hidden" name="id_curso" :value="idCurso">
-                            <input type="hidden" name="id_personal" value="{{ $usuario->id_personal }}">
-                            <button type="submit" class="btn-gold px-3 py-2 text-[10px]">Añadir</button>
-                        </form>
-                    </div>
-                </template>
+        <form method="POST" action="{{ route('curso.agregar.estudiante') }}">
+            @csrf
+            <input type="hidden" name="id_estudiante" :value="per.tipo === 'Estudiante' ? per.id : ''">
+            <input type="hidden" name="id_personal" :value="per.tipo === 'Personal' ? per.id : ''">
+            <input type="hidden" name="id_curso" :value="idCurso">
+
+            <button type="submit" class="btn-gold px-3 py-2 text-[10px]">
+                Añadir
+            </button>
+        </form>
+    </div>
+</template>
 
                 <div x-show="cargando" class="text-center text-gray-400 text-xs py-4 italic">Buscando...</div>
                 <div x-show="!cargando && resultados.length === 0" class="text-center text-gray-400 text-xs py-4 italic">

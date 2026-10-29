@@ -420,19 +420,55 @@ class DashboardController extends Controller
     {
         $q = trim($request->q ?? '');
 
-        $estudiantes = \App\Models\Estudiante::select('id_estudiante', 'nombre', 'apellido_p', 'ci')
+        $estudiantes = \App\Models\Estudiante::select(
+            'id_estudiante as id',
+            'nombre',
+            'apellido_p',
+            'apellido_m'
+        )
             ->when($q, function ($query) use ($q) {
                 $query->where(function ($w) use ($q) {
-                    $w->where('nombre', 'LIKE', "%{$q}%")
-                        ->orWhere('apellido_p', 'LIKE', "%{$q}%")
-                        ->orWhere('ci', 'LIKE', "%{$q}%");
+                    $w->where('nombre', 'ILIKE', "%{$q}%")
+                        ->orWhere('apellido_p', 'ILIKE', "%{$q}%")
+                        ->orWhere('apellido_m', 'ILIKE', "%{$q}%")
+                        ->orWhere('ci', 'ILIKE', "%{$q}%");
                 });
             })
-            ->orderBy('nombre')
-            ->limit(20)
-            ->get();
+            ->get()
+            ->map(function ($persona) {
+                return [
+                    'id' => $persona->id,
+                    'nombre' => $persona->nombre,
+                    'apellido_p' => $persona->apellido_p,
+                    'apellido_m' => $persona->apellido_m,
+                    'tipo' => 'Estudiante',
+                ];
+            });
 
-        return response()->json($estudiantes);
+        $personal = \App\Models\Personal::with('persona')
+            ->whereHas('persona', function ($query) use ($q) {
+                if ($q !== '') {
+                    $query->where(function ($w) use ($q) {
+                        $w->where('nombre', 'ILIKE', "%{$q}%")
+                            ->orWhere('apellido_p', 'ILIKE', "%{$q}%")
+                            ->orWhere('apellido_m', 'ILIKE', "%{$q}%");
+                    });
+                }
+            })
+            ->get()
+            ->map(function ($per) {
+                return [
+                    'id' => $per->id_personal,
+                    'nombre' => $per->persona->nombre ?? '',
+                    'apellido_p' => $per->persona->apellido_p ?? '',
+                    'apellido_m' => $per->persona->apellido_m ?? '',
+                    'tipo' => 'Personal',
+                ];
+            });
+
+        return response()->json(
+            $estudiantes->concat($personal)->values()
+        );
     }
 
     public function programsEdit($id)
