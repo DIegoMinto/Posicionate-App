@@ -53,7 +53,7 @@
                             <div class="flex items-center justify-between gap-4">
                                 <label class="text-sm font-medium text-black">Seleccionar el Tipo de Plan de
                                     Pagos</label>
-                                <select id="select-plan" name="id_plan"
+                                <select id="select-plan" name="id_plan" required
                                     class="bg-brand-green text-white text-xs font-bold px-4 py-2 rounded-sm outline-none cursor-pointer text-left">
                                     <option value="0" data-precio="0">Seleccionar Plan</option>
                                     @foreach($planes as $plan)

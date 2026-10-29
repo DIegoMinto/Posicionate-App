@@ -464,6 +464,30 @@ class InscripcionController extends Controller
 
     public function store_change(Request $request, $id_estudiante)
     {
+        $request->validate([
+            'id_curso' => 'required|exists:curso,id_curso',
+            'id_plan' => 'required|integer|min:1|exists:planes_pago,id_planes_pago',
+            'id_descuento' => 'nullable|integer',
+            'cuotas' => 'required|array',
+            'cuotas.*.monto_pagado' => 'nullable|numeric|min:0',
+            'cuotas.*.fecha_pagada' => 'nullable|date',
+        ], [
+            'id_plan.required' => 'Debes seleccionar un plan de pagos.',
+            'id_plan.min' => 'Debes seleccionar un plan de pagos válido.',
+            'id_plan.exists' => 'El plan de pagos seleccionado no existe.',
+            'cuotas.required' => 'Debes registrar al menos un pago.',
+            'cuotas.*.monto_pagado.numeric' => 'El monto pagado debe ser un número válido.',
+            'cuotas.*.monto_pagado.min' => 'El monto pagado no puede ser negativo.',
+        ]);
+
+        $montoTotalPagado = collect($request->input('cuotas', []))
+            ->sum(fn($cuota) => (float) ($cuota['monto_pagado'] ?? 0));
+
+        if ($montoTotalPagado <= 0) {
+            return back()
+                ->withInput()
+                ->with('error', 'Debes ingresar un monto pagado mayor a cero en al menos una cuota.');
+        }
         try {
             return \DB::transaction(function () use ($request, $id_estudiante) {
 
