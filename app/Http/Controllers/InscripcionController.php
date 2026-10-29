@@ -22,6 +22,8 @@ use Maatwebsite\Excel\Facades\Excel;
 use App\Exports\StudentsExport;
 use App\Support\StudentExportColumns;
 use Cloudinary\Cloudinary;
+use Illuminate\Support\Facades\Http;
+use setasign\Fpdi\Fpdi;
 
 
 class InscripcionController extends Controller
@@ -1040,6 +1042,7 @@ class InscripcionController extends Controller
             'fecha_registro' => 'required|date',
             'modulos_cursados' => 'nullable|string|max:3000',
             'detalle' => 'required|string|max:5000',
+            'documento' => 'nullable|file|mimes:pdf|max:10240',
         ]);
 
         $inscripcion = \App\Models\CursoEstudiante::with([
@@ -1052,8 +1055,19 @@ class InscripcionController extends Controller
 
         $estudiante = $inscripcion->estudiante;
         $curso = $inscripcion->curso;
+        $usuario = auth()->user();
+        $usuario?->loadMissing('persona');
+        $personaEmisor = $usuario?->persona;
+        $nombreEmisor = trim(implode(' ', array_filter([
+            $personaEmisor?->nombre,
+            $personaEmisor?->apellido_p,
+            $personaEmisor?->apellido_m,
+        ], fn($valor) => filled($valor))));
 
-        $registro = DB::transaction(function () use ($validated, $inscripcion, $estudiante, $curso) {
+        if ($nombreEmisor === '') {
+            $nombreEmisor = $usuario?->user ?? 'Usuario sin nombre';
+        }
+        $registro = DB::transaction(function () use ($validated, $inscripcion, $estudiante, $curso, $nombreEmisor) {
             $pagos = PagoEstudiante::where(
                 'id_curso_estudiante',
                 $inscripcion->id
@@ -1098,8 +1112,40 @@ class InscripcionController extends Controller
                 'monto_pagado' => $montoPagado,
                 'saldo_pendiente' => max(0, $montoTotal - $montoPagado),
                 'id_usuario' => auth()->id(),
+                'nombre_emisor' => $nombreEmisor,
             ]);
         });
+
+        if ($request->hasFile('documento')) {
+            $cloudinary = new Cloudinary([
+                'cloud' => [
+                    'cloud_name' => env('CLOUDINARY_CLOUD_NAME'),
+                    'api_key' => env('CLOUDINARY_API_KEY'),
+                    'api_secret' => env('CLOUDINARY_API_SECRET'),
+                ],
+                'url' => [
+                    'secure' => true,
+                ],
+            ]);
+
+            $resultado = $cloudinary->uploadApi()->upload(
+                $request->file('documento')->getRealPath(),
+                [
+                    'folder' => 'retiros-abandonos/adjuntos',
+                    'public_id' => 'adjunto-retiro-abandono-' . $registro->id,
+                    'resource_type' => 'raw',
+                    'overwrite' => true,
+                ]
+            );
+
+            $registro->adjunto_url =
+                $resultado['secure_url'] ?? $resultado['url'] ?? null;
+
+            $registro->adjunto_public_id =
+                $resultado['public_id'] ?? null;
+
+            $registro->save();
+        }
 
         return redirect()->route(
             'students.retiro-abandono.pdf',
@@ -1107,51 +1153,133 @@ class InscripcionController extends Controller
         );
     }
 
+
     public function pdfRetiroAbandono($id)
     {
         $registro = RegistroRetiroAbandono::findOrFail($id);
 
-        $pdf = Pdf::loadView('students.pdf-retiro-abandono', [
-            'registro' => $registro,
-        ]);
+        $archivoCarta = tempnam(sys_get_temp_dir(), 'carta_');
+        $archivoAdjunto = null;
+        $archivoFinal = tempnam(sys_get_temp_dir(), 'final_');
+        $archivoFinalPdf = $archivoFinal . '.pdf';
 
-        $cloudinary = new Cloudinary([
-            'cloud' => [
-                'cloud_name' => env('CLOUDINARY_CLOUD_NAME'),
-                'api_key' => env('CLOUDINARY_API_KEY'),
-                'api_secret' => env('CLOUDINARY_API_SECRET'),
-            ],
-            'url' => [
-                'secure' => true,
-            ],
-        ]);
+        try {
+            $pdfCarta = Pdf::loadView('students.pdf-retiro-abandono', [
+                'registro' => $registro,
+            ])->output();
 
-        $resultado = $cloudinary->uploadApi()->upload(
-            'data:application/pdf;base64,' . base64_encode($pdf->output()),
-            [
-                'folder' => 'retiros-abandonos',
-                'public_id' => 'retiro-abandono-' . $registro->id . '.pdf',
-                'resource_type' => 'raw',
-                'overwrite' => true,
-            ]
-        );
+            file_put_contents($archivoCarta, $pdfCarta);
 
-        $url = $resultado['secure_url'] ?? $resultado['url'] ?? null;
-        $publicId = $resultado['public_id'] ?? null;
+            $pdfFinal = new Fpdi();
+            $archivos = [$archivoCarta];
 
-        if (!$url) {
-            \Log::error('Cloudinary no devolvió una URL para el PDF de retiro/abandono', [
-                'registro_id' => $registro->id,
-                'resultado' => $resultado,
+            if ($registro->adjunto_url) {
+                $respuesta = Http::timeout(60)->get($registro->adjunto_url);
+                $respuesta->throw();
+
+                $contenidoAdjunto = $respuesta->body();
+
+                if (!str_starts_with($contenidoAdjunto, '%PDF-')) {
+                    throw new \RuntimeException(
+                        'El documento adjunto descargado no es un PDF válido.'
+                    );
+                }
+
+                $archivoAdjunto = tempnam(sys_get_temp_dir(), 'adjunto_');
+                file_put_contents($archivoAdjunto, $contenidoAdjunto);
+
+                $archivos[] = $archivoAdjunto;
+            }
+
+            foreach ($archivos as $archivo) {
+                $totalPaginas = $pdfFinal->setSourceFile($archivo);
+
+                for ($pagina = 1; $pagina <= $totalPaginas; $pagina++) {
+                    $plantilla = $pdfFinal->importPage($pagina);
+                    $tamano = $pdfFinal->getTemplateSize($plantilla);
+
+                    $pdfFinal->AddPage(
+                        $tamano['orientation'],
+                        [$tamano['width'], $tamano['height']]
+                    );
+
+                    $pdfFinal->useTemplate($plantilla);
+                }
+            }
+
+            file_put_contents($archivoFinal, $pdfFinal->Output('S'));
+
+            $verificacion = new Fpdi();
+            $totalFinal = $verificacion->setSourceFile($archivoFinal);
+
+            if ($totalFinal < 1) {
+                throw new \RuntimeException(
+                    'No se pudo generar el PDF combinado.'
+                );
+            }
+
+            if (!copy($archivoFinal, $archivoFinalPdf)) {
+                throw new \RuntimeException(
+                    'No se pudo preparar el PDF para subirlo a Cloudinary.'
+                );
+            }
+
+            $cloudinary = new \Cloudinary\Cloudinary([
+                'cloud' => [
+                    'cloud_name' => env('CLOUDINARY_CLOUD_NAME'),
+                    'api_key' => env('CLOUDINARY_API_KEY'),
+                    'api_secret' => env('CLOUDINARY_API_SECRET'),
+                ],
+                'url' => ['secure' => true],
             ]);
 
-            abort(500, 'Cloudinary no devolvió la URL del documento.');
+            $resultado = $cloudinary->uploadApi()->upload(
+                $archivoFinalPdf,
+                [
+                    'folder' => 'retiros-abandonos',
+                    'public_id' => 'retiro-abandono-' . $registro->id,
+                    'resource_type' => 'image',
+                    'overwrite' => true,
+                    'invalidate' => true,
+                ]
+            );
+
+            $registro->pdf_url = $resultado['secure_url']
+                ?? $resultado['url']
+                ?? null;
+
+            $registro->pdf_public_id = $resultado['public_id'] ?? null;
+            $registro->save();
+
+            if (!$registro->pdf_url) {
+                throw new \RuntimeException(
+                    'Cloudinary no devolvió la URL del PDF.'
+                );
+            }
+
+            return redirect()->away($registro->pdf_url);
+        } finally {
+            foreach ([
+                $archivoCarta,
+                $archivoAdjunto,
+                $archivoFinal,
+                $archivoFinalPdf,
+            ] as $archivo) {
+                if ($archivo && file_exists($archivo)) {
+                    unlink($archivo);
+                }
+            }
+        }
+    }
+
+    public function verPdfRetiroAbandono($id)
+    {
+        $registro = RegistroRetiroAbandono::findOrFail($id);
+
+        if (!$registro->pdf_url) {
+            abort(404, 'El documento PDF no está disponible.');
         }
 
-        $registro->pdf_url = $url;
-        $registro->pdf_public_id = $publicId;
-        $registro->save();
-
-        return redirect()->away($url);
+        return redirect()->away($registro->pdf_url);
     }
 }

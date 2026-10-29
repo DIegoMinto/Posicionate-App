@@ -111,10 +111,10 @@
                             <div class="mb-4 h-16 flex items-center justify-center w-full">
                                 <div
                                     class="bg-brand-green/10 p-2 rounded-full flex items-center justify-center w-14 h-14">
-                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                                        stroke-width="2" stroke="currentColor" class="w-8 h-8 text-brand-gold">
+                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
+                                        stroke="currentColor" stroke-width="2" class="w-8 h-8 text-brand-gold">
                                         <path stroke-linecap="round" stroke-linejoin="round"
-                                            d="M2.25 6.75c0 8.284 6.716 15 15 15h2.25a2.25 2.25 0 0 0 2.25-2.25v-1.372c0-1.016-.684-1.9-1.667-2.154l-4.423-.?" />
+                                            d="M2.25 4.5A2.25 2.25 0 0 1 4.5 2.25h3a2.25 2.25 0 0 1 2.25 2.25v1.5a2.25 2.25 0 0 1-1.5 2.18l-1.46.49a12.03 12.03 0 0 0 6.54 6.54l.49-1.46A2.25 2.25 0 0 1 16 12.25h1.5a2.25 2.25 0 0 1 2.25 2.25v3A2.25 2.25 0 0 1 17.5 19.75h-.75C9.02 19.75 2.25 12.98 2.25 5.25V4.5Z" />
                                     </svg>
                                 </div>
                             </div>
@@ -128,7 +128,8 @@
                                 </p>
                             </div>
 
-                            <a href="" class="btn-gold uppercase text-xs font-bold py-2 px-6 rounded-md w-full">
+                            <a href="{{ route('lineas-posicionate.index') }}"
+                                class="btn-gold uppercase text-xs font-bold py-2 px-6 rounded-md w-full">
                                 Acceder
                             </a>
                         </div>

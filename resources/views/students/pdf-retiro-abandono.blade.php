@@ -172,11 +172,13 @@
         {{ $registro->detalle }}
     </div>
 
-
     <div class="pie">
         POSICIONATE S.R.L. — Formación Continua
         <br>
         Documento generado el {{ now()->format('d/m/Y H:i') }}
+        <br><br>
+        <strong>Emitido por:</strong>
+        {{ $registro->nombre_emisor ?: 'No registrado' }}
     </div>
 </body>
 

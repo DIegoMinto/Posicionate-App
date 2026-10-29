@@ -17,7 +17,7 @@ use App\Http\Controllers\ModuloController;
 use App\Http\Controllers\EstudianteController;
 use App\Http\Controllers\ContrasenaController;
 use App\Http\Controllers\AreaController;
-
+use App\Http\Controllers\LineaPosicionateController;
 use App\Models\PlanesPago;
 
 Route::get('/', function () {
@@ -233,6 +233,8 @@ Route::middleware(['auth', 'vigente'])->group(function () {
 
         Route::get('/retiro-abandono/{id}/pdf', [InscripcionController::class, 'pdfRetiroAbandono'])->name('students.retiro-abandono.pdf');
 
+        Route::get('/retiros-abandonos/{id}/documento', [InscripcionController::class, 'verPdfRetiroAbandono'])->name('retiros-abandonos.documento');
+
     });
 
     // RUTAS DE CREACIONES Y CONFIGURACIÓN GLOBAL (Solo Super Admin)
@@ -269,6 +271,11 @@ Route::middleware(['auth', 'vigente'])->group(function () {
         Route::patch('/estudiantes/{id_estudiante}/moodle-habilitar', [InscripcionController::class, 'habilitarMoodle'])
             ->name('estudiantes.moodle.habilitar')
             ->middleware(['auth', 'role:super_admin']);
+
+        Route::resource('lineas-posicionate', LineaPosicionateController::class)
+            ->except(['show'])
+            ->names('lineas-posicionate')
+            ->parameters(['lineas-posicionate' => 'lineaPosicionate']);
     });
 
 });

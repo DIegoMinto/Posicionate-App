@@ -57,8 +57,8 @@
                 </div>
             @endif
 
-            <form method="POST" action="{{ route('students.retiro-abandono.store', $estudiante->id_estudiante) }}"
-                class="space-y-6">
+            <form method="POST" enctype="multipart/form-data"
+                action="{{ route('students.retiro-abandono.store', $estudiante->id_estudiante) }}" class="space-y-6">
                 @csrf
 
                 <input type="hidden" name="id_curso" value="{{ $curso->id_curso }}">
@@ -204,6 +204,32 @@
                         <textarea id="detalle" name="detalle" rows="5" maxlength="5000" required
                             class="form-input-pill-2 resize-y"
                             placeholder="Describe el motivo o las circunstancias del retiro o abandono...">{{ old('detalle', 'El participante solicitó formalmente el retiro del programa académico por motivos personales.') }}</textarea>
+                    </div>
+                </section>
+
+                <section class="overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-sm">
+                    <div class="border-b border-gray-100 px-5 py-4 sm:px-7">
+                        <h2 class="font-bold text-brand-green">Documento de respaldo</h2>
+                        <p class="mt-1 text-sm text-gray-500">
+                            Adjunta la carta presentada por el participante u otro documento de respaldo.
+                        </p>
+                    </div>
+
+                    <div class="p-5 sm:p-7">
+                        <label for="documento" class="mb-2 block text-sm font-semibold text-brand-green">
+                            Adjuntar documento PDF
+                        </label>
+
+                        <input type="file" id="documento" name="documento" accept=".pdf,application/pdf"
+                            class="form-input-pill-2">
+
+                        <p class="mt-2 text-xs text-gray-500">
+                            Opcional. Solo PDF, máximo 10 MB.
+                        </p>
+
+                        @error('documento')
+                            <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
+                        @enderror
                     </div>
                 </section>
 

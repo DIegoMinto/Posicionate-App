@@ -23,6 +23,9 @@ class RegistroRetiroAbandono extends Model
         'monto_pagado',
         'saldo_pendiente',
         'id_usuario',
+        'nombre_emisor',
+        'adjunto_url',
+        'adjunto_public_id',
     ];
 
     protected $casts = [
