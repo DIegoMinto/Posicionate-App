@@ -276,6 +276,9 @@ Route::middleware(['auth', 'vigente'])->group(function () {
             ->except(['show'])
             ->names('lineas-posicionate')
             ->parameters(['lineas-posicionate' => 'lineaPosicionate']);
+
+
+        Route::patch('/estudiantes/{id_estudiante}/cambiar-asesor', [InscripcionController::class, 'cambiarAsesor'])->name('students.updateAsesor');
     });
 
 });

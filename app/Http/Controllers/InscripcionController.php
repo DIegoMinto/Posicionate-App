@@ -212,6 +212,41 @@ class InscripcionController extends Controller
         }
     }
 
+
+    public function cambiarAsesor(Request $request, $id_estudiante)
+    {
+        abort_unless(
+            auth()->user()?->hasRole('super_admin'),
+            403,
+            'Solo un super administrador puede cambiar el asesor.'
+        );
+
+        $validated = $request->validate([
+            'id_curso' => 'required|integer|exists:curso,id_curso',
+            'id_personal' => 'required|integer|exists:personal,id_personal',
+        ], [
+            'id_curso.required' => 'No se especificó el curso.',
+            'id_curso.exists' => 'El curso seleccionado no existe.',
+            'id_personal.required' => 'Debes seleccionar un asesor.',
+            'id_personal.exists' => 'El asesor seleccionado no existe.',
+        ]);
+
+        $inscripcion = \App\Models\CursoEstudiante::where(
+            'id_estudiante',
+            $id_estudiante
+        )
+            ->where('id_curso', $validated['id_curso'])
+            ->firstOrFail();
+
+        $inscripcion->id_personal = $validated['id_personal'];
+        $inscripcion->save();
+
+        return back()->with(
+            'success',
+            'El asesor del estudiante se cambió correctamente.'
+        );
+    }
+
     private function recalcularFechasContado(PagoEstudiante $raiz): void
     {
         $inscripcion = \App\Models\CursoEstudiante::findOrFail($raiz->id_curso_estudiante);
@@ -320,6 +355,7 @@ class InscripcionController extends Controller
         );
     }
 
+
     private function buildStudentsQuery(Request $request, $usuario, $idCurso = null)
     {
         $query = DB::table('curso_estudiante')
@@ -330,13 +366,15 @@ class InscripcionController extends Controller
             ->select(
                 'estudiante.*',
                 'curso.nombre as curso_nombre',
+                'curso_estudiante.id_personal',
                 'curso_estudiante.estado',
                 'curso_estudiante.estadia',
                 'curso_estudiante.id_curso',
                 'curso_estudiante.created_at as fecha_inscripcion',
                 'persona.nombre as asesor_nombre',
                 'persona.apellido_p as asesor_apellido'
-            )->selectSub(
+            )
+            ->selectSub(
                 DB::table('pagos_estudiante')
                     ->select('monto_pagado')
                     ->whereColumn('pagos_estudiante.id_curso_estudiante', 'curso_estudiante.id')
@@ -387,10 +425,6 @@ class InscripcionController extends Controller
 
         if ($request->filled('fecha_fin')) {
             $query->whereDate('curso_estudiante.created_at', '<=', $request->fecha_fin);
-        }
-
-        if ($request->filled('estadia')) {
-            $query->where('curso_estudiante.estadia', $request->estadia);
         }
 
         if ($request->filled('estadia')) {

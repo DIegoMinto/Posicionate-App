@@ -264,9 +264,99 @@
                                         {{ $e->correo_electronico ?? '-' }}
                                     </td>
 
-                                    <td class="py-3 px-4 whitespace-nowrap italic">
-                                        {{ $e->asesor_nombre }} {{ $e->asesor_apellido }}
-                                    </td>
+                                    
+<td class="py-3 px-4 whitespace-nowrap">
+    @if($usuario->hasRole('super_admin'))
+        <div x-data="{ openAsesor: false }">
+            <button
+                type="button"
+                @click="openAsesor = true"
+                class="text-left italic text-brand-green hover:text-brand-gold hover:underline cursor-pointer"
+                title="Cambiar asesor"
+            >
+                {{ $e->asesor_nombre }} {{ $e->asesor_apellido }}
+                <span class="ml-1 not-italic">✎</span>
+            </button>
+
+            <div
+                x-show="openAsesor"
+                x-cloak
+                class="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 backdrop-blur-sm"
+            >
+                <div
+                    @click.away="openAsesor = false"
+                    class="bg-white p-6 rounded-sm shadow-2xl w-full max-w-md mx-4 text-left border-t-4 border-brand-gold"
+                >
+                    <h3 class="text-brand-green uppercase mb-2 font-bold text-sm">
+                        Cambiar asesor
+                    </h3>
+
+                    <p class="text-xs text-gray-600 mb-4">
+                        Estudiante:
+                        <strong class="text-black">
+                            {{ $e->nombre }} {{ $e->apellido_p }}
+                        </strong>
+                    </p>
+
+                    <form
+                        action="{{ route('students.updateAsesor', $e->id_estudiante) }}"
+                        method="POST"
+                    >
+                        @csrf
+                        @method('PATCH')
+
+                        <input
+                            type="hidden"
+                            name="id_curso"
+                            value="{{ $curso->id_curso }}"
+                        >
+
+                        <label class="block text-xs font-bold text-gray-700 mb-2">
+                            Seleccionar nuevo asesor
+                        </label>
+
+                        <select
+                            name="id_personal"
+                            required
+                            class="w-full border border-gray-300 rounded-sm p-2 text-sm mb-5 bg-white"
+                        >
+                            @foreach($personales as $per)
+                                <option
+                                    value="{{ $per->id_personal }}"
+                                    {{ (int) $e->id_personal === (int) $per->id_personal ? 'selected' : '' }}
+                                >
+                                    {{ strtoupper(trim(($per->persona->nombre ?? '') . ' ' . ($per->persona->apellido_p ?? '') . ' ' . ($per->persona->apellido_m ?? ''))) }}
+                                </option>
+                            @endforeach
+                        </select>
+
+                        <div class="flex justify-end gap-3">
+                            <button
+                                type="button"
+                                @click="openAsesor = false"
+                                class="text-xs uppercase text-gray-500 hover:text-red-600 cursor-pointer"
+                            >
+                                Cancelar
+                            </button>
+
+                            <button
+                                type="submit"
+                                class="btn-gold"
+                            >
+                                Guardar cambio
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    @else
+        <span class="italic">
+            {{ $e->asesor_nombre }} {{ $e->asesor_apellido }}
+        </span>
+    @endif
+</td>
+
 
                                     <td class="py-3 px-4 whitespace-nowrap">
                                         {{ \Carbon\Carbon::parse($e->fecha_inscripcion)->format('d/m/Y H:i') }}
