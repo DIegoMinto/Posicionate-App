@@ -56,8 +56,7 @@
                     </ul>
                 </div>
             @endif
-
-            <form method="POST" enctype="multipart/form-data"
+            <form method="POST" enctype="multipart/form-data" target="_blank"
                 action="{{ route('students.retiro-abandono.store', $estudiante->id_estudiante) }}" class="space-y-6">
                 @csrf
 
