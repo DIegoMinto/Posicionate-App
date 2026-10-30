@@ -1256,8 +1256,8 @@ class InscripcionController extends Controller
         }
 
         return response()->view('students.retiro-abandono-procesando', [
-            'urlEstudiantes' => route('students.index', [
-                'id_curso' => $curso->id_curso,
+            'urlEstudiantes' => route('curso.estudiantes', [
+                'id' => $curso->id_curso,
             ]),
             'urlPdf' => route('students.retiro-abandono.pdf', $registro->id),
         ]);
