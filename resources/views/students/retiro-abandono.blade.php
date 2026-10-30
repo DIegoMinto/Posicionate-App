@@ -202,7 +202,7 @@
                         </label>
                         <textarea id="detalle" name="detalle" rows="5" maxlength="5000" required
                             class="form-input-pill-2 resize-y"
-                            placeholder="Describe el motivo o las circunstancias del retiro o abandono...">{{ old('detalle', 'El participante solicitó formalmente el retiro del programa académico por motivos personales.') }}</textarea>
+                            placeholder="Describe el motivo o las circunstancias del retiro o abandono...">{{ old('detalle') }}</textarea>
                     </div>
                 </section>
 
@@ -255,8 +255,8 @@
                 const detalle = document.getElementById('etiqueta-detalle');
                 const texto = document.getElementById('detalle');
 
-                const motivoRetiro = 'El participante solicitó formalmente el retiro del programa académico por motivos personales.';
-                const motivoAbandono = 'Abandono del programa académico sin justificación. El participante dejó de asistir sin presentar solicitud escrita ni documentación de respaldo.';
+                const motivoRetiro = '';
+                const motivoAbandono = '';
 
                 const actualizar = () => {
                     if (tipo.value === 'retiro') {
