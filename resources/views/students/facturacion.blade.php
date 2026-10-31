@@ -423,41 +423,62 @@
                     Exportar PDF
                 </a>
 
-                @if(in_array($usuario->cargo, ['contador', 'asistente_contable']) || $usuario->rol === 'super_admin')
+                <a href="{{ route('curso.estudiantes', ['id' => $curso->id_curso]) }}"
+    class="inline-flex items-center gap-2 bg-gray-100 text-brand-green px-4 py-2 rounded-sm text-xs font-sans font-bold uppercase tracking-tighter hover:bg-gray-200 transition-colors">
+
+    <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none"
+        viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <path stroke-linecap="round" stroke-linejoin="round"
+            d="M15 19l-7-7 7-7M8 12h13" />
+    </svg>
+
+    Volver a estudiantes
+</a>
+
+               @if(in_array($usuario->cargo, ['contador', 'asistente_contable']) || $usuario->rol === 'super_admin')
+
     <a href="{{ route('students.change', $estudiante->id_estudiante) }}?id_curso={{ $curso->id_curso }}"
         onclick="return confirm('Esto eliminará TODAS las cuotas actuales del estudiante (incluyendo pagos ya registrados) y generará un plan nuevo desde cero. ¿Deseas continuar?');"
         class="inline-flex items-center gap-2 bg-brand-gold text-black px-4 py-2 rounded-sm text-xs font-sans font-bold uppercase tracking-tighter hover:bg-opacity-90 transition-colors">
+
         <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24"
             stroke="currentColor" stroke-width="2">
             <path stroke-linecap="round" stroke-linejoin="round"
                 d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
         </svg>
+
         Cambiar Plan de Pago
     </a>
 
-    @if(in_array($inscripcion->estadia, ['abandono', 'retirado']))
-        <a href="{{ route('students.retiro-abandono.form', [
-            'id_estudiante' => $estudiante->id_estudiante,
-            'id_curso' => $curso->id_curso
-        ]) }}"
-            class="inline-flex items-center gap-2 bg-brand-gold text-black px-4 py-2 rounded-sm text-xs font-sans font-bold uppercase tracking-tighter hover:bg-opacity-90 transition-colors">
-            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24"
-                stroke="currentColor" stroke-width="2">
-                <path stroke-linecap="round" stroke-linejoin="round"
-                    d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5l5 5v11a2 2 0 01-2 2z" />
-            </svg>
-            Retiro / Abandono
-        </a>
+@endif
 
-        @if($documentoRetiroAbandono && in_array($inscripcion->estadia, ['abandono', 'retirado']))
-    <a href="{{ $documentoRetiroAbandono->pdf_url }}"
+@if(in_array($inscripcion->estadia, ['abandono', 'retirado']))
+
+    <a href="{{ route('students.retiro-abandono.form', [
+        'id_estudiante' => $estudiante->id_estudiante,
+        'id_curso' => $curso->id_curso
+    ]) }}"
+        class="inline-flex items-center gap-2 bg-brand-gold text-black px-4 py-2 rounded-sm text-xs font-sans font-bold uppercase tracking-tighter hover:bg-opacity-90 transition-colors">
+
+        Retiro / Abandono
+    </a>
+
+    @if($documentoRetiroAbandono)
+
+@if($documentoRetiroAbandono && $documentoRetiroAbandono->pdf_url)
+
+    <a href="{{ route('retiros-abandonos.documento', $documentoRetiroAbandono->id) }}"
         target="_blank"
         rel="noopener noreferrer"
-        class="inline-flex items-center gap-2 bg-brand-gold text-black px-4 py-2 rounded-sm text-xs font-sans font-bold uppercase tracking-tighter hover:bg-opacity-90 transition-colors">
-        Ver documento de retiro/abandono
+        class="inline-flex items-center gap-2 bg-brand-green text-white px-4 py-2 rounded-sm text-xs font-sans font-bold uppercase tracking-tighter hover:bg-opacity-90 transition-colors">
+
+        Ver acta de {{ $documentoRetiroAbandono->tipo }} PDF
     </a>
+
 @endif
+
     @endif
+
 @endif
             </div>
         </div>

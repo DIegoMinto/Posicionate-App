@@ -369,6 +369,22 @@ class DashboardController extends Controller
                     $q->where('curso_estudiante.estado', 'pre_inscrito');
                 }
 
+            ])
+            ->addSelect([
+                'total_retiros' => \DB::table('curso_estudiante as ce')
+                    ->whereColumn('ce.id_curso', 'curso.id_curso')
+                    ->where('ce.estadia', 'retirado')
+                    ->selectRaw('COUNT(*)'),
+
+                'total_abandonos' => \DB::table('curso_estudiante as ce')
+                    ->whereColumn('ce.id_curso', 'curso.id_curso')
+                    ->where('ce.estadia', 'abandono')
+                    ->selectRaw('COUNT(*)'),
+
+                'total_retiros_abandonos' => \DB::table('curso_estudiante as ce')
+                    ->whereColumn('ce.id_curso', 'curso.id_curso')
+                    ->whereIn('ce.estadia', ['retirado', 'abandono'])
+                    ->selectRaw('COUNT(*)'),
             ]);
 
         if ($request->search) {

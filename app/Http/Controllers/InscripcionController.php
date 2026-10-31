@@ -637,8 +637,7 @@ class InscripcionController extends Controller
             'id_curso_estudiante',
             $inscripcion->id
         )
-            ->whereNotNull('pdf_url')
-            ->orderByDesc('id')
+            ->latest('id')
             ->first();
 
         return view('students.facturacion', compact(
@@ -1206,7 +1205,7 @@ class InscripcionController extends Controller
                 $estudiante->apellido_m,
             ], fn($valor) => filled($valor))));
 
-            return RegistroRetiroAbandono::create([
+            $registro = RegistroRetiroAbandono::create([
                 'id_curso_estudiante' => $inscripcion->id,
                 'tipo' => $validated['tipo'],
                 'fecha_registro' => $validated['fecha_registro'],
@@ -1222,6 +1221,14 @@ class InscripcionController extends Controller
                 'id_usuario' => auth()->id(),
                 'nombre_emisor' => $nombreEmisor,
             ]);
+
+            $inscripcion->estadia = $validated['tipo'] === 'retiro'
+                ? 'retirado'
+                : 'abandono';
+
+            $inscripcion->save();
+
+            return $registro;
         });
 
         if ($request->hasFile('documento')) {
@@ -1253,21 +1260,23 @@ class InscripcionController extends Controller
                 $resultado['public_id'] ?? null;
 
             $registro->save();
+
+            if (!$registro->adjunto_url) {
+                throw new \RuntimeException('No se pudo guardar el documento adjunto.');
+            }
         }
 
-        return response()->view('students.retiro-abandono-procesando', [
-            'urlEstudiantes' => route('curso.estudiantes', [
-                'id' => $curso->id_curso,
-            ]),
-            'urlPdf' => route('students.retiro-abandono.pdf', $registro->id),
-        ]);
+        // Generar el acta después de guardar el adjunto.
+        $this->generarPdfRetiroAbandono($registro);
+
+        return redirect()->route('students.facturacion', [
+            'id' => $id_estudiante,
+            'id_curso' => $curso->id_curso,
+        ])->with('success', 'El retiro o abandono y su acta PDF se registraron correctamente.');
     }
 
-
-    public function pdfRetiroAbandono($id)
+    private function generarPdfRetiroAbandono($registro)
     {
-        $registro = RegistroRetiroAbandono::findOrFail($id);
-
         $archivoCarta = tempnam(sys_get_temp_dir(), 'carta_');
         $archivoAdjunto = null;
         $archivoFinal = tempnam(sys_get_temp_dir(), 'final_');
@@ -1284,18 +1293,22 @@ class InscripcionController extends Controller
             $archivos = [$archivoCarta];
 
             if ($registro->adjunto_url) {
-                $respuesta = Http::timeout(60)->get($registro->adjunto_url);
+                $respuesta = Http::timeout(120)
+                    ->withOptions(['allow_redirects' => true])
+                    ->get($registro->adjunto_url);
+
                 $respuesta->throw();
 
                 $contenidoAdjunto = $respuesta->body();
 
-                if (!str_starts_with($contenidoAdjunto, '%PDF-')) {
+                if (substr($contenidoAdjunto, 0, 5) !== '%PDF-') {
                     throw new \RuntimeException(
                         'El documento adjunto descargado no es un PDF válido.'
                     );
                 }
 
                 $archivoAdjunto = tempnam(sys_get_temp_dir(), 'adjunto_');
+
                 file_put_contents($archivoAdjunto, $contenidoAdjunto);
 
                 $archivos[] = $archivoAdjunto;
@@ -1319,19 +1332,8 @@ class InscripcionController extends Controller
 
             file_put_contents($archivoFinal, $pdfFinal->Output('S'));
 
-            $verificacion = new Fpdi();
-            $totalFinal = $verificacion->setSourceFile($archivoFinal);
-
-            if ($totalFinal < 1) {
-                throw new \RuntimeException(
-                    'No se pudo generar el PDF combinado.'
-                );
-            }
-
             if (!copy($archivoFinal, $archivoFinalPdf)) {
-                throw new \RuntimeException(
-                    'No se pudo preparar el PDF para subirlo a Cloudinary.'
-                );
+                throw new \RuntimeException('No se pudo preparar el PDF final.');
             }
 
             $cloudinary = new \Cloudinary\Cloudinary([
@@ -1362,12 +1364,9 @@ class InscripcionController extends Controller
             $registro->save();
 
             if (!$registro->pdf_url) {
-                throw new \RuntimeException(
-                    'Cloudinary no devolvió la URL del PDF.'
-                );
+                throw new \RuntimeException('Cloudinary no devolvió la URL del PDF.');
             }
 
-            return redirect()->away($registro->pdf_url);
         } finally {
             foreach ([
                 $archivoCarta,
@@ -1380,6 +1379,15 @@ class InscripcionController extends Controller
                 }
             }
         }
+    }
+
+    public function pdfRetiroAbandono($id)
+    {
+        $registro = RegistroRetiroAbandono::findOrFail($id);
+
+        $this->generarPdfRetiroAbandono($registro);
+
+        return redirect()->away($registro->pdf_url);
     }
 
     public function verPdfRetiroAbandono($id)

@@ -56,7 +56,7 @@
                     </ul>
                 </div>
             @endif
-            <form method="POST" enctype="multipart/form-data" target="_blank"
+            <form method="POST" enctype="multipart/form-data"
                 action="{{ route('students.retiro-abandono.store', $estudiante->id_estudiante) }}" class="space-y-6">
                 @csrf
 
@@ -241,8 +241,7 @@
                     </a>
 
                     <button type="submit" class="btn-gold">
-
-                        Generar documento PDF
+                        Registrar retiro o abandono
                     </button>
                 </div>
             </form>

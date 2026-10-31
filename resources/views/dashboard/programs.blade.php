@@ -426,6 +426,44 @@
                                         </span>
                                     </div>
                                 </div>
+                                @if($curso->total_retiros_abandonos > 0)
+    <details class="relative">
+        <summary class="list-none cursor-pointer bg-red-100 text-red-700 rounded-sm px-2 py-1 flex items-center gap-2 shadow-sm hover:bg-red-200 transition-colors ml-2">
+            <span class="text-sm font-black">
+                {{ $curso->total_retiros_abandonos }}
+            </span>
+            <svg xmlns="http://www.w3.org/2000/svg"
+                class="w-4 h-4"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round"
+                    d="M8 10h8M8 14h5m-9 6 3-3h9a4 4 0 0 0 4-4V7a4 4 0 0 0-4-4H7a4 4 0 0 0-4 4v9a4 4 0 0 0 1 3z"/>
+            </svg>
+        </summary>
+
+        <div class="absolute right-0 top-full mt-2 w-44 bg-white rounded-sm shadow-xl border border-gray-200 p-3 z-50">
+            <p class="text-xs font-bold text-gray-500 uppercase mb-3">
+                Retiros y abandonos
+            </p>
+
+            <div class="flex justify-between items-center mb-2">
+                <span class="text-sm text-gray-600">Retiros</span>
+                <span class="text-sm font-black text-red-600">
+                    {{ $curso->total_retiros }}
+                </span>
+            </div>
+
+            <div class="flex justify-between items-center">
+                <span class="text-sm text-gray-600">Abandonos</span>
+                <span class="text-sm font-black text-red-600">
+                    {{ $curso->total_abandonos }}
+                </span>
+            </div>
+        </div>
+    </details>
+@endif
                             </div>
 
                         </div>
