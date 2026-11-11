@@ -220,7 +220,7 @@
                                 <th class="py-3 px-4 whitespace-nowrap">Fecha de Registro</th>
                                 <th class="py-3 px-4 text-center whitespace-nowrap">Estado</th>
                                 
-                                @if(auth()->user()->hasAnyRole(['super_admin', 'admin']) || auth()->user()->hasAnyCargo(['supervisor_academico', 'coordinador_academico', 'asistente_academico', 'coordinador_marketing']))
+                                @if(auth()->user()->hasAnyRole(['super_admin', 'admin']) || auth()->user()->hasAnyCargo(['supervisor_academico', 'coordinador_academico', 'asistente_academico', 'coordinador_marketing', 'asistente_contable']))
                                     <th class="py-3 px-4 text-center">Estadía</th>
                                 @endif
                                 <th class="py-3 px-4 text-center whitespace-nowrap">Moodle</th>
@@ -371,7 +371,7 @@
                                         </span>
                                     </td>
 
-                                    @if(auth()->user()->hasAnyRole(['super_admin', 'admin']) || auth()->user()->hasAnyCargo(['supervisor_academico', 'coordinador_academico', 'asistente_academico', 'coordinador_marketing']))
+                                    @if(auth()->user()->hasAnyRole(['super_admin', 'admin']) || auth()->user()->hasAnyCargo(['supervisor_academico', 'coordinador_academico', 'asistente_academico', 'coordinador_marketing', 'asistente_contable']))
     <td class="py-3 px-4 text-center">
         @if($e->estado === 'pre_inscrito')
             <span class="px-2 py-0.5 rounded-full text-[9px] font-black uppercase bg-gray-200 text-gray-600">
