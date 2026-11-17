@@ -70,4 +70,13 @@ class Curso extends Model
         return $this->hasMany(PlanesPago::class, 'id_curso');
     }
 
+    public function programacionAcademica()
+    {
+        return $this->hasOne(
+            ProgramacionAcademica::class,
+            'id_curso',
+            'id_curso'
+        );
+    }
+
 }

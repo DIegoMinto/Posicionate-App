@@ -18,7 +18,7 @@ use App\Http\Controllers\EstudianteController;
 use App\Http\Controllers\ContrasenaController;
 use App\Http\Controllers\AreaController;
 use App\Http\Controllers\LineaPosicionateController;
-use App\Models\PlanesPago;
+use App\Http\Controllers\MasterclassController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -182,6 +182,75 @@ Route::middleware(['auth', 'vigente'])->group(function () {
 
         Route::get('/modulo/crear', [ModuloController::class, 'create'])->name('modulo.create');
         Route::post('/modulo/guardar', [ModuloController::class, 'store'])->name('modulo.store');
+
+        // PROGRAMACIÓN DE DIPLOMADOS
+
+        // Ver programación académica
+        Route::get('/programs/{id_curso}/programacion', [ModuloController::class, 'programacionShow'])
+            ->name('programacion.show');
+
+        // Crear o editar configuración
+        Route::get('/programs/{id_curso}/programacion/editar', [ModuloController::class, 'programacionEdit'])
+            ->name('programacion.edit');
+
+        // Guardar configuración
+        Route::post('/programs/{id_curso}/programacion', [ModuloController::class, 'programacionStore'])
+            ->name('programacion.store');
+
+        // GESTIÓN DE MASTERCLASS
+
+        Route::prefix('/programs/{id_curso}/programacion/masterclass')
+            ->name('programacion.masterclass.')
+            ->controller(MasterclassController::class)
+            ->group(function () {
+
+                Route::get('/', 'index')->name('index');
+
+                Route::get('/crear', 'create')->name('create');
+
+                Route::post('/', 'store')->name('store');
+
+                Route::get('/{id_masterclass}/editar', 'edit')->name('edit');
+
+                Route::put('/{id_masterclass}', 'update')->name('update');
+
+                Route::delete('/{id_masterclass}', 'destroy')->name('destroy');
+
+            });
+
+        Route::get('/programs/{id_curso}/programacion/pdf', [ModuloController::class, 'programacionPdf'])
+            ->name('programacion.pdf');
+
+        // GESTIÓN DE MÓDULOS DE LA PROGRAMACIÓN ACADÉMICA
+
+        Route::prefix('/programs/{id_curso}/programacion/modulos')
+            ->name('programacion.modulos.')
+            ->group(function () {
+
+                // Listado de módulos
+                Route::get('/', [ModuloController::class, 'modulosIndex'])
+                    ->name('index');
+
+                // Formulario para crear
+                Route::get('/crear', [ModuloController::class, 'modulosCreate'])
+                    ->name('create');
+
+                // Guardar módulo
+                Route::post('/', [ModuloController::class, 'modulosStore'])
+                    ->name('store');
+
+                // Formulario para editar
+                Route::get('/{id_modulo}/editar', [ModuloController::class, 'modulosEdit'])
+                    ->name('edit');
+
+                // Actualizar módulo
+                Route::put('/{id_modulo}', [ModuloController::class, 'modulosUpdate'])
+                    ->name('update');
+
+                // Eliminar módulo
+                Route::delete('/{id_modulo}', [ModuloController::class, 'modulosDestroy'])
+                    ->name('destroy');
+            });
 
         // MANEJO DE DOCENTES
 

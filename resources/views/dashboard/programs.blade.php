@@ -197,7 +197,7 @@
 
                                             @if ($usuario->hasAnyCargo(['coordinador_academico']) || $usuario->rol === 'super_admin')
 
-                                                <a href="{{ route('modulo.create', ['id_curso' => $curso->id_curso]) }}"
+                                                <a href="{{ route('programacion.show', ['id_curso' => $curso->id_curso]) }}"
                                                     class="group relative flex items-center justify-center" title="Añadir Clase">
                                                     <svg xmlns="http://www.w3.org/2000/svg" class="w-12 h-12 p-2 text-brand-green" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
                                                         <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25" />
@@ -205,7 +205,7 @@
                                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M18.5 3.8v3.4M16.8 5.5h3.4" />
                                                     </svg>
                                                     <span class="absolute -top-8 scale-0 transition-all rounded bg-gray-800 p-1 text-[10px] text-white group-hover:scale-100">
-                                                        Añadir Módulo
+                                                        Gestionar Programación
                                                     </span>
                                                 </a>
 
