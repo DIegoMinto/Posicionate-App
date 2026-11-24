@@ -130,27 +130,80 @@ class DashboardController extends Controller
             ->values();
     }
 
+
     public function eventosCalendario()
     {
-        $eventos = EventoCalendario::all();
+        $eventos = EventoCalendario::all()->map(function ($evento) {
+            return [
+                'id' => 'evento-' . $evento->id,
+                'title' => $evento->titulo,
+                'start' => $evento->fecha_inicio,
+                'end' => $evento->fecha_fin,
+                'extendedProps' => [
+                    'tipo' => $evento->tipo,
+                    'descripcion' => $evento->descripcion,
+                    'fecha_inicio' => $evento->fecha_inicio,
+                    'fecha_fin' => $evento->fecha_fin,
+                ],
+            ];
+        });
 
-        return response()->json(
-            $eventos->map(function ($evento) {
+        $sesiones = DB::table('programa_sesiones as ps')
+            ->join('programa_modulos as pm', 'pm.id_modulo', '=', 'ps.id_modulo')
+            ->join('curso as c', 'c.id_curso', '=', 'pm.id_curso')
+            ->select(
+                'ps.id_sesion',
+                'ps.titulo as sesion',
+                'ps.descripcion',
+                'ps.fecha',
+                'ps.hora_inicio',
+                'ps.hora_fin',
+                'ps.estado',
+                'ps.enlace_zoom',
+                'pm.nombre as modulo',
+                'pm.id_modulo',
+                'c.nombre as curso',
+                'c.id_curso'
+            )
+            ->orderBy('ps.fecha')
+            ->orderBy('ps.hora_inicio')
+            ->get()
+            ->map(function ($sesion) {
+
+                $fechaInicio = $sesion->fecha . 'T' . $sesion->hora_inicio;
+                $fechaFin = $sesion->fecha . 'T' . $sesion->hora_fin;
+
                 return [
-                    'id' => $evento->id,
-                    'title' => $evento->titulo,
-                    'start' => $evento->fecha_inicio,
-                    'end' => $evento->fecha_fin,
+                    'id' => 'sesion-' . $sesion->id_sesion,
+
+                    'title' => $sesion->curso . ' - ' . $sesion->sesion,
+
+                    'start' => $fechaInicio,
+                    'end' => $fechaFin,
+
                     'extendedProps' => [
-                        'tipo' => $evento->tipo,
-                        'descripcion' => $evento->descripcion,
-                        'fecha_inicio' => $evento->fecha_inicio,
-                        'fecha_fin' => $evento->fecha_fin,
+                        'tipo' => 'clase',
+                        'descripcion' => $sesion->descripcion,
+                        'fecha_inicio' => $fechaInicio,
+                        'fecha_fin' => $fechaFin,
+
+                        'id_sesion' => $sesion->id_sesion,
+                        'id_modulo' => $sesion->id_modulo,
+                        'id_curso' => $sesion->id_curso,
+
+                        'curso' => $sesion->curso,
+                        'modulo' => $sesion->modulo,
+                        'estado' => $sesion->estado,
+                        'enlace_zoom' => $sesion->enlace_zoom,
                     ],
                 ];
-            })
+            });
+
+        return response()->json(
+            $eventos->concat($sesiones)->values()
         );
     }
+
     public function guardarEvento(Request $request)
     {
         $data = $request->validate([
