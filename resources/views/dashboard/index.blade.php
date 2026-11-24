@@ -243,36 +243,6 @@
 
                     </div>
 
-                    <div class="flex flex-wrap items-center gap-4">
-
-                        <div class="flex items-center gap-3 text-xs font-semibold">
-
-                            <div class="flex items-center gap-2">
-                                <span class="w-3 h-3 rounded-sm bg-brand-green inline-block"></span>
-                                <span>Clases</span>
-                            </div>
-
-                            <div class="flex items-center gap-2">
-                                <span class="w-3 h-3 rounded-sm bg-[#9B843F] inline-block"></span>
-                                <span>Eventos</span>
-                            </div>
-
-                            <div class="flex items-center gap-2">
-                                <span class="w-3 h-3 rounded-sm bg-[#343434] inline-block"></span>
-                                <span>Webinars</span>
-                            </div>
-
-                        </div>
-                        @if ($usuario->hasAnyCargo(['supervisor_academico', 'asistente_academico', 'coordinador_academico']) || $usuario->hasAnyRole(['super_admin', 'admin']))
-                            <button id="btnNuevoEvento" type="button"
-                                class="btn-gold !py-2 !px-4 text-xs whitespace-nowrap">
-
-                                + Agregar Evento
-
-                            </button>
-                        @endif
-                    </div>
-
                 </div>
 
                 <div class="calendario-layout">
@@ -638,37 +608,42 @@
                 document.getElementById('detalleDescripcionContainer');
 
 
-            function estiloTipo(tipo) {
-                switch ((tipo || '').toLowerCase()) {
-                    case 'clase':
-                        return {
-                            color: '#176b5b',
-                            fondo: '#e9f1ed',
-                            label: 'Clase'
-                        };
 
-                    case 'evento':
-                        return {
-                            color: '#94782e',
-                            fondo: '#f5f0df',
-                            label: 'Evento'
-                        };
+            const PALETA_EVENTOS = [
+                { color: '#3569B7', fondo: '#E9EFF8' }, // Azul
+                { color: '#16745F', fondo: '#E5F1ED' }, // Verde
+                { color: '#A27B22', fondo: '#F5F0DF' }, // Dorado
+                { color: '#9455A6', fondo: '#F1EAF4' }, // Morado
+                { color: '#C15B42', fondo: '#F8ECE7' }, // Terracota
+                { color: '#B04465', fondo: '#F5EAF0' }, // Rosa
+                { color: '#477D91', fondo: '#E8F0F3' }, // Celeste
+                { color: '#687B35', fondo: '#EEF1E5' }, // Oliva
+                { color: '#7659A5', fondo: '#EEEAF5' }, // Violeta
+                { color: '#A45F28', fondo: '#F5EDE5' }, // Naranja
+                { color: '#397C78', fondo: '#E7F1EF' }, // Turquesa
+                { color: '#8B5360', fondo: '#F3EAEC' }  // Vino
+            ];
 
-                    case 'webinar':
-                        return {
-                            color: '#343434',
-                            fondo: '#f1f1f1',
-                            label: 'Webinar'
-                        };
+            function estiloEvento(evento) {
+                const identificador = String(
+                    evento.id || (
+                        evento.title + '-' +
+                        (evento.start ? evento.start.toISOString() : '')
+                    )
+                );
 
-                    default:
-                        return {
-                            color: '#176b5b',
-                            fondo: '#e9f1ed',
-                            label: 'Clase'
-                        };
+                let hash = 0;
+
+                for (let i = 0; i < identificador.length; i++) {
+                    hash = ((hash << 5) - hash) + identificador.charCodeAt(i);
+                    hash |= 0;
                 }
+
+                const indice = Math.abs(hash) % PALETA_EVENTOS.length;
+
+                return PALETA_EVENTOS[indice];
             }
+
 
             let fechaSeleccionada = new Date();
 
