@@ -275,8 +275,28 @@
 
                 </div>
 
-                <div class="calendario-contenedor">
-                    <div id="calendar"></div>
+                <div class="calendario-layout">
+
+                    <div class="calendario-principal">
+                        <div id="calendar"></div>
+                    </div>
+
+                    <aside class="calendario-agenda">
+                        <div class="calendario-agenda-header">
+                            <span>AGENDA DEL DÍA</span>
+                            <h3 id="agendaFechaTitulo"></h3>
+                            <p id="agendaFechaSubtitulo"></p>
+                        </div>
+
+                        <div class="calendario-agenda-contenido">
+                            <span class="calendario-total-dia" id="agendaTotal">
+                                0 sesiones
+                            </span>
+
+                            <div id="agendaLista"></div>
+                        </div>
+                    </aside>
+
                 </div>
 
             </section>
@@ -620,109 +640,126 @@
 
             function estiloTipo(tipo) {
                 switch ((tipo || '').toLowerCase()) {
-
                     case 'clase':
                         return {
-                            bg: '#e9f1ed',
-                            text: '#176b5b',
+                            color: '#176b5b',
+                            fondo: '#e9f1ed',
                             label: 'Clase'
                         };
 
                     case 'evento':
                         return {
-                            bg: '#f5f0df',
-                            text: '#94782e',
+                            color: '#94782e',
+                            fondo: '#f5f0df',
                             label: 'Evento'
                         };
 
                     case 'webinar':
                         return {
-                            bg: '#f1f1f1',
-                            text: '#343434',
+                            color: '#343434',
+                            fondo: '#f1f1f1',
                             label: 'Webinar'
                         };
 
                     default:
                         return {
-                            bg: '#e9f1ed',
-                            text: '#176b5b',
+                            color: '#176b5b',
+                            fondo: '#e9f1ed',
                             label: 'Clase'
                         };
                 }
             }
 
-            function iconoTipo(tipo) {
+            let fechaSeleccionada = new Date();
 
-                switch ((tipo || '').toLowerCase()) {
+            function claveFecha(fecha) {
+                const anio = fecha.getFullYear();
+                const mes = String(fecha.getMonth() + 1).padStart(2, '0');
+                const dia = String(fecha.getDate()).padStart(2, '0');
 
-                    case 'clase':
-
-                        return `
-                        <svg class="calendar-event-icon"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                            stroke-width="2"
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
-                            aria-hidden="true">
-                            <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/>
-                            <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2Z"/>
-                        </svg>
-                    `;
-
-                    case 'evento':
-
-                        return `
-                        <svg class="calendar-event-icon"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                            stroke-width="2"
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
-                            aria-hidden="true">
-                            <rect x="3" y="4" width="18" height="18" rx="2"/>
-                            <line x1="16" y1="2" x2="16" y2="6"/>
-                            <line x1="8" y1="2" x2="8" y2="6"/>
-                            <line x1="3" y1="10" x2="21" y2="10"/>
-                        </svg>
-                    `;
-
-                    case 'webinar':
-
-                        return `
-                        <svg class="calendar-event-icon"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                            stroke-width="2"
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
-                            aria-hidden="true">
-                            <rect x="2" y="5" width="20" height="14" rx="2"/>
-                            <polygon points="10,9 16,12 10,15"/>
-                        </svg>
-                    `;
-
-                    default:
-
-                        return `
-                        <svg class="calendar-event-icon"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                            stroke-width="2"
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
-                            aria-hidden="true">
-                            <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/>
-                            <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2Z"/>
-                        </svg>
-                    `;
-                }
+                return `${anio}-${mes}-${dia}`;
             }
 
+            function formatearFechaAgenda(fecha, opciones) {
+                return fecha.toLocaleDateString('es-BO', opciones);
+            }
+
+            function actualizarAgenda(calendar, fecha) {
+                fechaSeleccionada = new Date(fecha);
+
+                const titulo = document.getElementById('agendaFechaTitulo');
+                const subtitulo = document.getElementById('agendaFechaSubtitulo');
+                const total = document.getElementById('agendaTotal');
+                const lista = document.getElementById('agendaLista');
+
+                titulo.textContent = formatearFechaAgenda(fecha, {
+                    day: 'numeric',
+                    month: 'long'
+                });
+
+                subtitulo.textContent = formatearFechaAgenda(fecha, {
+                    weekday: 'long',
+                    year: 'numeric'
+                });
+
+                const fechaClave = claveFecha(fecha);
+
+                const eventos = calendar.getEvents()
+                    .filter(evento => claveFecha(evento.start) === fechaClave)
+                    .sort((a, b) => a.start - b.start);
+
+                total.textContent =
+                    `${eventos.length} ${eventos.length === 1 ? 'sesión' : 'sesiones'}`;
+
+                lista.innerHTML = '';
+
+                if (eventos.length === 0) {
+                    const vacio = document.createElement('div');
+                    vacio.className = 'calendario-agenda-vacia';
+                    vacio.innerHTML = `
+            <strong>Día libre</strong>
+            <p>No hay sesiones programadas para esta fecha.</p>
+        `;
+
+                    lista.appendChild(vacio);
+                    return;
+                }
+
+                eventos.forEach(evento => {
+                    const props = evento.extendedProps || {};
+                    const estilo = estiloTipo(props.tipo);
+
+                    const tarjeta = document.createElement('div');
+                    tarjeta.className = 'calendario-agenda-evento';
+                    tarjeta.style.setProperty('--evento-color', estilo.color);
+
+                    const hora = document.createElement('span');
+                    hora.className = 'agenda-evento-hora';
+
+                    hora.textContent = formatearFechaAgenda(evento.start, {
+                        hour: '2-digit',
+                        minute: '2-digit'
+                    });
+
+                    if (evento.end) {
+                        hora.textContent += ' – ' + formatearFechaAgenda(evento.end, {
+                            hour: '2-digit',
+                            minute: '2-digit'
+                        });
+                    }
+
+                    const nombre = document.createElement('strong');
+                    nombre.textContent = evento.title;
+
+                    const descripcion = document.createElement('span');
+                    descripcion.className = 'agenda-evento-modulo';
+                    descripcion.textContent = props.descripcion || estilo.label;
+
+                    tarjeta.append(hora, nombre, descripcion);
+
+                    lista.appendChild(tarjeta);
+                });
+            }
 
             function formatearFecha(fechaInicio, fechaFin) {
 
@@ -788,9 +825,13 @@
 
                 locale: 'es',
 
-                height: 520,
+                height: 'auto',
 
-                dayMaxEventRows: 2,
+                contentHeight: 'auto',
+
+                expandRows: true,
+
+                dayMaxEvents: 3,
 
                 moreLinkClick: 'popover',
 
@@ -798,25 +839,14 @@
 
                 eventDisplay: 'block',
 
-
-                eventTimeFormat: {
-                    hour: '2-digit',
-                    minute: '2-digit',
-                    meridiem: false
-                },
-
-
                 headerToolbar: {
-                    left: 'prev,next today',
-                    center: 'title',
-                    right: 'dayGridMonth,listMonth'
+                    left: 'title',
+                    center: '',
+                    right: 'today prev,next'
                 },
-
 
                 buttonText: {
-                    today: 'Hoy',
-                    month: 'Mes',
-                    list: 'Agenda'
+                    today: 'Hoy'
                 },
 
                 events: '{{ route("calendario.eventos") }}',
@@ -828,90 +858,63 @@
                     info.el.title = info.event.title;
                 },
 
-
                 eventContent: function (info) {
-
                     const tipo = info.event.extendedProps?.tipo || 'clase';
                     const estilo = estiloTipo(tipo);
-                    const icono = iconoTipo(tipo);
+
+                    const hora = info.timeText
+                        ? `<b>${info.timeText}</b> `
+                        : '';
 
                     return {
                         html: `
-            <div class="calendar-event-content"
-                style="
-                    background: ${estilo.bg};
-                    color: ${estilo.text};
-                    border-left: 3px solid ${estilo.text};
-                ">
-                ${icono}
-                <span class="calendar-event-title">
-                    ${info.event.title}
-                </span>
-            </div>
-        `
+                <div class="calendar-event-content"
+                     style="
+                        --evento-color: ${estilo.color};
+                        --evento-fondo: ${estilo.fondo};
+                     ">
+                    <span class="calendar-event-title">
+                        ${hora}${info.event.title}
+                    </span>
+                </div>
+            `
                     };
                 },
 
+                dateClick: function (info) {
+                    actualizarAgenda(calendar, info.date);
+                },
+
+                eventsSet: function () {
+                    actualizarAgenda(calendar, fechaSeleccionada);
+                },
+
                 eventClick: function (info) {
+                    actualizarAgenda(calendar, info.event.start);
 
-                    const evento =
-                        info.event;
+                    const evento = info.event;
+                    const props = evento.extendedProps || {};
+                    const estilo = estiloTipo(props.tipo);
 
-                    const props =
-                        evento.extendedProps || {};
+                    detalleTitulo.textContent = evento.title;
+                    detalleTipo.textContent = estilo.label;
+                    detalleTipo.style.color = estilo.color;
 
-                    const estilo =
-                        estiloTipo(props.tipo);
-
-
-                    detalleTitulo.textContent =
-                        evento.title;
-
-
-                    detalleTipo.textContent =
-                        estilo.label;
-
-                    detalleTipo.style.color =
-                        estilo.bg;
-
-
-                    detalleFecha.textContent =
-                        formatearFecha(
-                            props.fecha_inicio,
-                            props.fecha_fin
-                        );
-
-
-                    if (props.descripcion) {
-
-                        detalleDescripcion.textContent =
-                            props.descripcion;
-
-                        detalleDescripcionContainer.classList.remove(
-                            'hidden'
-                        );
-
-                    } else {
-
-                        detalleDescripcion.textContent =
-                            'Sin descripción';
-
-                        detalleDescripcionContainer.classList.remove(
-                            'hidden'
-                        );
-                    }
-
-
-                    modalDetalle.classList.remove(
-                        'hidden'
+                    detalleFecha.textContent = formatearFecha(
+                        props.fecha_inicio,
+                        props.fecha_fin
                     );
+
+                    detalleDescripcion.textContent =
+                        props.descripcion || 'Sin descripción';
+
+                    detalleDescripcionContainer.classList.remove('hidden');
+                    modalDetalle.classList.remove('hidden');
                 }
 
             });
 
-
             calendar.render();
-
 
             const btnNuevoEvento =
                 document.getElementById(

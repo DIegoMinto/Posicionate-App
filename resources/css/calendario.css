@@ -189,3 +189,348 @@
         display: none;
     }
 }
+
+
+/* ==========================================
+   CALENDARIO POSICIONATE
+   ========================================== */
+
+.calendario-layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 375px;
+    align-items: start;
+    gap: 22px;
+    width: 100%;
+}
+
+.calendario-principal,
+.calendario-agenda {
+    min-width: 0;
+    border: 1px solid #e5eae7;
+    border-radius: 17px;
+    background: #fff;
+    box-shadow: 0 4px 18px rgb(7 46 44 / 3%);
+    overflow: hidden;
+}
+
+/* ==========================================
+   CABECERA DEL CALENDARIO
+   ========================================== */
+
+.calendario-principal .fc {
+    font-family: Poppins, sans-serif;
+    color: #34413f;
+}
+
+.calendario-principal .fc .fc-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 22px 22px 20px;
+    margin: 0;
+}
+
+.calendario-principal .fc .fc-toolbar-title {
+    color: #072e2c;
+    font-size: 1.35rem;
+    font-weight: 700;
+    text-transform: capitalize;
+}
+
+.calendario-principal .fc .fc-button {
+    min-height: 38px;
+    padding: 7px 13px;
+    border: 1px solid #e5eae7;
+    border-radius: 9px;
+    background: #fff;
+    color: #072e2c;
+    box-shadow: none;
+    font-family: inherit;
+    font-size: .78rem;
+    font-weight: 600;
+}
+
+.calendario-principal .fc .fc-button:hover {
+    background: #f5f8f5;
+    color: #072e2c;
+    border-color: #d5ded8;
+}
+
+.calendario-principal .fc .fc-button:focus {
+    box-shadow: none;
+}
+
+.calendario-principal .fc .fc-button-primary:not(:disabled).fc-button-active {
+    background: #072e2c;
+    border-color: #072e2c;
+    color: white;
+}
+
+/* ==========================================
+   DÍAS DE LA SEMANA
+   ========================================== */
+
+.calendario-principal .fc .fc-col-header-cell {
+    padding: 11px 4px;
+    background: #fafbf9;
+    border-color: #e5eae7;
+}
+
+.calendario-principal .fc .fc-col-header-cell-cushion {
+    color: #697670;
+    font-size: .72rem;
+    font-weight: 600;
+    text-decoration: none;
+}
+
+/* ==========================================
+   CUADRÍCULA
+   ========================================== */
+
+.calendario-principal .fc-theme-standard td,
+.calendario-principal .fc-theme-standard th {
+    border-color: #e5eae7;
+}
+
+.calendario-principal .fc .fc-daygrid-day {
+    background: #fff;
+    transition: background .15s;
+}
+
+.calendario-principal .fc .fc-daygrid-day:hover {
+    background: #f5f8f5;
+}
+
+.calendario-principal .fc .fc-daygrid-day-frame {
+    min-height: 119px;
+    padding: 7px 5px;
+}
+
+.calendario-principal .fc .fc-daygrid-day-number {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 27px;
+    min-height: 27px;
+    margin: 2px 0 5px 2px;
+    padding: 0 5px;
+    border-radius: 9px;
+    color: #4b5852;
+    font-size: .78rem;
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.calendario-principal .fc .fc-day-other {
+    background: #fafbf9;
+}
+
+.calendario-principal .fc .fc-day-other .fc-daygrid-day-number {
+    color: #b7c0bb;
+}
+
+.calendario-principal .fc .fc-day-today {
+    background: #fff;
+}
+
+.calendario-principal .fc .fc-day-today .fc-daygrid-day-number {
+    background: #ccb463;
+    color: #263a31;
+}
+
+/* ==========================================
+   EVENTOS SIN ICONOS
+   ========================================== */
+
+.calendario-principal .fc-daygrid-event {
+    margin: 3px 3px;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    cursor: pointer;
+}
+
+.calendar-event-content {
+    display: block;
+    width: 100%;
+    min-width: 0;
+    overflow: hidden;
+    padding: 5px 6px;
+    border-left: 3px solid var(--evento-color);
+    border-radius: 4px;
+    background: var(--evento-fondo);
+    color: var(--evento-color);
+    box-sizing: border-box;
+}
+
+.calendar-event-title {
+    display: block;
+    overflow: hidden;
+    color: var(--evento-color);
+    font-size: .65rem;
+    font-weight: 600;
+    line-height: 1.35;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.calendar-event-title b {
+    font-weight: 700;
+}
+
+.calendario-principal .fc .fc-daygrid-more-link {
+    padding-left: 4px;
+    color: #65726c;
+    font-size: .65rem;
+    font-weight: 600;
+    text-decoration: none;
+}
+
+/* ==========================================
+   AGENDA DEL DÍA
+   ========================================== */
+
+.calendario-agenda-header {
+    padding: 22px 20px 19px;
+    border-bottom: 1px solid #e5eae7;
+    background: linear-gradient(145deg, #f7f9f5, #fff);
+}
+
+.calendario-agenda-header > span {
+    color: #8a7840;
+    font-size: .65rem;
+    font-weight: 700;
+    letter-spacing: .12em;
+}
+
+.calendario-agenda-header h3 {
+    margin: 8px 0 4px;
+    color: #072e2c;
+    font-size: 1.4rem;
+    font-weight: 700;
+    text-transform: capitalize;
+}
+
+.calendario-agenda-header p {
+    margin: 0;
+    color: #7b8680;
+    font-size: .78rem;
+    text-transform: capitalize;
+}
+
+.calendario-agenda-contenido {
+    display: grid;
+    gap: 12px;
+    padding: 16px;
+}
+
+.calendario-total-dia {
+    color: #78837e;
+    font-size: .74rem;
+}
+
+#agendaLista {
+    display: grid;
+    gap: 12px;
+}
+
+.calendario-agenda-evento {
+    display: grid;
+    gap: 7px;
+    padding: 14px;
+    border: 1px solid #e5eae7;
+    border-left: 4px solid var(--evento-color);
+    border-radius: 10px;
+    background: #fff;
+    text-align: left;
+    transition: background .2s, box-shadow .2s;
+}
+
+.calendario-agenda-evento:hover {
+    background: #fafbf9;
+    box-shadow: 0 3px 12px rgb(7 46 44 / 7%);
+}
+
+.agenda-evento-hora {
+    color: var(--evento-color);
+    font-size: .72rem;
+    font-weight: 700;
+}
+
+.calendario-agenda-evento > strong {
+    color: #072e2c;
+    font-size: .84rem;
+    line-height: 1.5;
+}
+
+.agenda-evento-modulo {
+    color: #596660;
+    font-size: .78rem;
+    line-height: 1.5;
+}
+
+.calendario-agenda-vacia {
+    padding: 24px 12px;
+    text-align: center;
+}
+
+.calendario-agenda-vacia strong {
+    display: block;
+    color: #072e2c;
+    font-size: .9rem;
+}
+
+.calendario-agenda-vacia p {
+    color: #7b8680;
+    font-size: .76rem;
+}
+
+/* ==========================================
+   RESPONSIVE
+   ========================================== */
+
+@media (max-width: 1050px) {
+    .calendario-layout {
+        grid-template-columns: minmax(0, 1fr) 310px;
+        gap: 14px;
+    }
+}
+
+@media (max-width: 800px) {
+    .calendario-layout {
+        grid-template-columns: 1fr;
+    }
+
+    .calendario-agenda {
+        width: 100%;
+    }
+
+    .calendario-principal .fc .fc-daygrid-day-frame {
+        min-height: 95px;
+    }
+}
+
+@media (max-width: 520px) {
+    .calendario-principal .fc .fc-toolbar {
+        flex-wrap: wrap;
+        padding: 15px 12px;
+    }
+
+    .calendario-principal .fc .fc-toolbar-title {
+        font-size: 1.05rem;
+    }
+
+    .calendario-principal .fc .fc-daygrid-day-frame {
+        min-height: 76px;
+        padding: 4px 2px;
+    }
+
+    .calendar-event-content {
+        padding: 4px;
+    }
+
+    .calendar-event-title {
+        font-size: .56rem;
+    }
+}
