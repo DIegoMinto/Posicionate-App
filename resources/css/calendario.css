@@ -1,0 +1,191 @@
+
+/* CONTENEDOR */
+.calendario-contenedor {
+    width: 100%;
+    max-width: 1250px;
+    margin: 0 auto;
+    padding: 20px;
+    background: #fff;
+    border: 1px solid #e5eae7;
+    border-radius: 15px;
+    box-shadow: 0 4px 18px rgb(7 46 44 / 3%);
+    font-family: Poppins, sans-serif;
+}
+
+/* CALENDARIO */
+.calendario-contenedor .fc {
+    font-family: Poppins, sans-serif;
+    color: var(--color-texto, #34413f);
+}
+
+/* BARRA SUPERIOR */
+.calendario-contenedor .fc .fc-toolbar {
+    padding: 8px 5px 20px;
+    margin-bottom: 0;
+    gap: 12px;
+}
+
+.calendario-contenedor .fc .fc-toolbar-title {
+    color: var(--color-verde, #072e2c);
+    font-size: 1.3rem;
+    font-weight: 700;
+    text-transform: capitalize;
+}
+
+/* BOTONES */
+.calendario-contenedor .fc .fc-button {
+    background: #fff !important;
+    border: 1px solid #e5eae7 !important;
+    color: var(--color-verde, #072e2c) !important;
+    border-radius: 9px !important;
+    box-shadow: none !important;
+    font-family: inherit;
+    font-size: .78rem;
+    font-weight: 600;
+    padding: 8px 13px;
+}
+
+.calendario-contenedor .fc .fc-button:hover,
+.calendario-contenedor .fc .fc-button:focus {
+    background: #f0f5f0 !important;
+}
+
+.calendario-contenedor .fc .fc-button-primary:not(:disabled).fc-button-active {
+    background: var(--color-verde, #072e2c) !important;
+    border-color: var(--color-verde, #072e2c) !important;
+    color: #fff !important;
+}
+
+/* CABECERA DE LOS DÍAS */
+.calendario-contenedor .fc .fc-col-header-cell {
+    background: #fafbf9;
+    border-color: #e5eae7;
+}
+
+.calendario-contenedor .fc .fc-col-header-cell-cushion {
+    padding: 12px 4px;
+    color: #697670;
+    font-size: .72rem;
+    font-weight: 600;
+    text-decoration: none;
+}
+
+/* CUADRÍCULA */
+.calendario-contenedor .fc .fc-daygrid-day {
+    border-color: #e5eae7;
+    background: #fff;
+}
+
+.calendario-contenedor .fc .fc-daygrid-day-frame {
+    min-height: 119px;
+}
+
+.calendario-contenedor .fc .fc-daygrid-day-number {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 27px;
+    min-height: 27px;
+    margin: 5px;
+    padding: 0 5px;
+    border-radius: 9px;
+    color: #4b5852;
+    font-size: .78rem;
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.calendario-contenedor .fc .fc-day-today {
+    background: #fff !important;
+}
+
+.calendario-contenedor .fc .fc-day-today .fc-daygrid-day-number {
+    background: var(--color-dorado, #ccb463);
+    color: #263a31;
+}
+
+.calendario-contenedor .fc .fc-day-other {
+    background: #fafbf9;
+}
+
+.calendario-contenedor .fc .fc-day-other .fc-daygrid-day-number {
+    color: #b7c0bb;
+}
+
+/* EVENTOS */
+.calendario-contenedor .fc .fc-daygrid-event {
+    border: 0 !important;
+    background: transparent !important;
+    padding: 0;
+    margin: 3px 4px;
+    cursor: pointer;
+}
+
+.calendario-contenedor .calendar-event-content {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    width: 100%;
+    min-width: 0;
+    overflow: hidden;
+    padding: 5px 6px;
+    border-radius: 4px;
+    font-size: .65rem;
+    font-weight: 600;
+    box-sizing: border-box;
+}
+
+.calendario-contenedor .calendar-event-icon {
+    width: 13px;
+    height: 13px;
+    flex-shrink: 0;
+}
+
+.calendario-contenedor .calendar-event-title {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* MÁS EVENTOS */
+.calendario-contenedor .fc .fc-daygrid-more-link {
+    color: var(--color-verde, #072e2c);
+    font-size: .68rem;
+    font-weight: 600;
+    text-decoration: none;
+}
+
+/* RESPONSIVE */
+@media (max-width: 650px) {
+    .calendario-contenedor {
+        padding: 10px;
+        border-radius: 10px;
+    }
+
+    .calendario-contenedor .fc .fc-toolbar {
+        flex-wrap: wrap;
+        padding-bottom: 15px;
+    }
+
+    .calendario-contenedor .fc .fc-toolbar-title {
+        font-size: 1rem;
+    }
+
+    .calendario-contenedor .fc .fc-daygrid-day-frame {
+        min-height: 85px;
+    }
+
+    .calendario-contenedor .fc .fc-daygrid-day-number {
+        font-size: .68rem;
+    }
+
+    .calendario-contenedor .calendar-event-content {
+        padding: 4px;
+        font-size: .57rem;
+    }
+
+    .calendario-contenedor .calendar-event-icon {
+        display: none;
+    }
+}

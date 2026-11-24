@@ -11,6 +11,7 @@
 
     <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@fullcalendar/core/locales/es.global.min.js"></script>
+    <link rel="stylesheet" href="{{ asset('css/calendario.css') }}">
 </head>
 
 <body class="bg-gray-50 text-gray-800 antialiased">
@@ -274,7 +275,8 @@
 
                 </div>
 
-                <div id="calendar" class="fc-posicionate max-w-5xl mx-auto">
+                <div class="calendario-contenedor">
+                    <div id="calendar"></div>
                 </div>
 
             </section>
@@ -617,39 +619,37 @@
 
 
             function estiloTipo(tipo) {
-
                 switch ((tipo || '').toLowerCase()) {
 
                     case 'clase':
                         return {
-                            bg: '#072E2C',
-                            text: '#FFFFFF',
+                            bg: '#e9f1ed',
+                            text: '#176b5b',
                             label: 'Clase'
                         };
 
                     case 'evento':
                         return {
-                            bg: '#9B843F',
-                            text: '#FFFFFF',
+                            bg: '#f5f0df',
+                            text: '#94782e',
                             label: 'Evento'
                         };
 
                     case 'webinar':
                         return {
-                            bg: '#343434',
-                            text: '#FFFFFF',
+                            bg: '#f1f1f1',
+                            text: '#343434',
                             label: 'Webinar'
                         };
 
                     default:
                         return {
-                            bg: '#072E2C',
-                            text: '#FFFFFF',
+                            bg: '#e9f1ed',
+                            text: '#176b5b',
                             label: 'Clase'
                         };
                 }
             }
-
 
             function iconoTipo(tipo) {
 
@@ -819,93 +819,38 @@
                     list: 'Agenda'
                 },
 
-
                 events: '{{ route("calendario.eventos") }}',
 
-
                 eventDidMount: function (info) {
+                    const tipo = info.event.extendedProps?.tipo || 'clase';
 
-                    const tipo =
-                        info.event.extendedProps?.tipo || 'clase';
-
-                    const estilo =
-                        estiloTipo(tipo);
-
-
-                    info.el.style.setProperty(
-                        'background-color',
-                        estilo.bg,
-                        'important'
-                    );
-
-                    info.el.style.setProperty(
-                        'border-color',
-                        estilo.bg,
-                        'important'
-                    );
-
-                    info.el.style.setProperty(
-                        'color',
-                        estilo.text,
-                        'important'
-                    );
-
-
-                    info.el.setAttribute(
-                        'data-event-type',
-                        tipo
-                    );
-
-
-                    info.el.title =
-                        info.event.title;
+                    info.el.setAttribute('data-event-type', tipo);
+                    info.el.title = info.event.title;
                 },
 
 
                 eventContent: function (info) {
 
-                    const tipo =
-                        info.event.extendedProps?.tipo || 'clase';
-
-                    const estilo =
-                        estiloTipo(tipo);
-
-                    const icono =
-                        iconoTipo(tipo);
-
+                    const tipo = info.event.extendedProps?.tipo || 'clase';
+                    const estilo = estiloTipo(tipo);
+                    const icono = iconoTipo(tipo);
 
                     return {
                         html: `
-                        <div
-                            class="calendar-event-content"
-                            style="
-                                color: ${estilo.text};
-                                display: flex;
-                                align-items: center;
-                                gap: 6px;
-                                width: 100%;
-                                overflow: hidden;
-                            "
-                        >
-                            ${icono}
-
-                            <span
-                                class="calendar-event-title"
-                                style="
-                                    color: ${estilo.text};
-                                    overflow: hidden;
-                                    text-overflow: ellipsis;
-                                    white-space: nowrap;
-                                    min-width: 0;
-                                "
-                            >
-                                ${info.event.title}
-                            </span>
-                        </div>
-                    `
+            <div class="calendar-event-content"
+                style="
+                    background: ${estilo.bg};
+                    color: ${estilo.text};
+                    border-left: 3px solid ${estilo.text};
+                ">
+                ${icono}
+                <span class="calendar-event-title">
+                    ${info.event.title}
+                </span>
+            </div>
+        `
                     };
                 },
-
 
                 eventClick: function (info) {
 
