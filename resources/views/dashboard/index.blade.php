@@ -702,19 +702,23 @@
 
                 eventos.forEach(evento => {
                     const props = evento.extendedProps || {};
-                    const estilo = estiloTipo(props.tipo);
+                    const estilo = estiloEvento(evento);
 
                     const tarjeta = document.createElement('div');
                     tarjeta.className = 'calendario-agenda-evento';
+
                     tarjeta.style.setProperty('--evento-color', estilo.color);
+                    tarjeta.style.setProperty('--evento-fondo', estilo.fondo);
 
                     const hora = document.createElement('span');
                     hora.className = 'agenda-evento-hora';
 
-                    hora.textContent = formatearFechaAgenda(evento.start, {
-                        hour: '2-digit',
-                        minute: '2-digit'
-                    });
+                    if (evento.end) {
+                        hora.textContent += ' – ' + evento.end.toLocaleTimeString('es-BO', {
+                            hour: '2-digit',
+                            minute: '2-digit'
+                        });
+                    }
 
                     if (evento.end) {
                         hora.textContent += ' – ' + formatearFechaAgenda(evento.end, {
@@ -728,7 +732,9 @@
 
                     const descripcion = document.createElement('span');
                     descripcion.className = 'agenda-evento-modulo';
-                    descripcion.textContent = props.descripcion || estilo.label;
+
+                    descripcion.textContent =
+                        props.descripcion || props.tipo || 'Actividad';
 
                     tarjeta.append(hora, nombre, descripcion);
 
@@ -873,7 +879,7 @@
                     const estilo = estiloEvento(evento);
 
                     detalleTitulo.textContent = evento.title;
-                    detalleTipo.textContent = estilo.label;
+                    detalleTipo.textContent = props.tipo || 'Evento';
                     detalleTipo.style.color = estilo.color;
 
                     detalleFecha.textContent = formatearFecha(
