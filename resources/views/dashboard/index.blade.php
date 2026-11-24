@@ -833,9 +833,9 @@
                     info.el.title = info.event.title;
                 },
 
+
                 eventContent: function (info) {
-                    const tipo = info.event.extendedProps?.tipo || 'clase';
-                    const estilo = estiloTipo(tipo);
+                    const estilo = estiloEvento(info.event);
 
                     const hora = info.timeText
                         ? `<b>${info.timeText}</b> `
@@ -843,18 +843,19 @@
 
                     return {
                         html: `
-                <div class="calendar-event-content"
-                     style="
-                        --evento-color: ${estilo.color};
-                        --evento-fondo: ${estilo.fondo};
-                     ">
-                    <span class="calendar-event-title">
-                        ${hora}${info.event.title}
-                    </span>
-                </div>
-            `
+            <div class="calendar-event-content"
+                 style="
+                    --evento-color: ${estilo.color};
+                    --evento-fondo: ${estilo.fondo};
+                 ">
+                <span class="calendar-event-title">
+                    ${hora}${info.event.title}
+                </span>
+            </div>
+        `
                     };
                 },
+
 
                 dateClick: function (info) {
                     actualizarAgenda(calendar, info.date);
@@ -869,7 +870,7 @@
 
                     const evento = info.event;
                     const props = evento.extendedProps || {};
-                    const estilo = estiloTipo(props.tipo);
+                    const estilo = estiloEvento(evento);
 
                     detalleTitulo.textContent = evento.title;
                     detalleTipo.textContent = estilo.label;
